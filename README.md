@@ -13,9 +13,8 @@
 ## Branch
 - `main` : 배포 시 사용
 - `develop` : 개발 시 기본 브랜치
-- `feature/이슈번호` : 기능 개발
-  - ex) feature/2
-  - 이름과 기능도 이슈번호 외 추가...?
+- `이름_유형/이슈번호` : 기능 개발
+  - ex) ajeong_feat/#1
 
 ## Issues
 - `[Type] 기능 설명`
