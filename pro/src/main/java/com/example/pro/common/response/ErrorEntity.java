@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -18,5 +19,6 @@ public class ErrorEntity {
     public ErrorEntity(String errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
+        this.errors = new HashMap<>();
     }
 }
