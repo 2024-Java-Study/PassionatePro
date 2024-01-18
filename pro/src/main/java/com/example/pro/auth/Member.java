@@ -19,11 +19,11 @@ public class Member {
     @Id @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+    @NotNull
     private String username;
-    @NotBlank
+    @NotNull
     private String password;
-    @Email
+    @NotNull
     private String email;
 
     @Builder
