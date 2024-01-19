@@ -1,11 +1,12 @@
 package com.example.pro.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -32,5 +33,19 @@ public class Board {
     private List<Comment> comment = new ArrayList<>();
 
     private String content;
-    private Date created_at; // LocalDateTime
+    private LocalDateTime created_at; // Date
+
+    /**
+     * 생성 메서드
+     */
+    // 유저 추가
+    @Builder
+//    public Board (Long userId, String title, String content) {
+    public Board (String title, String content) {
+        // 사진?
+//        this.user = user.getUserId(); ??
+        this.title = title;
+        this.content = content;
+        this.created_at = LocalDateTime.now();
+    }
 }

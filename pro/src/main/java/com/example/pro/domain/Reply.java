@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -24,5 +25,17 @@ public class Reply {
     private Comment comment;
 
     private String content;
-    private Date created_at;
+    private LocalDateTime created_at;
+
+    /**
+     * 생성 메서드
+     */
+//    public Reply(User user, Board board, String content) {
+    public Reply(Comment comment, String content) {
+//        this.user = user;
+        // board?
+        this.comment = comment;
+        this.content = content;
+        this.created_at = LocalDateTime.now();
+    }
 }
