@@ -20,7 +20,7 @@ public class Comment {
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")
-//    private User user;
+//    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
@@ -36,9 +36,9 @@ public class Comment {
      * 생성 메서드
      */
     @Builder
-//    public Comment(User user, Board board, String content) {
+//    public Comment(Member member, Board board, String content) {
     public Comment(Board board, String content) {
-//        this.user = user;
+//        this.member = member;
         this.board = board;
         this.content = content;
         this.created_at = LocalDateTime.now();

@@ -18,10 +18,10 @@ public class Board {
     @Column(name = "board_id")
     private Long id;
 
-    // user
+    // Member
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")
-//    private User user;
+//    private Member member;
 
     @OneToMany(mappedBy = "board")
     private List<BoardImage> image = new ArrayList<>();
@@ -40,7 +40,7 @@ public class Board {
      */
     // 유저 추가
     @Builder
-//    public Board (Long userId, String title, String content) {
+//    public Board (Member member, String title, String content) {
     public Board (String title, String content) {
         // 사진?
 //        this.user = user.getUserId(); ??

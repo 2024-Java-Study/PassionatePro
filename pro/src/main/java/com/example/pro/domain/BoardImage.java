@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "board_image") // ???
+@Table(name = "board_image")
 @Getter
 @NoArgsConstructor
 public class BoardImage {
@@ -21,7 +21,7 @@ public class BoardImage {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @Column(unique = true) // ?
+    @Column(unique = true)
     private String board_image_url;
 
     /**

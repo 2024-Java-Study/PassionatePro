@@ -18,7 +18,7 @@ public class Reply {
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")
-//    private User user;
+//    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
@@ -30,9 +30,9 @@ public class Reply {
     /**
      * 생성 메서드
      */
-//    public Reply(User user, Board board, String content) {
+//    public Reply(Member member, Board board, String content) {
     public Reply(Comment comment, String content) {
-//        this.user = user;
+//        this.member = member;
         // board?
         this.comment = comment;
         this.content = content;
