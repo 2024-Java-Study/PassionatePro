@@ -32,6 +32,7 @@ public class Board {
     @OneToMany(mappedBy = "board")
     private List<Comment> comment = new ArrayList<>();
 
+    @Column(nullable = false)
     private String content;
     private LocalDateTime created_at; // Date
 

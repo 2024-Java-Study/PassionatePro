@@ -19,6 +19,7 @@ public class BoardImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
+    @Column(nullable = false)
     private Board board;
 
     @Column(unique = true)

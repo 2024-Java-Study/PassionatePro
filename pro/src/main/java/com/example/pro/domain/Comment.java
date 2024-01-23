@@ -24,11 +24,13 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
+    @Column(nullable = false)
     private Board board;
 
     @OneToMany(mappedBy = "comment")
     private List<Reply> reply = new ArrayList<>();
 
+    @Column(nullable = false)
     private String content;
     private LocalDateTime created_at;
 

@@ -22,6 +22,7 @@ public class Reply {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
+    @Column(nullable = false)
     private Comment comment;
 
     private String content;
