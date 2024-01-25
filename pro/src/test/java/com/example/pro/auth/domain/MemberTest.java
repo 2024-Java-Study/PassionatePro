@@ -1,6 +1,5 @@
-package com.example.pro.auth;
+package com.example.pro.auth.domain;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.common.exception.ValidationException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
