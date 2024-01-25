@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class SessionAuthenticationProvider implements AuthProvider {
     private final UserSessionRepository sessionRepository;
     private final MemberRepository memberRepository;
+    private final Clock clock;
 
     public Authentication getAuthentication(String sessionId) {
         Optional<UserSession> optionalSession = sessionRepository.findById(sessionId);
@@ -28,9 +30,9 @@ public class SessionAuthenticationProvider implements AuthProvider {
 
         Optional<Member> optionalMember = memberRepository.findByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, "");
-        if (optionalSession.isPresent() && optionalMember.isPresent() && optionalSession.get().isValidate()) {
+        if (optionalSession.isPresent() && optionalMember.isPresent() && optionalSession.get().isValidate(clock)) {
             Member member = optionalMember.get();
-            sessionRepository.saveAndFlush(optionalSession.get().update());
+            sessionRepository.saveAndFlush(optionalSession.get().update(clock));
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(member.getRole().getName()));
             authentication = new UsernamePasswordAuthenticationToken(username, member.getPassword(), authorities);
         }

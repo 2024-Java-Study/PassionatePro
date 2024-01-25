@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class AuthService {
     private final UserSessionRepository sessionRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final Clock clock;
 
     @Transactional
     public void signUp(SignUpRequest request) {
@@ -42,7 +45,7 @@ public class AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(form.getUsername(), form.getPassword())
         );
-        sessionRepository.save(UserSession.create(sessionId, form.getUsername()));
+        sessionRepository.save(UserSession.create(sessionId, form.getUsername(), clock));
         return form.getUsername();
     }
 
