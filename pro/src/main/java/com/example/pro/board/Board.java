@@ -1,5 +1,7 @@
-package com.example.pro.domain;
+package com.example.pro.board;
 
+import com.example.pro.domain.BoardImage;
+import com.example.pro.domain.Comment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

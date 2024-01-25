@@ -22,8 +22,7 @@ public class Reply {
 //    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
     private String content;

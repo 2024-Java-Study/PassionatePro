@@ -1,5 +1,6 @@
 package com.example.pro.domain;
 
+import com.example.pro.board.Board;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,8 +25,7 @@ public class Comment {
 //    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
     @OneToMany(mappedBy = "comment")
