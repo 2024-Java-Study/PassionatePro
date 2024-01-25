@@ -1,4 +1,4 @@
-package com.example.pro.auth;
+package com.example.pro.auth.controller;
 
 
 import com.example.pro.auth.dto.LoginRequest;
@@ -35,7 +35,7 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public BasicResponse<String> requestMe(HttpServletRequest request) {
+    public BasicResponse<String> requestMe() {
         String username = authService.loadUser();
         return ResponseUtil.success("인증된 사용자: " + username);
     }

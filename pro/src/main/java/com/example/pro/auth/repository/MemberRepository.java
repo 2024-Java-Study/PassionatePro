@@ -1,4 +1,4 @@
-package com.example.pro.auth;
+package com.example.pro.auth.repository;
 
 import com.example.pro.auth.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

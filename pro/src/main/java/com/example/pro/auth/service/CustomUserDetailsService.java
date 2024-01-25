@@ -1,5 +1,6 @@
-package com.example.pro.auth;
+package com.example.pro.auth.service;
 
+import com.example.pro.auth.repository.MemberRepository;
 import com.example.pro.auth.domain.CustomUserDetails;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.exception.AuthErrorCode;
@@ -20,7 +21,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("load {}", username);
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new AuthException(AuthErrorCode.MEMBER_NOT_FOUND));
         return CustomUserDetails.create(member);

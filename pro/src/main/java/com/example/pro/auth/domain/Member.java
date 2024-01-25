@@ -1,11 +1,14 @@
-package com.example.pro.auth;
+package com.example.pro.auth.domain;
 
+import com.example.pro.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 import static com.example.pro.common.exception.Validator.validEmail;
 import static com.example.pro.common.exception.Validator.validString;
@@ -14,9 +17,9 @@ import static com.example.pro.common.exception.Validator.validString;
 @Getter
 @Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity {
 
-    @Id @NotNull
+    @Id @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
@@ -27,6 +30,7 @@ public class Member {
     private String email;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Builder

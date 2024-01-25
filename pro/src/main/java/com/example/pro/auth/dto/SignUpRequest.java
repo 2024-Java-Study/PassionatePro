@@ -1,5 +1,6 @@
-package com.example.pro.auth.domain;
+package com.example.pro.auth.dto;
 
+import com.example.pro.auth.domain.Member;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;

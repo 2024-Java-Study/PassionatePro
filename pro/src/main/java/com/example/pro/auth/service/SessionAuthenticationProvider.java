@@ -1,5 +1,6 @@
 package com.example.pro.auth.service;
 
+import com.example.pro.auth.AuthProvider;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.domain.UserSession;
 import com.example.pro.auth.repository.MemberRepository;
@@ -15,11 +16,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class SessionProvider {
+public class SessionAuthenticationProvider implements AuthProvider {
     private final UserSessionRepository sessionRepository;
     private final MemberRepository memberRepository;
 
-    public Authentication checkSession(String sessionId) {
+    public Authentication getAuthentication(String sessionId) {
         Optional<UserSession> optionalSession = sessionRepository.findById(sessionId);
         String username = sessionId;
         if (optionalSession.isPresent())
@@ -29,11 +30,9 @@ public class SessionProvider {
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, "");
         if (optionalSession.isPresent() && optionalMember.isPresent() && optionalSession.get().isValidate()) {
             Member member = optionalMember.get();
-            optionalSession.get().update();
-            sessionRepository.saveAndFlush(optionalSession.get());
-            List<GrantedAuthority> roles = new ArrayList<>();
-            roles.add(new SimpleGrantedAuthority(member.getRole().getName()));
-            authentication = new UsernamePasswordAuthenticationToken(username, member.getPassword(), roles);
+            sessionRepository.saveAndFlush(optionalSession.get().update());
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(member.getRole().getName()));
+            authentication = new UsernamePasswordAuthenticationToken(username, member.getPassword(), authorities);
         }
         return authentication;
     }

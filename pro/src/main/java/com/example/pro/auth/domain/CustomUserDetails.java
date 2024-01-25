@@ -1,4 +1,4 @@
-package com.example.pro.auth;
+package com.example.pro.auth.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -6,15 +6,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
 @Getter
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, Serializable {
 
     private final String username;
-    private final Member member;
+    private final String password;
     private final Collection<GrantedAuthority> authorities;
 
     @Override
@@ -24,7 +25,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return password;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class CustomUserDetails implements UserDetails {
     public static CustomUserDetails create(Member member) {
         return new CustomUserDetails(
                 member.getUsername(),
-                member,
+                member.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getKey()))
         );
     }
