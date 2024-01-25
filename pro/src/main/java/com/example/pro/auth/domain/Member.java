@@ -26,10 +26,14 @@ public class Member {
     @NotNull
     private String email;
 
+    @NotNull
+    private Role role;
+
     @Builder
     public Member(String username, String password, String email) {
         this.username = validString(username);
         this.password = validString(password);
         this.email = validEmail(email);
+        this.role = Role.USER;
     }
 }
