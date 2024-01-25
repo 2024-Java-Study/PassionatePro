@@ -5,47 +5,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 db 이용
-class BoardRepositoryCreateTest {
+public class BoardRepositorySearchTest {
 
     @Autowired BoardRepository boardRepository;
-
     public static Board board;
 
     @BeforeEach
     public void setUp() {
         board = new Board("제목", "내용");
     }
-
-    @Test
-    @DisplayName("게시글 생성")
-    public void CreateBoard() throws Exception {
-        // given
-        // static board
-
-        // when
-        Board createdBoard = boardRepository.save(board);
-
-        // then
-        assertThat(board).isEqualTo(createdBoard);
-    }
     
     @Test
-    @DisplayName("Board 생성 시 null 값이 없어야 한다")
-    public void validateCreateBoard() throws Exception {
+    @DisplayName("게시판 전체 조회")
+    public void findAll() throws Exception {
         // given
         // static board
+        Board board1 = new Board("제목", "내용");
 
         // when
-        Board createdBoard = boardRepository.save(board);
+        boardRepository.save(board);
+        boardRepository.save(board1);
+        List<Board> boardList = boardRepository.findAll();
 
         // then
-//        assertThat(createdBoard.getMember()).isNotNull();
-        assertThat(createdBoard.getTitle()).isNotNull();
-        assertThat(createdBoard.getContent()).isNotNull();
+        assertThat(boardList).isNotNull();
+        assertThat(boardList.size()).isEqualTo(2);
     }
 }
