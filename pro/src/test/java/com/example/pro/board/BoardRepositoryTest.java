@@ -35,6 +35,11 @@ class BoardRepositoryTest {
 
         // then
         assertThat(board).isEqualTo(createdBoard);
+        assertThat(board.getId()).isEqualTo(createdBoard.getId());
+        assertThat(board.getTitle()).isEqualTo(createdBoard.getTitle());
+        assertThat(board.getContent()).isEqualTo(createdBoard.getContent());
+        assertThat(board.getCreated_at()).isEqualTo(createdBoard.getCreated_at());
+
     }
     
     @Test
@@ -48,6 +53,7 @@ class BoardRepositoryTest {
 
         // then
 //        assertThat(createdBoard.getMember()).isNotNull();
+        assertThat(createdBoard.getId()).isNotNull();
         assertThat(createdBoard.getTitle()).isNotNull();
         assertThat(createdBoard.getContent()).isNotNull();
     }
@@ -65,7 +71,6 @@ class BoardRepositoryTest {
         List<Board> boardList = boardRepository.findAll();
 
         // then
-        assertThat(boardList).isNotNull();
         assertThat(boardList.size()).isEqualTo(2);
     }
 
