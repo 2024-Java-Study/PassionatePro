@@ -20,6 +20,7 @@ public abstract class ControllerTest {
     void setUp(RestDocumentationContextProvider provider) {
         this.mockMvc = MockMvcBuilders.standaloneSetup(injectController())
                 .apply(documentationConfiguration(provider))
+
                 .build();
     }
 
