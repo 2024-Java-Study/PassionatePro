@@ -28,4 +28,15 @@ public class BoardService {
     public List<Board> findAllBoards() {
         return boardRepository.findAll();
     }
+
+    public List<Board> searchTitle(String title) {
+        return boardRepository.findByTitle(title);
+    }
+
+    public BoardDto updateBoard(Long boardId) {
+        Optional<Board> board = boardRepository.findById(boardId);
+        Optional<Board> boardDto = board;
+
+        return null;
+    }
 }

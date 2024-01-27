@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
@@ -22,22 +19,18 @@ public class BoardServiceSearchTest {
 
     @Mock BoardRepository boardRepository; // 의존성 주입
     @InjectMocks BoardService boardService;
-//    public static Board board;
+    public static Board board;
 
-//    @BeforeEach
-//    public void setUp() {
-//        board = new Board("제목", "내용");
-//        Long id = 1L;
-//
-//        // boardRepository 동작 명시
-//        when(boardRepository.findById(id)).thenReturn(null);
-//    }
+    @BeforeEach
+    public void setUp() {
+        board = new Board("제목", "내용");
+    }
 
     @Test
     @DisplayName("게시글 생성")
     public void createBoard() throws Exception {
         // given
-        Board board = new Board("제목", "내용");
+        // static board
 
         // when
         when(boardRepository.save(board)).thenReturn(board);
@@ -50,7 +43,7 @@ public class BoardServiceSearchTest {
     @DisplayName("게시글 전체 조회")
     public void findAll() throws Exception {
         // given
-        Board board = new Board("제목", "내용");
+        // static board
         List<Board> boardList = new ArrayList<>();
         boardList.add(board);
 
@@ -66,12 +59,12 @@ public class BoardServiceSearchTest {
     @DisplayName("게시글 단건 조회")
     public void findById() throws Exception {
         // given
-        Board board = new Board("제목", "내용");
+        // static board
         Long boardId = 1L;
         
         // when
-        when(boardRepository.findById(1L)).thenReturn(Optional.of(board));
-        Board findBoard = boardService.findBoard(1L);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        Board findBoard = boardService.findBoard(boardId);
 
         // then
         assertThat(findBoard).isEqualTo(board);
@@ -82,14 +75,32 @@ public class BoardServiceSearchTest {
     @DisplayName("게시글 단건 조회 시 게시글이 없으면 예외를 던진다")
     public void findByIdException() throws Exception {
 
-        Long boardId = 1L;
+        Long boardId = null;
+
         // boardRepository 동작 명시
-        when(boardRepository.findById(boardId)).thenThrow(new IllegalArgumentException((String.format(
-                "게시글(%d)이 존재하지 않습니다", boardId))));
+        when(boardRepository.findById(boardId)).thenThrow(new IllegalArgumentException(
+                "게시글이 존재하지 않습니다"));
 
         // then
         assertThrows(IllegalArgumentException.class, () -> {
             boardService.findBoard(boardId);
         });
+    }
+
+    @Test
+    @DisplayName("제목으로 게시글을 찾아 리스트로 반환한다") // 두 글자 이상 같으면 List로 반환
+    public void findByTitle() throws Exception {
+        // given
+        // static board
+        String title = board.getTitle();
+
+        List<Board> boardWithTitle = new ArrayList<>();
+        boardWithTitle.add(board);
+
+        // when
+        when(boardRepository.findByTitle(title)).thenReturn(boardWithTitle);
+
+        // then
+        assertThat(boardWithTitle).isEqualTo(boardService.searchTitle(title));
     }
 }
