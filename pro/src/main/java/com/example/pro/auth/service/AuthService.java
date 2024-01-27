@@ -33,10 +33,9 @@ public class AuthService {
 
     @Transactional
     public void signUp(SignUpRequest request) {
-        memberRepository.findByUsername(request.getUsername())
-                .ifPresent(e -> {
-                    throw new AuthException(AuthErrorCode.MEMBER_DUPLICATED);
-                });
+        memberRepository.findByUsername(request.getUsername()).ifPresent(e -> {
+            throw new AuthException(AuthErrorCode.MEMBER_DUPLICATED);
+        });
         memberRepository.save(SignUpRequest.toMember(request, passwordEncoder));
     }
 
