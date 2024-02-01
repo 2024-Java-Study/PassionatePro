@@ -2,6 +2,7 @@ package com.example.pro.board;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,10 +21,12 @@ public class BoardServiceSearchTest {
     @Mock BoardRepository boardRepository; // 의존성 주입
     @InjectMocks BoardService boardService;
     public static Board board;
+    public BoardSaveDto boardSaveDto;
 
     @BeforeEach
     public void setUp() {
-        board = new Board("제목", "내용");
+        boardSaveDto = new BoardSaveDto("제목", "내용");
+        board = BoardSaveDto.toBoardEntity(boardSaveDto);
     }
 
     @Test
@@ -31,12 +34,13 @@ public class BoardServiceSearchTest {
     public void createBoard() throws Exception {
         // given
         // static board
+        Long boardId = 1L;
 
         // when
-        when(boardRepository.save(board)).thenReturn(board);
+        when(boardRepository.save(ArgumentMatchers.any())).thenReturn(board);
 
         // then
-        assertThat(boardService.createBoard(board)).isEqualTo(board);
+        assertThat(boardService.createBoard(boardSaveDto).getTitle()).isEqualTo("제목");
     }
     
     @Test

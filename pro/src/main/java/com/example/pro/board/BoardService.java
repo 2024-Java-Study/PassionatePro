@@ -14,7 +14,8 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    public Board createBoard(Board board) {
+    public Board createBoard(BoardSaveDto boardDto) {
+        Board board = BoardSaveDto.toBoardEntity(boardDto);
         return boardRepository.save(board);
     }
 
@@ -33,10 +34,16 @@ public class BoardService {
         return boardRepository.findByTitle(title);
     }
 
-    public BoardDto updateBoard(Long boardId) {
+    public Board updateBoard(Long boardId, String title, String content) {
         Optional<Board> board = boardRepository.findById(boardId);
-        Optional<Board> boardDto = board;
-
+        board = Optional.of(new Board(title, content));
         return null;
+    }
+
+    public void deleteBoard(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(
+                        () -> new NullPointerException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+        boardRepository.delete(board);
     }
 }
