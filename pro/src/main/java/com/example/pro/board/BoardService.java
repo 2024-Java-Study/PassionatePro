@@ -3,12 +3,12 @@ package com.example.pro.board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
+import com.example.pro.board.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,10 +47,12 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    public Board updateBoard(Long boardId, String title, String content) {
-        Optional<Board> board = boardRepository.findById(boardId);
-        board = Optional.of(new Board(title, content));
-        return null;
+    public BoardUpdateDto updateBoard(Long boardId, String title, String content) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+
+        board.updateBoard(title, content);
+        return BoardUpdateDto.toBoardUpdateDto(board);
     }
 
     public void deleteBoard(Long boardId) {

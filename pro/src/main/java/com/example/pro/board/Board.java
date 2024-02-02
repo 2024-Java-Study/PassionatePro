@@ -37,6 +37,8 @@ public class Board {
 
     @Column(nullable = false)
     private String content;
+
+    @Column(nullable = false)
     private LocalDateTime created_at; // Date
 
     /**
@@ -50,6 +52,11 @@ public class Board {
 //        this.user = user.getUserId(); ??
         this.title = title;
         this.content = content;
-        this.created_at = LocalDateTime.now();
+//        this.created_at = LocalDateTime.now();
+    }
+
+    public void updateBoard(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }
