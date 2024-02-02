@@ -1,5 +1,6 @@
 package com.example.pro.board;
 
+import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ResponseUtil;
 import jakarta.validation.Valid;

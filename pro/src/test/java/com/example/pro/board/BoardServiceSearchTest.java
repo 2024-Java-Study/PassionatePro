@@ -1,5 +1,8 @@
 package com.example.pro.board;
 
+import com.example.pro.board.dto.BoardListResponseDto;
+import com.example.pro.board.dto.BoardResponseDto;
+import com.example.pro.board.dto.BoardSaveDto;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -67,10 +70,10 @@ public class BoardServiceSearchTest {
         
         // when
         when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-        Board findBoard = boardService.findBoard(boardId);
+        BoardResponseDto findBoard = boardService.findBoard(boardId);
 
         // then
-        assertThat(findBoard).isEqualTo(board);
+        assertThat(findBoard.getTitle()).isEqualTo("제목");
     }
 
     

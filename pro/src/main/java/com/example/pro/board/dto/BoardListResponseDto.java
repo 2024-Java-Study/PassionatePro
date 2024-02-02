@@ -1,5 +1,6 @@
-package com.example.pro.board;
+package com.example.pro.board.dto;
 
+import com.example.pro.board.Board;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,7 +24,7 @@ public class BoardListResponseDto {
         this.createdAt = createdAt;
     }
 
-    public static BoardListResponseDto toBoardDto(Board board) {
+    public static BoardListResponseDto toBoardListDto(Board board) {
         return BoardListResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())

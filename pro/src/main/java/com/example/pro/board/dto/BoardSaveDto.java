@@ -1,5 +1,6 @@
-package com.example.pro.board;
+package com.example.pro.board.dto;
 
+import com.example.pro.board.Board;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
