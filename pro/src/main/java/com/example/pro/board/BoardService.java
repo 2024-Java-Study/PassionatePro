@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -13,6 +15,8 @@ import java.util.Optional;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardSaveDto boardSaveDto;
+    private final BoardListResponseDto boardListResponseDto;
 
     public Board createBoard(BoardSaveDto boardDto) {
         Board board = BoardSaveDto.toBoardEntity(boardDto);
@@ -23,11 +27,16 @@ public class BoardService {
         return boardRepository.findById(boardId)
                 .orElseThrow(
                         () -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
-
     }
 
-    public List<Board> findAllBoards() {
-        return boardRepository.findAll();
+    public List<BoardListResponseDto> findAllBoards() {
+        List<Board> boards = boardRepository.findAll();
+
+        // 엔티티를 Dto로 변환하는 로직
+        return boards.stream()
+//                .map(board -> boardListResponseDto.toBoardDto(board))
+                .map(BoardListResponseDto::toBoardDto)
+                .collect(Collectors.toList());
     }
 
     public List<Board> searchTitle(String title) {

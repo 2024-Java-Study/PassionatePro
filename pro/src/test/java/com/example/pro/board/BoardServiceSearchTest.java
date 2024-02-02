@@ -34,7 +34,6 @@ public class BoardServiceSearchTest {
     public void createBoard() throws Exception {
         // given
         // static board
-        Long boardId = 1L;
 
         // when
         when(boardRepository.save(ArgumentMatchers.any())).thenReturn(board);
@@ -53,10 +52,10 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.findAll()).thenReturn(boardList);
-        List<Board> allBoards = boardService.findAllBoards();
+        List<BoardListResponseDto> allBoards = boardService.findAllBoards(); // 모든 보드를 찾아 Dto로 바꿔주기
 
         // then
-        assertThat(allBoards).isEqualTo((boardList));
+        assertThat(allBoards.size()).isEqualTo(1); // 전부 다 찾았는지 확인
     }
     
     @Test
