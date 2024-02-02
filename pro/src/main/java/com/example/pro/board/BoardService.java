@@ -3,9 +3,6 @@ package com.example.pro.board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
-import com.example.pro.common.response.BasicResponse;
-import com.example.pro.common.response.ErrorEntity;
-import com.example.pro.common.response.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +24,8 @@ public class BoardService {
     }
 
     public BoardResponseDto findBoard(Long boardId) {
-        Board findBoard = boardRepository.findById(boardId).orElseThrow(
-                        () -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+        Board findBoard = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
         return BoardResponseDto.toBoardDto(findBoard);
     }
 
@@ -41,8 +38,13 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    public List<Board> searchTitle(String title) {
-        return boardRepository.findByTitle(title);
+    public List<BoardResponseDto> searchTitle(String title) {
+        List<Board> boards = boardRepository.findByTitle(title);
+
+        // 엔티티를 Dto로 변환하는 로직
+        return boards.stream()
+                .map(BoardResponseDto::toBoardDto)
+                .collect(Collectors.toList());
     }
 
     public Board updateBoard(Long boardId, String title, String content) {

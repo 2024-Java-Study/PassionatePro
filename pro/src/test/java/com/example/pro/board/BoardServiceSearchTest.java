@@ -81,7 +81,7 @@ public class BoardServiceSearchTest {
     @DisplayName("게시글 단건 조회 시 게시글이 없으면 예외를 던진다")
     public void findByIdException() throws Exception {
 
-        Long boardId = null;
+        Long boardId = 1L;
 
         // boardRepository 동작 명시
         when(boardRepository.findById(boardId)).thenThrow(new IllegalArgumentException(
@@ -98,15 +98,16 @@ public class BoardServiceSearchTest {
     public void findByTitle() throws Exception {
         // given
         // static board
-        String title = board.getTitle();
-
         List<Board> boardWithTitle = new ArrayList<>();
         boardWithTitle.add(board);
+        String title = "제목";
+
 
         // when
         when(boardRepository.findByTitle(title)).thenReturn(boardWithTitle);
+        List<BoardResponseDto> boardWithTitleList = boardService.searchTitle(title);
 
         // then
-        assertThat(boardWithTitle).isEqualTo(boardService.searchTitle(title));
+        assertThat(boardWithTitleList.size()).isEqualTo(1);
     }
 }
