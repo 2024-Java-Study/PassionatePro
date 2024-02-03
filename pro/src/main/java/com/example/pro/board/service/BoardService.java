@@ -49,11 +49,18 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    public BoardUpdateDto updateBoard(Long boardId, String title, String content) {
+//    public BoardUpdateDto updateBoard(Long boardId, String title, String content) {
+//        Board board = boardRepository.findById(boardId)
+//                .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+//
+//        board.updateBoard(title, content);
+//        return BoardUpdateDto.toBoardUpdateDto(board);
+//    }
+
+    public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
-
-        board.updateBoard(title, content);
+        board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
         return BoardUpdateDto.toBoardUpdateDto(board);
     }
 

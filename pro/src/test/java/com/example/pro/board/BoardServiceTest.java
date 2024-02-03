@@ -26,14 +26,16 @@ public class BoardServiceTest {
     @InjectMocks
     BoardService boardService;
 
-    public BoardResponseDto boardResponseDto;
     public BoardSaveDto boardSaveDto;
+    public BoardUpdateDto boardUpdateDto;
     public static Board board;
 
     @BeforeEach
     public void setUp() {
         boardSaveDto = new BoardSaveDto("제목", "내용");
         board = BoardSaveDto.toBoardEntity(boardSaveDto);
+
+        boardUpdateDto = new BoardUpdateDto("제목(new)", "내용(new)");
     }
 
     // board 단건 삭제, board 수정
@@ -43,12 +45,10 @@ public class BoardServiceTest {
         // given
         // static board
         Long boardId = 1L;
-        String newTitle = "제목(new)";
-        String newContent = "내용(new)";
 
         // when
         when(boardRepository.findById(boardId)).thenReturn(Optional.ofNullable(board));
-        BoardUpdateDto updateBoard = boardService.updateBoard(boardId, newTitle, newContent);
+        BoardUpdateDto updateBoard = boardService.updateBoard(boardId, boardUpdateDto);
 
 
         // then
