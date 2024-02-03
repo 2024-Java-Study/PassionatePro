@@ -1,4 +1,4 @@
-package com.example.pro.board;
+package com.example.pro.board.domain;
 
 import com.example.pro.domain.BoardImage;
 import com.example.pro.domain.Comment;

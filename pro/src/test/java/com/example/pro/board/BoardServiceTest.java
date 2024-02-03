@@ -1,28 +1,30 @@
 package com.example.pro.board;
 
+import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
+import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.board.service.BoardService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.OngoingStubbing;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceTest {
 
-    @Mock BoardRepository boardRepository;
-    @InjectMocks BoardService boardService;
+    @Mock
+    BoardRepository boardRepository;
+    @InjectMocks
+    BoardService boardService;
 
     public BoardResponseDto boardResponseDto;
     public BoardSaveDto boardSaveDto;

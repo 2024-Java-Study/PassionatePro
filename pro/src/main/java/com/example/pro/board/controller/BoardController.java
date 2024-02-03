@@ -1,6 +1,8 @@
-package com.example.pro.board;
+package com.example.pro.board.controller;
 
+import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardSaveDto;
+import com.example.pro.board.service.BoardService;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ResponseUtil;
 import jakarta.validation.Valid;

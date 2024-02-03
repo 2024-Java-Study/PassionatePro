@@ -1,5 +1,7 @@
-package com.example.pro.board;
+package com.example.pro.board.service;
 
+import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;

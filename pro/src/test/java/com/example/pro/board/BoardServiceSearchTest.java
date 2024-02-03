@@ -1,8 +1,11 @@
 package com.example.pro.board;
 
+import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
+import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.board.service.BoardService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -21,8 +24,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceSearchTest {
 
-    @Mock BoardRepository boardRepository; // 의존성 주입
-    @InjectMocks BoardService boardService;
+    @Mock
+    BoardRepository boardRepository; // 의존성 주입
+    @InjectMocks
+    BoardService boardService;
     public static Board board;
     public BoardSaveDto boardSaveDto;
 

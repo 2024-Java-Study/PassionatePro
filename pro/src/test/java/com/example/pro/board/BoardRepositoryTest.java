@@ -1,5 +1,7 @@
 package com.example.pro.board;
 
+import com.example.pro.board.domain.Board;
+import com.example.pro.board.repository.BoardRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,7 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 db 이용
 class BoardRepositoryTest {
 
-    @Autowired BoardRepository boardRepository;
+    @Autowired
+    BoardRepository boardRepository;
 
     public static Board board;
 

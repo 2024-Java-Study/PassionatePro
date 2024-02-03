@@ -1,6 +1,6 @@
 package com.example.pro.board.dto;
 
-import com.example.pro.board.Board;
+import com.example.pro.board.domain.Board;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
