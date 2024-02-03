@@ -1,6 +1,8 @@
 package com.example.pro.domain;
 
+import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reply {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +20,10 @@ public class Reply {
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")
-//    private User user;
+//    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
     private String content;
@@ -30,9 +32,9 @@ public class Reply {
     /**
      * 생성 메서드
      */
-//    public Reply(User user, Board board, String content) {
+//    public Reply(Member member, Board board, String content) {
     public Reply(Comment comment, String content) {
-//        this.user = user;
+//        this.member = member;
         // board?
         this.comment = comment;
         this.content = content;

@@ -1,6 +1,10 @@
-package com.example.pro.domain;
+package com.example.pro.board.domain;
 
+import com.example.pro.common.BaseTimeEntity;
+import com.example.pro.domain.BoardImage;
+import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,17 +15,17 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
-public class Board {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Board extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
     private Long id;
 
-    // user
+    // Member
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")
-//    private User user;
+//    private Member member;
 
     @OneToMany(mappedBy = "board")
     private List<BoardImage> image = new ArrayList<>();
@@ -32,20 +36,25 @@ public class Board {
     @OneToMany(mappedBy = "board")
     private List<Comment> comment = new ArrayList<>();
 
+    @Column(nullable = false)
     private String content;
-    private LocalDateTime created_at; // Date
 
     /**
      * 생성 메서드
      */
     // 유저 추가
     @Builder
-//    public Board (Long userId, String title, String content) {
+//    public Board (Member member, String title, String content) {
     public Board (String title, String content) {
         // 사진?
 //        this.user = user.getUserId(); ??
         this.title = title;
         this.content = content;
-        this.created_at = LocalDateTime.now();
+//        this.created_at = LocalDateTime.now();
+    }
+
+    public void updateBoard(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }
