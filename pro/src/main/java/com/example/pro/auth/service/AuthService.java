@@ -32,11 +32,12 @@ public class AuthService {
     private final Clock clock;
 
     @Transactional
-    public void signUp(SignUpRequest request) {
+    public long signUp(SignUpRequest request) {
         memberRepository.findByUsername(request.getUsername()).ifPresent(e -> {
             throw new AuthException(AuthErrorCode.MEMBER_DUPLICATED);
         });
-        memberRepository.save(SignUpRequest.toMember(request, passwordEncoder));
+        Member member = memberRepository.save(SignUpRequest.toMember(request, passwordEncoder));
+        return member.getId();
     }
 
     @Transactional

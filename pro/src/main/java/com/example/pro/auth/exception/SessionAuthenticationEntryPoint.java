@@ -22,7 +22,11 @@ public class SessionAuthenticationEntryPoint implements AuthenticationEntryPoint
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setCharacterEncoding("utf-8");
-        String result = mapper.writeValueAsString(ResponseUtil.error(new ErrorEntity("UNAUTHORIZED_USER", "인증된 사용자가 아닙니다.")));
+        String result = mapper.writeValueAsString(
+                ResponseUtil.error(
+                        new ErrorEntity(AuthErrorCode.UNAUTHORIZED_USER.toString(), AuthErrorCode.UNAUTHORIZED_USER.getMessage())
+                )
+        );
         response.getWriter().write(result);
     }
 }
