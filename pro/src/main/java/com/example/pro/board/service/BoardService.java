@@ -20,6 +20,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
+    @Transactional
     public Board createBoard(BoardSaveDto boardDto) {
         Board board = BoardSaveDto.toBoardEntity(boardDto);
         return boardRepository.save(board);
@@ -57,6 +58,7 @@ public class BoardService {
 //        return BoardUpdateDto.toBoardUpdateDto(board);
 //    }
 
+    @Transactional
     public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
@@ -64,6 +66,7 @@ public class BoardService {
         return BoardUpdateDto.toBoardUpdateDto(board);
     }
 
+    @Transactional
     public void deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(

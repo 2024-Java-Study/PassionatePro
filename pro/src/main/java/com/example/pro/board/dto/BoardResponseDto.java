@@ -24,7 +24,7 @@ public class BoardResponseDto {
         return BoardResponseDto.builder()
                 .title(board.getTitle())
                 .content(board.getContent())
-                .createdAt(String.valueOf(board.getCreated_at()))
+                .createdAt(String.valueOf(board.getCreatedAt()))
                 .build();
     }
 }

@@ -28,7 +28,7 @@ public class BoardListResponseDto {
         return BoardListResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
-                .createdAt(String.valueOf(board.getCreated_at()))
+                .createdAt(String.valueOf(board.getCreatedAt()))
                 .build();
     }
 }

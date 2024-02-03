@@ -1,7 +1,8 @@
 package com.example.pro.board.domain;
 
+import com.example.pro.common.BaseTimeEntity;
 import com.example.pro.domain.BoardImage;
-import com.example.pro.domain.Comment;
+import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Board {
+public class Board extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
@@ -37,9 +38,6 @@ public class Board {
 
     @Column(nullable = false)
     private String content;
-
-    @Column(nullable = false)
-    private LocalDateTime created_at; // Date
 
     /**
      * 생성 메서드

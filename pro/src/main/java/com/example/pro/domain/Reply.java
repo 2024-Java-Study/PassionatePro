@@ -1,5 +1,6 @@
 package com.example.pro.domain;
 
+import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

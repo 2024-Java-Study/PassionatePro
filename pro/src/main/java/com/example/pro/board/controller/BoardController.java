@@ -28,7 +28,7 @@ public class BoardController {
     }
 
     @GetMapping("") // 전체 게시글 조회
-    public BasicResponse<List<BoardListResponseDto>> findAll(@PathVariable Long id) {
+    public BasicResponse<List<BoardListResponseDto>> findAll() {
         return ResponseUtil.success(boardService.findAllBoards());
     }
 
@@ -47,6 +47,6 @@ public class BoardController {
     @DeleteMapping("/{id}") // 게시글 삭제
     public BasicResponse<String> delete(@PathVariable Long id) {
         boardService.deleteBoard(id);
-        return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + id);
+        return ResponseUtil.success("게시물 삭제에 성공하였습니다. 게시물id: " + id);
     }
 }
