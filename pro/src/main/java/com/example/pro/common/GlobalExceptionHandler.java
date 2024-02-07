@@ -4,6 +4,7 @@ import com.example.pro.auth.exception.AuthException;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ErrorEntity;
 import com.example.pro.common.response.ResponseUtil;
+import com.example.pro.files.S3IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
     public BasicResponse<ErrorEntity> authException(AuthException e) {
         log.error("Auth Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public BasicResponse<ErrorEntity> s3Exception(S3IOException e) {
+        log.error("S3 IOException({})={}", e.getErrorCode(), e.getMessage());
+        return ResponseUtil.error(new ErrorEntity(e.getErrorCode(), e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
