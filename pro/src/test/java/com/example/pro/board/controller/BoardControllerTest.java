@@ -1,11 +1,14 @@
 package com.example.pro.board.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.example.pro.auth.exception.AuthException;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.NoSearchBoardException;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
@@ -16,12 +19,13 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -233,6 +237,40 @@ class BoardControllerTest extends ControllerTest {
 //    }
 
     @Test
+    @DisplayName("[실패] 게시물 조회 - 게시물을 찾을 수 없는 경우")
+    void findByIdWithBoardNull() throws Exception{
+        Long boardId = 1L;
+
+        when(boardService.findBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+
+        ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
+
+        // 문서 자동화
+        perform.andDo(document("board findById-board not found",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
+
+    @Test
     @DisplayName("[성공] 게시물 수정")
     void update() throws Exception{
         BoardUpdateDto dto = BoardUpdateDto.builder()
@@ -310,6 +348,40 @@ class BoardControllerTest extends ControllerTest {
         ));
     }
 
+//    @Test
+//    @DisplayName("[실패] 게시물 수정 - 게시물을 찾을 수 없는 경우")
+//    void updateWithBoardNull() throws Exception{
+//        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+//        String body = objectMapper.writeValueAsString(Optional.empty());
+//
+//        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(body)
+//        );
+//
+//        perform.andDo(print())
+//                .andExpect(status().isNotFound())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+//                .andExpect(jsonPath("$.success").value(false))
+//                .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
+//                .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
+//
+//        // 문서 자동화
+//        perform.andDo(document("board create-board not found",
+//                preprocessRequest(prettyPrint()),
+//                preprocessResponse(prettyPrint()),
+//                resource(ResourceSnippetParameters.builder()
+//                        .tag("API-Board")
+//                        .responseFields(
+//                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+//                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+//                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+//                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+//                        ).build())
+//        ));
+//    }
+
     @Test
     @DisplayName("[성공] 게시물 삭제")
     void deleteBoard() throws Exception{
@@ -333,6 +405,40 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
                                 fieldWithPath("response").type(JsonFieldType.STRING).description("응답 메시지")
                         ).build())));
+    }
+
+    @Test
+    @DisplayName("[실패] 게시물 삭제 - 게시물을 찾을 수 없는 경우")
+    void deleteWithBoardNull() throws Exception{
+//        when(boardService.deleteBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        doThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND))
+                .when(boardService)
+                .deleteBoard(any());
+        ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
+
+        // 문서 자동화
+        perform.andDo(document("board delete-board not found",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
     }
 
     @Override
