@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     }
 
     // board
-    @ExceptionHandler
+    @ExceptionHandler(NoSearchBoardException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND) // 상태 코드 204...?
     public BasicResponse<ErrorEntity> boardException(NoSearchBoardException e) {
         log.error("Board Exception({})={}", e.getCode(), e.getMessage());

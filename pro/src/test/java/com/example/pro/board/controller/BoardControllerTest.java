@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -80,13 +81,11 @@ class BoardControllerTest extends ControllerTest {
                 .content(null)
                 .build();
 
-        Board board = BoardSaveDto.toBoardEntity(dto);
-        // Exception? thenThrows?
-        when(boardService.createBoard(any())).thenReturn(board);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(post("/boards")
                 .contentType(MediaType.APPLICATION_JSON)
+                        .locale(Locale.KOREA)
                 .content(body));
 
         // ControllerTest
@@ -96,8 +95,8 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BAD_INPUT"))
                 .andExpect(jsonPath("$.response.errorMessage").value("입력이 올바르지 않습니다."))
-                .andExpect(jsonPath("$.response.errors.title").value("must not be blank"))
-                .andExpect(jsonPath("$.response.errors.content").value("must not be blank"));
+                .andExpect(jsonPath("$.response.errors.title").value("공백일 수 없습니다"))
+                .andExpect(jsonPath("$.response.errors.content").value("공백일 수 없습니다"));
 
         // 문서 자동화
         perform.andDo(document("board creation-validation failed",
@@ -320,6 +319,7 @@ class BoardControllerTest extends ControllerTest {
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
+                .locale(Locale.KOREA)
                 .content(body)
         );
 
@@ -329,8 +329,8 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BAD_INPUT"))
                 .andExpect(jsonPath("$.response.errorMessage").value("입력이 올바르지 않습니다."))
-                .andExpect(jsonPath("$.response.errors.title").value("must not be blank"))
-                .andExpect(jsonPath("$.response.errors.content").value("must not be blank"));
+                .andExpect(jsonPath("$.response.errors.title").value("공백일 수 없습니다"))
+                .andExpect(jsonPath("$.response.errors.content").value("공백일 수 없습니다"));
 
         // 문서 자동화
         perform.andDo(document("board update-validation failed",
@@ -348,39 +348,46 @@ class BoardControllerTest extends ControllerTest {
         ));
     }
 
-//    @Test
-//    @DisplayName("[실패] 게시물 수정 - 게시물을 찾을 수 없는 경우")
-//    void updateWithBoardNull() throws Exception{
+    @Test
+    @DisplayName("[실패] 게시물 수정 - 게시물을 찾을 수 없는 경우")
+    void updateWithBoardNull() throws Exception{
+
+        BoardUpdateDto dto = BoardUpdateDto.builder()
+                .title("null")
+                .content("null")
+                .build();
+
 //        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
-//        String body = objectMapper.writeValueAsString(Optional.empty());
-//
-//        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(body)
-//        );
-//
-//        perform.andDo(print())
-//                .andExpect(status().isNotFound())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
-//                .andExpect(jsonPath("$.success").value(false))
-//                .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
-//                .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
-//
-//        // 문서 자동화
-//        perform.andDo(document("board create-board not found",
-//                preprocessRequest(prettyPrint()),
-//                preprocessResponse(prettyPrint()),
-//                resource(ResourceSnippetParameters.builder()
-//                        .tag("API-Board")
-//                        .responseFields(
-//                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
-//                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
-//                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
-//                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
-//                        ).build())
-//        ));
-//    }
+        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        String body = objectMapper.writeValueAsString(dto);
+
+        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
+
+        // 문서 자동화
+        perform.andDo(document("board create-board not found",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
 
     @Test
     @DisplayName("[성공] 게시물 삭제")
