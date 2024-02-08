@@ -19,7 +19,7 @@ public class UserSession {
     private LocalDateTime lastAccessedAt;
     private LocalDateTime expiredAt;
     public static final String SESSION_KEY = "JSESSIONID";
-    public static final int SESSION_EXPIRED_SECOND = 60; // TODO: 테스트를 위해 1분으로 설정. 배포전 수정 필요.
+    public static final int SESSION_EXPIRED_SECOND = 1800; // TODO: 테스트를 위해 1분으로 설정. 배포전 수정 필요.
 
     public static UserSession create(String sessionId, String username, Clock clock) {
         return new UserSession(sessionId, username, clock);

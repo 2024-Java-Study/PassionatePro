@@ -1,6 +1,7 @@
 package com.example.pro.common;
 
 import com.example.pro.auth.exception.AuthException;
+import com.example.pro.board.exception.NoSearchBoardException;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ErrorEntity;
 import com.example.pro.common.response.ResponseUtil;
@@ -42,5 +43,13 @@ public class GlobalExceptionHandler {
                 .forEach(c -> errors.put(((FieldError) c).getField(), c.getDefaultMessage()));
         log.error("Dto Validation Exception({}): {}", "BAD_INPUT", errors);
         return ResponseUtil.error(new ErrorEntity("BAD_INPUT", "입력이 올바르지 않습니다.", errors));
+    }
+
+    // board
+    @ExceptionHandler(NoSearchBoardException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND) // 상태 코드 204...?
+    public BasicResponse<ErrorEntity> boardException(NoSearchBoardException e) {
+        log.error("Board Exception({})={}", e.getCode(), e.getMessage());
+        return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
     }
 }
