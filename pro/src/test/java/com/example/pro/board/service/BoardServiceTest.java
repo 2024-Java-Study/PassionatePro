@@ -1,9 +1,11 @@
-package com.example.pro.board;
+package com.example.pro.board.service;
 
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.NoSearchBoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.service.BoardService;
 import org.junit.jupiter.api.*;
@@ -12,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,9 +41,9 @@ public class BoardServiceTest {
         boardUpdateDto = new BoardUpdateDto("제목(new)", "내용(new)");
     }
 
-    // board 단건 삭제, board 수정
+
     @Test
-    @DisplayName("게시글 수정")
+    @DisplayName("[성공] 게시글 수정")
     public void updateBoard() throws Exception {
         // given
         // static board
@@ -57,20 +60,36 @@ public class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 삭제")
-    public void deleteBoard() throws Exception {
+    @DisplayName("[실패] 게시글 수정 - 게시물을 찾을 수 없는 경우")
+    public void updateBoardWithNotFound() throws Exception {
         // given
         // static board
         Long boardId = 1L;
 
         // when
-        when(boardRepository.findById(1L)).thenReturn(Optional.ofNullable(board)).thenReturn(null);
-        boardService.deleteBoard(1L);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+        // then
+        NoSearchBoardException exception = assertThrows(NoSearchBoardException.class, () -> {
+            boardService.updateBoard(boardId, boardUpdateDto);
+        });
+        assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
+    }
+
+    @Test
+    @DisplayName("[실패] 게시글 삭제 - 게시물을 찾을 수 없는 경우")
+    public void deleteBoardWithNotFound() throws Exception {
+        // given
+        // static board
+        Long boardId = 1L;
+
+        // when
+        when(boardRepository.findById(1L)).thenReturn(Optional.empty());
 
         // then
         // 삭제된 게시글에 접근 하려 할 때 예외 발생
-        assertThrows(NullPointerException.class, () -> {
-            boardService.findBoard(boardId);
+        NoSearchBoardException exception = assertThrows(NoSearchBoardException.class, () -> {
+            boardService.deleteBoard(boardId);
         });
+        assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
 }

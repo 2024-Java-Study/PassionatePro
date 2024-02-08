@@ -18,8 +18,9 @@ public class BoardListResponseDto {
     public String createdAt; // 날짜
 
     @Builder
-    public BoardListResponseDto(Long id, String title, String createdAt) {
+    public BoardListResponseDto(Long id, String username, String title, String createdAt) {
         this.id = id;
+        this.username = username;
         this.title = title;
         this.createdAt = createdAt;
     }

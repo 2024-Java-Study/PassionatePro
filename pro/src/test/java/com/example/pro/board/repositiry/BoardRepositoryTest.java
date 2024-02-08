@@ -1,4 +1,4 @@
-package com.example.pro.board;
+package com.example.pro.board.repositiry;
 
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
@@ -41,7 +41,7 @@ class BoardRepositoryTest {
         assertThat(board.getId()).isEqualTo(createdBoard.getId());
         assertThat(board.getTitle()).isEqualTo(createdBoard.getTitle());
         assertThat(board.getContent()).isEqualTo(createdBoard.getContent());
-        assertThat(board.getCreated_at()).isEqualTo(createdBoard.getCreated_at());
+        assertThat(board.getCreatedAt()).isEqualTo(createdBoard.getCreatedAt());
 
     }
     
