@@ -4,6 +4,8 @@ import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.NoSearchBoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.service.BoardService;
 import org.junit.jupiter.api.*;
@@ -38,7 +40,7 @@ public class BoardServiceSearchTest {
     }
 
     @Test
-    @DisplayName("게시글 생성")
+    @DisplayName("[성공] 게시글 생성")
     public void createBoard() throws Exception {
         // given
         // static board
@@ -51,7 +53,7 @@ public class BoardServiceSearchTest {
     }
     
     @Test
-    @DisplayName("게시글 전체 조회")
+    @DisplayName("[성공] 게시글 전체 조회")
     public void findAll() throws Exception {
         // given
         // static board
@@ -67,7 +69,7 @@ public class BoardServiceSearchTest {
     }
     
     @Test
-    @DisplayName("게시글 단건 조회")
+    @DisplayName("[성공] 게시글 단건 조회")
     public void findById() throws Exception {
         // given
         // static board
@@ -83,23 +85,22 @@ public class BoardServiceSearchTest {
 
     
     @Test
-    @DisplayName("게시글 단건 조회 시 게시글이 없으면 예외를 던진다")
+    @DisplayName("[실패] 게시글 단건 조회 - 게시글이 없으면 예외를 던진다")
     public void findByIdException() throws Exception {
 
         Long boardId = 1L;
 
         // boardRepository 동작 명시
-        when(boardRepository.findById(boardId)).thenThrow(new IllegalArgumentException(
-                "게시글이 존재하지 않습니다"));
+        when(boardRepository.findById(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // then
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(NoSearchBoardException.class, () -> {
             boardService.findBoard(boardId);
         });
     }
 
     @Test
-    @DisplayName("제목으로 게시글을 찾아 리스트로 반환한다") // 두 글자 이상 같으면 List로 반환
+    @DisplayName("[성공] 제목으로 게시글을 찾아 리스트로 반환한다") // 두 글자 이상 같으면 List로 반환
     public void findByTitle() throws Exception {
         // given
         // static board
