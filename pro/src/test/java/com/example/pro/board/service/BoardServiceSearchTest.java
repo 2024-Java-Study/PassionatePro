@@ -94,9 +94,11 @@ public class BoardServiceSearchTest {
         when(boardRepository.findById(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // then
-        assertThrows(NoSearchBoardException.class, () -> {
+        NoSearchBoardException exception = assertThrows(NoSearchBoardException.class, () -> {
             boardService.findBoard(boardId);
         });
+
+        assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
 
     @Test

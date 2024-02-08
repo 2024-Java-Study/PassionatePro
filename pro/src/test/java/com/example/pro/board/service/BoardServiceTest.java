@@ -60,8 +60,24 @@ public class BoardServiceTest {
     }
 
     @Test
+    @DisplayName("[실패] 게시글 수정 - 게시물을 찾을 수 없는 경우")
+    public void updateBoardWithNotFound() throws Exception {
+        // given
+        // static board
+        Long boardId = 1L;
+
+        // when
+        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+        // then
+        NoSearchBoardException exception = assertThrows(NoSearchBoardException.class, () -> {
+            boardService.updateBoard(boardId, boardUpdateDto);
+        });
+        assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
+    }
+
+    @Test
     @DisplayName("[실패] 게시글 삭제 - 게시물을 찾을 수 없는 경우")
-    public void deleteBoard() throws Exception {
+    public void deleteBoardWithNotFound() throws Exception {
         // given
         // static board
         Long boardId = 1L;
