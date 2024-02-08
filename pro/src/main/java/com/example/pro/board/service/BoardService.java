@@ -1,5 +1,7 @@
 package com.example.pro.board.service;
 
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.NoSearchBoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
@@ -28,7 +30,7 @@ public class BoardService {
 
     public BoardResponseDto findBoard(Long boardId) {
         Board findBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+                .orElseThrow(() -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
         return BoardResponseDto.toBoardDto(findBoard);
     }
 
@@ -50,18 +52,10 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-//    public BoardUpdateDto updateBoard(Long boardId, String title, String content) {
-//        Board board = boardRepository.findById(boardId)
-//                .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
-//
-//        board.updateBoard(title, content);
-//        return BoardUpdateDto.toBoardUpdateDto(board);
-//    }
-
     @Transactional
     public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+                .orElseThrow(() -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
         return BoardUpdateDto.toBoardUpdateDto(board);
     }
@@ -70,7 +64,7 @@ public class BoardService {
     public void deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(
-                        () -> new NullPointerException(String.format("게시글(%d)이 존재하지 않습니다", boardId)));
+                        () -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
         boardRepository.delete(board);
     }
 }
