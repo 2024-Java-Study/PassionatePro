@@ -4,6 +4,7 @@ import com.example.pro.common.BaseTimeEntity;
 import com.example.pro.domain.BoardImage;
 import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,12 +32,14 @@ public class Board extends BaseTimeEntity {
     private List<BoardImage> image = new ArrayList<>();
 
     @Column(length = 50, nullable = false)
+    @NotBlank
     private String title;
 
     @OneToMany(mappedBy = "board")
     private List<Comment> comment = new ArrayList<>();
 
     @Column(nullable = false)
+    @NotBlank
     private String content;
 
     /**
