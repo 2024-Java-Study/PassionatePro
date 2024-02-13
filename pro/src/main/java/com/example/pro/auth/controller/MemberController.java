@@ -36,7 +36,7 @@ public class MemberController {
 
     @GetMapping("/me")
     public BasicResponse<String> requestMe() {
-        String username = authService.loadUser();
+        String username = authService.loadUser().getUsername();
         return ResponseUtil.success("인증된 사용자: " + username);
     }
 }
