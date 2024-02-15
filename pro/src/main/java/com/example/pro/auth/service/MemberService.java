@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberService {
     private final AuthService authService;
     private final FileUploader fileUploader;
-    private static final String PROFILE_KEY = "profiles/";
+    static final String PROFILE_KEY = "profiles/";
 
     @Transactional
     public Member updateProfile(MultipartFile file) {

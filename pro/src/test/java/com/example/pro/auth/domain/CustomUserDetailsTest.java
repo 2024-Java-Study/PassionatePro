@@ -17,12 +17,13 @@ class CustomUserDetailsTest {
         member = Member.builder()
                 .username("username")
                 .password("password")
+                .nickname("nickname")
                 .email("hello@gamil.com")
                 .build();
     }
 
     @Test
-    @DisplayName("[성공] 인증 권환 목록 반환")
+    @DisplayName("[성공] 인증 권한 목록 반환")
     void getAuthorities() {
         CustomUserDetails userDetails = CustomUserDetails.create(member);
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();

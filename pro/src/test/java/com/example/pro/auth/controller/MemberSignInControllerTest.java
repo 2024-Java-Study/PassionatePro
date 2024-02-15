@@ -1,10 +1,12 @@
 package com.example.pro.auth.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.dto.LoginRequest;
 import com.example.pro.auth.exception.AuthErrorCode;
 import com.example.pro.auth.exception.AuthException;
 import com.example.pro.auth.service.AuthService;
+import com.example.pro.auth.service.MemberService;
 import com.example.pro.docs.ControllerTest;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class MemberSignInControllerTest extends ControllerTest {
     private final AuthService authService = mock(AuthService.class);
+    private final MemberService memberService = mock(MemberService.class);
     private static final String SESSION_ID = UUID.randomUUID().toString();
     private static final String USERNAME = "username";
 
@@ -143,7 +146,14 @@ public class MemberSignInControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 로그인 사용자 조회")
     void requestMe() throws Exception {
-        when(authService.loadUser()).thenReturn(USERNAME);
+        Member member = Member.builder()
+                .username(USERNAME)
+                .password("password")
+                .nickname("nickname")
+                .email("hello@gamil.com")
+                .build();
+
+        when(authService.loadUser()).thenReturn(member);
 
         ResultActions perform = mockMvc.perform(get("/members/me")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -202,6 +212,6 @@ public class MemberSignInControllerTest extends ControllerTest {
 
     @Override
     protected Object injectController() {
-        return new MemberController(authService);
+        return new MemberController(authService, memberService);
     }
 }
