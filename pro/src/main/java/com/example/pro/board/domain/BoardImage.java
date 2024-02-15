@@ -1,4 +1,4 @@
-package com.example.pro.files;
+package com.example.pro.board.domain;
 
 import com.example.pro.board.domain.Board;
 import jakarta.persistence.*;

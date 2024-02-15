@@ -1,7 +1,6 @@
 package com.example.pro.board.domain;
 
 import com.example.pro.common.BaseTimeEntity;
-import com.example.pro.files.BoardImage;
 import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
