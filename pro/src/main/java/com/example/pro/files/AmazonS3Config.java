@@ -28,4 +28,9 @@ public class AmazonS3Config {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .build();
     }
+
+    @Bean
+    public FileUploader fileUploader() {
+        return new TestFileUploader(amazonS3Client());
+    }
 }

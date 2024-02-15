@@ -1,8 +1,16 @@
 package com.example.pro.files;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface FileUploader {
+public abstract class FileUploader {
 
-    String uploadFile(MultipartFile multipartFile, String path);
+    public abstract String uploadFile(MultipartFile multipartFile, String path);
+
+    public ObjectMetadata createObjectMetaData(MultipartFile multipartFile) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType("image/png");
+        objectMetadata.setContentLength(multipartFile.getSize());
+        return objectMetadata;
+    }
 }

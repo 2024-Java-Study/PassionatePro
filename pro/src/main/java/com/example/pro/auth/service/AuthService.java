@@ -49,11 +49,11 @@ public class AuthService {
         return form.getUsername();
     }
 
-    public String loadUser() {
+    public Member loadUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Member user = memberRepository.findByUsername(authentication.getName()).orElseThrow(
                 () -> new AuthException(AuthErrorCode.MEMBER_NOT_FOUND)
         );
-        return user.getUsername();
+        return user;
     }
 }

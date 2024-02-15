@@ -17,6 +17,8 @@ public class SignUpRequest {
     private String username;
     @NotBlank
     private String password;
+    @NotBlank
+    private String nickname;
     @Email
     private String email;
 
@@ -24,6 +26,7 @@ public class SignUpRequest {
         return Member.builder()
                 .username(dto.username)
                 .password(passwordEncoder.encode(dto.password))
+                .nickname(dto.nickname)
                 .email(dto.email)
                 .build();
     }
