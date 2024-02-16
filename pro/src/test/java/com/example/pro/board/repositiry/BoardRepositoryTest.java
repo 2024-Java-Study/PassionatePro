@@ -1,5 +1,6 @@
 package com.example.pro.board.repositiry;
 
+import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
 import org.junit.jupiter.api.*;
@@ -21,10 +22,21 @@ class BoardRepositoryTest {
     BoardRepository boardRepository;
 
     public static Board board;
+    public static Member member;
 
     @BeforeEach
     public void setUp() {
-        board = new Board("제목", "내용");
+        member = Member.builder()
+                .username("ajeong")
+                .password("password1234")
+                .email("ajung7038@gmail.com")
+                .build();
+
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .build();
     }
 
     @Test
@@ -66,7 +78,11 @@ class BoardRepositoryTest {
     public void findAll() throws Exception {
         // given
         // static board
-        Board board1 = new Board("제목", "내용");
+        Board board1 = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .build();
 
         // when
         boardRepository.save(board);

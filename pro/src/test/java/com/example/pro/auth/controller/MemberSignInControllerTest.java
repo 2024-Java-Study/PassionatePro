@@ -1,6 +1,7 @@
 package com.example.pro.auth.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.dto.BoardRequest;
 import com.example.pro.auth.dto.LoginRequest;
 import com.example.pro.auth.exception.AuthErrorCode;
@@ -144,12 +145,9 @@ public class MemberSignInControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 로그인 사용자 조회")
     void requestMe() throws Exception {
-        BoardRequest boardRequest = BoardRequest.builder()
-                .username(USERNAME)
-                .build();
-
-        when(authService.loadUser()).thenReturn(boardRequest);
-        String userName = boardRequest.getUsername();
+        Member member = new Member(USERNAME, "password1234", "ajung7038@gmail.com");
+        when(authService.loadUser()).thenReturn(member);
+        String userName = member.getUsername();
 
         ResultActions perform = mockMvc.perform(get("/members/me")
                 .contentType(MediaType.APPLICATION_JSON)
