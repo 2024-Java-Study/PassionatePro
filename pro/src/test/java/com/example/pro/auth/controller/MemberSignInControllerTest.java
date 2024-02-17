@@ -38,7 +38,7 @@ public class MemberSignInControllerTest extends ControllerTest {
     private final AuthService authService = mock(AuthService.class);
     private final MemberService memberService = mock(MemberService.class);
     private static final String SESSION_ID = UUID.randomUUID().toString();
-    private static final String USERNAME = "username";
+    static final String USERNAME = "username";
 
     @Test
     @DisplayName("[성공] 로그인")

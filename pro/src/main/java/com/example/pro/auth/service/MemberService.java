@@ -16,8 +16,7 @@ public class MemberService {
     static final String PROFILE_KEY = "profiles/";
 
     @Transactional
-    public Member updateProfile(MultipartFile file) {
-        Member member = authService.loadUser();
+    public Member updateProfile(MultipartFile file, Member member) {
         String url = fileUploader.uploadFile(file, PROFILE_KEY);
         return member.updateProfile(url);
     }

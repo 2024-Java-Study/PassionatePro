@@ -3,6 +3,7 @@ package com.example.pro.auth.controller;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.dto.LoginRequest;
+import com.example.pro.auth.dto.ProfileUpdateRequest;
 import com.example.pro.auth.dto.SignUpRequest;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.auth.service.MemberService;
@@ -38,8 +39,9 @@ public class MemberController {
     }
 
     @PutMapping("/profiles")
-    public BasicResponse<String> updateProfile(@RequestPart MultipartFile image) {
-        Member member = memberService.updateProfile(image);
+    public BasicResponse<String> updateProfile(@ModelAttribute ProfileUpdateRequest request) {
+        Member member = authService.loadUser();
+        member = memberService.updateProfile(request.getImage(), member);
         return ResponseUtil.success(member.getUsername() + "님의 프로필 이미지가 변경되었습니다.");
     }
 

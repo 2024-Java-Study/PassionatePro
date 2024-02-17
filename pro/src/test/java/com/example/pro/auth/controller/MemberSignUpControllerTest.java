@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.example.pro.auth.controller.MemberSignInControllerTest.USERNAME;
 import static com.example.pro.auth.domain.UserSession.SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +37,6 @@ class MemberSignUpControllerTest extends ControllerTest {
     private final AuthService authService = mock(AuthService.class);
     private final MemberService memberService = mock(MemberService.class);
     private static final String SESSION_ID = UUID.randomUUID().toString();
-    private static final String USERNAME = "username";
 
     @Test
     @DisplayName("[성공] 회원가입")
