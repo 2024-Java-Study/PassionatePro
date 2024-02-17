@@ -1,5 +1,7 @@
 package com.example.pro.board.controller;
 
+import com.example.pro.auth.domain.Member;
+import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
@@ -20,9 +22,11 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final AuthService authService;
 
     @PostMapping
     public BasicResponse<String> create(@RequestBody @Valid BoardSaveDto boardDto) {
+//        Member member = authService.loadUser();
         Board board = boardService.createBoard(boardDto);
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }

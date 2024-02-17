@@ -58,7 +58,7 @@ public class BoardServiceTest {
 
         // when
 //        when(authService.loadUser()).thenReturn(member);
-//        when(authService.loadUser().getId()).thenReturn(memberId);
+        when(authService.loadUser().getId()).thenReturn(memberId);
         when(board.getMember().getId()).thenReturn(memberId);
 
         when(boardRepository.findById(boardId)).thenReturn(Optional.ofNullable(board));
