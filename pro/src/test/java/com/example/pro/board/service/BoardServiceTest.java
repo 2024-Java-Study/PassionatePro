@@ -1,5 +1,6 @@
 package com.example.pro.board.service;
 
+import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
@@ -36,7 +37,13 @@ public class BoardServiceTest {
     @BeforeEach
     public void setUp() {
         boardSaveDto = new BoardSaveDto("제목", "내용");
-        board = BoardSaveDto.toBoardEntity(boardSaveDto);
+
+        Member member = new Member("ajeong", "password1234", "ajung7038@gmail.com");
+        board = Board.builder()
+                .member(member)
+                .title(boardSaveDto.getTitle())
+                .content(boardSaveDto.getContent())
+                .build();
 
         boardUpdateDto = new BoardUpdateDto("제목(new)", "내용(new)");
     }

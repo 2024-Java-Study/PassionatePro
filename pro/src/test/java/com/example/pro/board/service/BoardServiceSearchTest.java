@@ -1,5 +1,7 @@
 package com.example.pro.board.service;
 
+import com.example.pro.auth.domain.Member;
+import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
@@ -26,34 +28,43 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceSearchTest {
 
-    @Mock
-    BoardRepository boardRepository; // 의존성 주입
-    @InjectMocks
-    BoardService boardService;
+    @Mock BoardRepository boardRepository; // 의존성 주입
+    @Mock AuthService authService;
+    @InjectMocks BoardService boardService;
+
+
     public static Board board;
+    public static Member member;
     public BoardSaveDto boardSaveDto;
 
     @BeforeEach
     public void setUp() {
         boardSaveDto = new BoardSaveDto("제목", "내용");
-        board = BoardSaveDto.toBoardEntity(boardSaveDto);
+        member = new Member("ajeong", "password1234", "ajung7038@gmail.com");
+        board = Board.builder()
+                .member(member)
+                .title(boardSaveDto.getTitle())
+                .content(boardSaveDto.getContent())
+                .build();
     }
 
     @Test
-    @DisplayName("[성공] 게시글 생성")
+    @DisplayName("[성공] 게시물 생성")
     public void createBoard() throws Exception {
         // given
         // static board
 
         // when
+        when(authService.loadUser()).thenReturn(member);
         when(boardRepository.save(ArgumentMatchers.any())).thenReturn(board);
 
         // then
         assertThat(boardService.createBoard(boardSaveDto).getTitle()).isEqualTo("제목");
+        assertThat(boardService.createBoard(boardSaveDto).getMember().getUsername()).isEqualTo("ajeong");
     }
     
     @Test
-    @DisplayName("[성공] 게시글 전체 조회")
+    @DisplayName("[성공] 게시물 전체 조회")
     public void findAll() throws Exception {
         // given
         // static board
@@ -69,7 +80,7 @@ public class BoardServiceSearchTest {
     }
     
     @Test
-    @DisplayName("[성공] 게시글 단건 조회")
+    @DisplayName("[성공] 게시물 단건 조회")
     public void findById() throws Exception {
         // given
         // static board
@@ -85,7 +96,7 @@ public class BoardServiceSearchTest {
 
     
     @Test
-    @DisplayName("[실패] 게시글 단건 조회 - 게시글이 없으면 예외를 던진다")
+    @DisplayName("[실패] 게시물 단건 조회 - 게시글이 없으면 예외를 던진다")
     public void findByIdException() throws Exception {
 
         Long boardId = 1L;
@@ -102,7 +113,7 @@ public class BoardServiceSearchTest {
     }
 
     @Test
-    @DisplayName("[성공] 제목으로 게시글을 찾아 리스트로 반환한다") // 두 글자 이상 같으면 List로 반환
+    @DisplayName("[성공] 제목으로 게시물을 찾아 리스트로 반환한다") // 두 글자 이상 같으면 List로 반환
     public void findByTitle() throws Exception {
         // given
         // static board

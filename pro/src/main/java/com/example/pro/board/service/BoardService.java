@@ -1,5 +1,6 @@
 package com.example.pro.board.service;
 
+import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.NoSearchBoardException;
 import com.example.pro.board.repository.BoardRepository;
@@ -21,10 +22,15 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final AuthService authService;
 
     @Transactional
     public Board createBoard(BoardSaveDto boardDto) {
-        Board board = BoardSaveDto.toBoardEntity(boardDto);
+        Board board = Board.builder()
+                .member(authService.loadUser())
+                .title(boardDto.getTitle())
+                .content(boardDto.getContent())
+                .build();
         return boardRepository.save(board);
     }
 
