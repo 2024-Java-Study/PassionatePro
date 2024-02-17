@@ -7,9 +7,8 @@ import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.exception.BoardErrorCode;
-import com.example.pro.board.exception.NoSearchBoardException;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
-import com.example.pro.board.service.BoardService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -102,10 +101,10 @@ public class BoardServiceSearchTest {
         Long boardId = 1L;
 
         // boardRepository 동작 명시
-        when(boardRepository.findById(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardRepository.findById(boardId)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // then
-        NoSearchBoardException exception = assertThrows(NoSearchBoardException.class, () -> {
+        BoardException exception = assertThrows(BoardException.class, () -> {
             boardService.findBoard(boardId);
         });
 

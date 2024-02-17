@@ -2,7 +2,7 @@ package com.example.pro.board.service;
 
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.exception.BoardErrorCode;
-import com.example.pro.board.exception.NoSearchBoardException;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
@@ -36,7 +36,7 @@ public class BoardService {
 
     public BoardResponseDto findBoard(Long boardId) {
         Board findBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         return BoardResponseDto.toBoardDto(findBoard);
     }
 
@@ -60,8 +60,15 @@ public class BoardService {
 
     @Transactional
     public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto) {
+        // 게시물 수정 로직
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+
+        // 권한 확인 로직
+        if (!authService.loadUser().getId().equals(board.getMember().getId())) {
+            throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
+        }
+
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
         return BoardUpdateDto.toBoardUpdateDto(board);
     }
@@ -70,7 +77,7 @@ public class BoardService {
     public void deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(
-                        () -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+                        () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         boardRepository.delete(board);
     }
 }

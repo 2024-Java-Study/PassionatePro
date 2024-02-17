@@ -1,14 +1,13 @@
 package com.example.pro.board.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import com.example.pro.auth.exception.AuthException;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
 import com.example.pro.board.exception.BoardErrorCode;
-import com.example.pro.board.exception.NoSearchBoardException;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -240,7 +238,7 @@ class BoardControllerTest extends ControllerTest {
     void findByIdWithBoardNull() throws Exception{
         Long boardId = 1L;
 
-        when(boardService.findBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardService.findBoard(boardId)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -249,7 +247,7 @@ class BoardControllerTest extends ControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
                 .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
@@ -358,7 +356,7 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
 //        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardService.updateBoard(any(), any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -369,7 +367,7 @@ class BoardControllerTest extends ControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
                 .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
@@ -418,7 +416,7 @@ class BoardControllerTest extends ControllerTest {
     @DisplayName("[실패] 게시물 삭제 - 게시물을 찾을 수 없는 경우")
     void deleteWithBoardNull() throws Exception{
 //        when(boardService.deleteBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        doThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND))
+        doThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND))
                 .when(boardService)
                 .deleteBoard(any());
         ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
@@ -428,7 +426,7 @@ class BoardControllerTest extends ControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
                 .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
