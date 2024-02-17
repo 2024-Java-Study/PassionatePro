@@ -1,7 +1,6 @@
 package com.example.pro.board.domain;
 
 import com.example.pro.common.BaseTimeEntity;
-import com.example.pro.domain.BoardImage;
 import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
