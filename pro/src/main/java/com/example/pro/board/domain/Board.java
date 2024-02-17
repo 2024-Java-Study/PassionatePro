@@ -26,7 +26,7 @@ public class Board extends BaseTimeEntity {
     private Long id;
 
     // Member
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

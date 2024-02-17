@@ -78,6 +78,11 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(
                         () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        // 권한 확인 로직
+        if (!authService.loadUser().getId().equals(board.getMember().getId())) {
+            throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
+        }
+
         boardRepository.delete(board);
     }
 }
