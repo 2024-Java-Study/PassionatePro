@@ -5,6 +5,7 @@ import com.example.pro.auth.dto.SignUpRequest;
 import com.example.pro.auth.exception.AuthErrorCode;
 import com.example.pro.auth.exception.AuthException;
 import com.example.pro.auth.service.AuthService;
+import com.example.pro.auth.service.MemberService;
 import com.example.pro.docs.ControllerTest;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.example.pro.auth.controller.MemberSignInControllerTest.USERNAME;
 import static com.example.pro.auth.domain.UserSession.SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,13 +35,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class MemberSignUpControllerTest extends ControllerTest {
     private final AuthService authService = mock(AuthService.class);
+    private final MemberService memberService = mock(MemberService.class);
     private static final String SESSION_ID = UUID.randomUUID().toString();
-    private static final String USERNAME = "username";
 
     @Test
     @DisplayName("[성공] 회원가입")
     void signUpSuccess() throws Exception {
-        SignUpRequest request = new SignUpRequest(USERNAME, "password1234", "hello@gmail.com");
+        SignUpRequest request = new SignUpRequest(USERNAME, "password1234", "nickname", "hello@gmail.com");
         String body = objectMapper.writeValueAsString(request);
 
         ResultActions perform = mockMvc.perform(post("/members/signup")
@@ -71,7 +73,7 @@ class MemberSignUpControllerTest extends ControllerTest {
     void duplicatedMember() throws Exception {
         when(authService.signUp(any()))
                 .thenThrow(new AuthException(AuthErrorCode.MEMBER_DUPLICATED));
-        SignUpRequest request = new SignUpRequest(USERNAME, "password1234", "hello@gmail.com");
+        SignUpRequest request = new SignUpRequest(USERNAME, "password1234", "nickname", "hello@gmail.com");
         String body = objectMapper.writeValueAsString(request);
 
         ResultActions perform = mockMvc.perform(post("/members/signup")
@@ -105,7 +107,7 @@ class MemberSignUpControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 회원가입-유효성 검사 실패")
     void signUpValidation() throws Exception {
-        SignUpRequest request = new SignUpRequest(" ", " ", "hello");
+        SignUpRequest request = new SignUpRequest(" ", " ", " ", "hello");
         String body = objectMapper.writeValueAsString(request);
 
         ResultActions perform = mockMvc.perform(post("/members/signup")
@@ -123,6 +125,7 @@ class MemberSignUpControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.errorMessage").value("입력이 올바르지 않습니다."))
                 .andExpect(jsonPath("$.response.errors.username").value("공백일 수 없습니다"))
                 .andExpect(jsonPath("$.response.errors.password").value("공백일 수 없습니다"))
+                .andExpect(jsonPath("$.response.errors.nickname").value("공백일 수 없습니다"))
                 .andExpect(jsonPath("$.response.errors.email").value("올바른 형식의 이메일 주소여야 합니다"));
 
         perform.andDo(document("sign up-validation failed",
@@ -136,6 +139,7 @@ class MemberSignUpControllerTest extends ControllerTest {
                                 fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
                                 fieldWithPath("response.errors.username").type(JsonFieldType.STRING).description("아이디 공백 검사"),
                                 fieldWithPath("response.errors.password").type(JsonFieldType.STRING).description("비밀번호 공백 검사"),
+                                fieldWithPath("response.errors.nickname").type(JsonFieldType.STRING).description("닉네임 공백 검사"),
                                 fieldWithPath("response.errors.email").type(JsonFieldType.STRING).description("이메일 형식 검사")
                         ).build())
         ));
@@ -144,6 +148,6 @@ class MemberSignUpControllerTest extends ControllerTest {
 
     @Override
     protected Object injectController() {
-        return new MemberController(authService);
+        return new MemberController(authService, memberService);
     }
 }

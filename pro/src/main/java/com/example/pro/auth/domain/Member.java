@@ -27,17 +27,25 @@ public class Member extends BaseTimeEntity {
     @NotNull
     private String password;
     @NotNull
+    private String nickname;
+    private String profile;
+    @NotNull
     private String email;
-
     @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Builder
-    public Member(String username, String password, String email) {
+    public Member(String username, String password, String nickname, String email) {
         this.username = validString(username);
         this.password = validString(password);
+        this.nickname = validString(nickname);
         this.email = validEmail(email);
         this.role = Role.USER;
+    }
+
+    public Member updateProfile(String profileUrl) {
+        this.profile = profileUrl;
+        return this;
     }
 }

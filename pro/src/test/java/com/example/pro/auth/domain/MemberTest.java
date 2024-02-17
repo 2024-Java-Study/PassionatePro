@@ -13,6 +13,7 @@ class MemberTest {
         Member member = Member.builder()
                 .username("username")
                 .password("password")
+                .nickname("nickname")
                 .email("hello@gamil.com")
                 .build();
         Assertions.assertThat(member.getUsername()).isEqualTo("username");
@@ -24,7 +25,9 @@ class MemberTest {
         Assertions.assertThatThrownBy(() -> Member.builder()
                         .username("")
                         .password("password")
-                        .email("hello@gmail.com").build()
+                        .nickname("nickname")
+                        .email("hello@gmail.com")
+                        .build()
                 )
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("공백인 값이 포함되어 있습니다.");
@@ -36,6 +39,7 @@ class MemberTest {
         Assertions.assertThatThrownBy(() ->  Member.builder()
                         .username("username")
                         .password(null)
+                        .nickname("nickname")
                         .email("hello@gmail.com").build())
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("null값이 포함되어 있습니다.");
@@ -47,6 +51,7 @@ class MemberTest {
         Assertions.assertThatThrownBy(() -> Member.builder()
                         .username("username")
                         .password("password")
+                        .nickname("nickname")
                         .email("").build())
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("이메일 형식이 올바르지 않습니다.");

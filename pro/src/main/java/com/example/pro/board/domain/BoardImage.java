@@ -1,4 +1,4 @@
-package com.example.pro.domain;
+package com.example.pro.board.domain;
 
 import com.example.pro.board.domain.Board;
 import jakarta.persistence.*;
@@ -22,14 +22,14 @@ public class BoardImage {
     private Board board;
 
     @Column(unique = true)
-    private String board_image_url;
+    private String url;
 
     /**
      * 생성 메서드
      */
     @Builder
-    public BoardImage (Board board, String boardImageUrl) {
+    public BoardImage (Board board, String url) {
         this.board = board;
-        this.board_image_url = boardImageUrl;
+        this.url = url;
     }
 }
