@@ -134,7 +134,7 @@ class BoardControllerTest extends ControllerTest {
         List<BoardListResponseDto> boards = new ArrayList<>();
         BoardListResponseDto dto = BoardListResponseDto.builder()
                 .id(1L)
-                .username("ajeong")
+                .username("ajeong7038")
                 .title("제목")
                 .createdAt("2024-02-07 18:32:25")
                 .build();
@@ -208,46 +208,6 @@ class BoardControllerTest extends ControllerTest {
                         ).build())
         ));
     }
-
-//    @Test
-//    @DisplayName("[성공] 게시물 조회 - id 값이 null")
-//    void findByIdWithIdNull() throws Exception{
-//        Long boardId = null;
-//
-//        BoardResponseDto dto = BoardResponseDto.builder()
-//                .title("제목")
-//                .content("내용")
-//                .createdAt("2024-02-08 11:59:07")
-//                .build();
-//
-//        when(boardService.findBoard(boardId)).thenReturn(dto);
-//
-//        ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
-//                .contentType(MediaType.APPLICATION_JSON)
-//        );
-//
-//        perform.andDo(print())
-//                .andExpect(status().isOk())
-//    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(jsonPath("$.success").value(true))
-//                .andExpect(jsonPath("$.response.title").value("제목"))
-//                .andExpect(jsonPath("$.response.content").value("내용"))
-//                .andExpect(jsonPath("$.response.createdAt").value("2024-02-08 11:59:07"));
-//
-//        // 문서 자동화
-//        perform.andDo(document("board findById-success",
-//                preprocessRequest(prettyPrint()),
-//                preprocessResponse(prettyPrint()),
-//                resource(ResourceSnippetParameters.builder()
-//                        .tag("API-Board")
-//                        .responseFields(
-//                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
-//                                fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
-//                                fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
-//                                fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
-//                        ).build())
-//        ));
-//    }
 
     @Test
     @DisplayName("[실패] 게시물 조회 - 게시물을 찾을 수 없는 경우")

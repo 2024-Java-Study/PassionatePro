@@ -42,7 +42,7 @@ class BoardRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시글 생성")
+    @DisplayName("게시물 생성")
     public void CreateBoard() throws Exception {
         // given
         // static board
@@ -76,7 +76,7 @@ class BoardRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시글 전체 조회")
+    @DisplayName("게시물 전체 조회")
     public void findAll() throws Exception {
         // given
         // static board
@@ -96,7 +96,7 @@ class BoardRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시글 단건 조회")
+    @DisplayName("게시물 단건 조회")
     public void findById() throws Exception {
         // given
         // static board

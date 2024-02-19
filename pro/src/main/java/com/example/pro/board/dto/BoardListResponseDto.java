@@ -30,6 +30,7 @@ public class BoardListResponseDto {
     public static BoardListResponseDto toBoardListDto(Board board) {
         return BoardListResponseDto.builder()
                 .id(board.getId())
+                .username(board.getMember().getUsername())
                 .title(board.getTitle())
                 .createdAt(String.valueOf(board.getCreatedAt()))
                 .build();
