@@ -172,15 +172,16 @@ class BoardControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("[성공] 게시물 조회 - id 값이 null")
+    @DisplayName("[성공] 게시물 조회")
     void findById() throws Exception{
         BoardResponseDto dto = BoardResponseDto.builder()
+                .username("ajeong7038")
                 .title("제목")
                 .content("내용")
                 .createdAt("2024-02-08 11:59:07")
                 .build();
 
-        when(boardService.findBoard(boardId)).thenReturn(dto);
+        when(boardService.findBoard(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -190,9 +191,10 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.title").value("제목"))
-                .andExpect(jsonPath("$.response.content").value("내용"))
-                .andExpect(jsonPath("$.response.createdAt").value("2024-02-08 11:59:07"));
+                .andExpect(jsonPath("$.response.username").value(dto.getUsername()))
+                .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
+                .andExpect(jsonPath("$.response.content").value(dto.getContent()))
+                .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()));
 
         // 문서 자동화
         perform.andDo(document("board findById-success",
@@ -202,6 +204,7 @@ class BoardControllerTest extends ControllerTest {
                         .tag("API-Board")
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.username").type(JsonFieldType.STRING).description("응답 메시지 - 유저 아이디"),
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
                                 fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")

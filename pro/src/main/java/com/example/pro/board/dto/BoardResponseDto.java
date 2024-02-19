@@ -27,6 +27,7 @@ public class BoardResponseDto {
 
     public static BoardResponseDto toBoardDto(Board board) {
         return BoardResponseDto.builder()
+                .username(board.getMember().getUsername())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .createdAt(String.valueOf(board.getCreatedAt()))

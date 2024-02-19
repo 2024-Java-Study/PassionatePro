@@ -38,8 +38,7 @@ public class BoardController {
 
     @GetMapping("{id}") // 게시글 조회
     public BasicResponse<BoardResponseDto> findById(@PathVariable Long id) {
-        BoardResponseDto board = boardService.findBoard(id);
-        return ResponseUtil.success(board);
+        return ResponseUtil.success(boardService.findBoard(id));
     }
 
     @PutMapping("/{id}") // 게시글 수정

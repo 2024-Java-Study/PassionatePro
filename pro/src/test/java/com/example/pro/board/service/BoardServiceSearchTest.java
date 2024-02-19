@@ -94,29 +94,27 @@ public class BoardServiceSearchTest {
     public void findById() throws Exception {
         // given
         // static board
-        Long boardId = 1L;
         
         // when
-        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
-        BoardResponseDto findBoard = boardService.findBoard(boardId);
+        when(boardRepository.findById(any())).thenReturn(Optional.of(board));
+        BoardResponseDto findBoard = boardService.findBoard(1L);
 
         // then
         assertThat(findBoard.getTitle()).isEqualTo("제목");
+        assertThat(findBoard.getUsername()).isEqualTo("ajeong7038");
     }
 
     
     @Test
-    @DisplayName("[실패] 게시물 단건 조회 - 게시글이 없으면 예외를 던진다")
+    @DisplayName("[실패] 게시물 단건 조회 - 게시물이 없으면 예외를 던진다")
     public void findByIdException() throws Exception {
 
-        Long boardId = 1L;
-
         // boardRepository 동작 명시
-        when(boardRepository.findById(boardId)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardRepository.findById(any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardService.findBoard(boardId);
+            boardService.findBoard(1L);
         });
 
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
