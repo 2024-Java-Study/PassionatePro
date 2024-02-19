@@ -3,6 +3,7 @@ package com.example.pro.board.repositiry;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 db 이용
@@ -27,8 +28,9 @@ class BoardRepositoryTest {
     @BeforeEach
     public void setUp() {
         member = Member.builder()
-                .username("ajeong")
+                .username("ajeong7038")
                 .password("password1234")
+                .nickname("ajeong")
                 .email("ajung7038@gmail.com")
                 .build();
 
@@ -49,11 +51,9 @@ class BoardRepositoryTest {
         Board createdBoard = boardRepository.save(board);
 
         // then
-        assertThat(board).isEqualTo(createdBoard);
-        assertThat(board.getId()).isEqualTo(createdBoard.getId());
-        assertThat(board.getTitle()).isEqualTo(createdBoard.getTitle());
-        assertThat(board.getContent()).isEqualTo(createdBoard.getContent());
-        assertThat(board.getCreatedAt()).isEqualTo(createdBoard.getCreatedAt());
+        assertThat(createdBoard).isEqualTo(board);
+        assertThat(createdBoard.getTitle()).isEqualTo("제목");
+        assertThat(createdBoard.getContent()).isEqualTo("내용");
 
     }
     
@@ -62,15 +62,17 @@ class BoardRepositoryTest {
     public void validateCreateBoard() throws Exception {
         // given
         // static board
+        Board boardWithNull = Board.builder()
+                .member(member)
+                .title(null)
+                .content(null)
+                .build();
 
         // when
-        Board createdBoard = boardRepository.save(board);
-
         // then
-//        assertThat(createdBoard.getMember()).isNotNull();
-        assertThat(createdBoard.getId()).isNotNull();
-        assertThat(createdBoard.getTitle()).isNotNull();
-        assertThat(createdBoard.getContent()).isNotNull();
+        assertThrows(ConstraintViolationException.class, () -> {
+            boardRepository.save(boardWithNull);
+        });
     }
 
     @Test
