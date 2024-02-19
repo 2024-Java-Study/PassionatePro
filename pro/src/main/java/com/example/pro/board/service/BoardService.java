@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final AuthService authService;
 
     @Transactional
     public Board createBoard(BoardSaveDto boardDto, Member member) {
