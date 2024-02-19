@@ -131,7 +131,7 @@ public class BoardServiceSearchTest {
 
 
         // when
-        when(boardRepository.findByTitle(title)).thenReturn(boardWithTitle);
+        when(boardRepository.findByTitle(any())).thenReturn(boardWithTitle);
         List<BoardResponseDto> boardWithTitleList = boardService.searchTitle(title);
 
         // then

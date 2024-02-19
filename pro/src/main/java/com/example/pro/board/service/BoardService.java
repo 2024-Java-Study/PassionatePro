@@ -60,13 +60,13 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto) {
+    public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
         // 게시물 수정 로직
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // 권한 확인 로직
-        if (!authService.loadUser().getId().equals(board.getMember().getId())) {
+        if (!member.getUsername().equals(board.getMember().getUsername())) {
             throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
         }
 
@@ -75,12 +75,12 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoard(Long boardId) {
+    public void deleteBoard(Long boardId, Member member) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(
                         () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         // 권한 확인 로직
-        if (!authService.loadUser().getId().equals(board.getMember().getId())) {
+        if (!member.getUsername().equals(board.getMember().getUsername())) {
             throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
         }
 

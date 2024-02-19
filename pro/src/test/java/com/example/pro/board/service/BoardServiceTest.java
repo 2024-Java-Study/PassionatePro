@@ -39,14 +39,23 @@ public class BoardServiceTest {
     public void setUp() {
         boardSaveDto = new BoardSaveDto("제목", "내용");
 
-        member = new Member("ajeong", "password1234", "ajeong", "ajung7038@gmail.com");
+        member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
         board = Board.builder()
                 .member(member)
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
                 .build();
 
-        boardUpdateDto = new BoardUpdateDto("제목(new)", "내용(new)");
+        boardUpdateDto = BoardUpdateDto.builder()
+                .title("제목(new)")
+                .content("내용(new)")
+                .build();
     }
 
 
@@ -57,14 +66,10 @@ public class BoardServiceTest {
         // static board
 
         // when
-        when(authService.loadUser()).thenReturn(member);
-//        when(authService.loadUser().getId()).thenReturn(memberId);
-//        when(board.getMember()).thenReturn(member);
-
         when(boardRepository.findById(anyLong())).thenReturn(Optional.ofNullable(board));
 
 
-        BoardUpdateDto updateBoard = boardService.updateBoard(boardId, boardUpdateDto);
+        BoardUpdateDto updateBoard = boardService.updateBoard(boardId, boardUpdateDto, member);
 
         // then
         assertThat(updateBoard.getTitle()).isEqualTo("제목(new)");
@@ -79,10 +84,10 @@ public class BoardServiceTest {
         Long boardId = 1L;
 
         // when
-        when(boardRepository.findById(boardId)).thenReturn(Optional.empty());
+        when(boardRepository.findById(anyLong())).thenReturn(Optional.empty());
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardService.updateBoard(boardId, boardUpdateDto);
+            boardService.updateBoard(boardId, boardUpdateDto, member);
         });
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
@@ -95,12 +100,12 @@ public class BoardServiceTest {
         Long boardId = 1L;
 
         // when
-        when(boardRepository.findById(1L)).thenReturn(Optional.empty());
+        when(boardRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // then
         // 삭제된 게시글에 접근 하려 할 때 예외 발생
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardService.deleteBoard(boardId);
+            boardService.deleteBoard(boardId, member);
         });
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }

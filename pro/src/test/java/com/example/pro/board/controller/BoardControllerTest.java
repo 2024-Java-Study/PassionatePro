@@ -254,7 +254,7 @@ class BoardControllerTest extends ControllerTest {
                 .content("내용(new)")
                 .build();
 
-        when(boardService.updateBoard(any(), any())).thenReturn(dto);
+        when(boardService.updateBoard(any(), any(), any())).thenReturn(dto);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -291,7 +291,7 @@ class BoardControllerTest extends ControllerTest {
                 .content(null)
                 .build();
 
-        when(boardService.updateBoard(any(), any())).thenReturn(dto);
+        when(boardService.updateBoard(any(), any(), any())).thenReturn(dto);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -334,8 +334,7 @@ class BoardControllerTest extends ControllerTest {
                 .content("null")
                 .build();
 
-//        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        when(boardService.updateBoard(any(), any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardService.updateBoard(any(), any(), any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -397,7 +396,7 @@ class BoardControllerTest extends ControllerTest {
 //        when(boardService.deleteBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
         doThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND))
                 .when(boardService)
-                .deleteBoard(any());
+                .deleteBoard(any(), any());
         ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
         );
