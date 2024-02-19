@@ -1,5 +1,6 @@
 package com.example.pro.board.service;
 
+import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
@@ -25,9 +26,9 @@ public class BoardService {
     private final AuthService authService;
 
     @Transactional
-    public Board createBoard(BoardSaveDto boardDto) {
+    public Board createBoard(BoardSaveDto boardDto, Member member) {
         Board board = Board.builder()
-                .member(authService.loadUser())
+                .member(member)
                 .title(boardDto.getTitle())
                 .content(boardDto.getContent())
                 .build();

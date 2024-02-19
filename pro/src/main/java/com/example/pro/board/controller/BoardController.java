@@ -26,8 +26,8 @@ public class BoardController {
 
     @PostMapping
     public BasicResponse<String> create(@RequestBody @Valid BoardSaveDto boardDto) {
-//        Member member = authService.loadUser();
-        Board board = boardService.createBoard(boardDto);
+        Member member = authService.loadUser();
+        Board board = boardService.createBoard(boardDto, member);
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }
 

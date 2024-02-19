@@ -1,6 +1,8 @@
 package com.example.pro.board.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.example.pro.auth.domain.Member;
+import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BoardControllerTest extends ControllerTest {
 
     private final BoardService boardService = mock(BoardService.class);
+    private final AuthService authService = mock(AuthService.class);
     static Long boardId = 1L;
 
     @Test
@@ -45,8 +48,21 @@ class BoardControllerTest extends ControllerTest {
                 .content("내용")
                 .build();
 
-        Board board = BoardSaveDto.toBoardEntity(dto);
-        when(boardService.createBoard(any())).thenReturn(board);
+        Member member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
+        Board board = Board.builder()
+                .member(member)
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .build();
+
+        when(authService.loadUser()).thenReturn(member);
+        when(boardService.createBoard(any(), any())).thenReturn(board);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(post("/boards")
@@ -448,6 +464,6 @@ class BoardControllerTest extends ControllerTest {
 
     @Override
     protected Object injectController() {
-        return new BoardController(boardService);
+        return new BoardController(boardService, authService);
     }
 }

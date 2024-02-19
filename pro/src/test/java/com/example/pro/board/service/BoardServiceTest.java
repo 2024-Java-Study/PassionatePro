@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
@@ -38,7 +39,7 @@ public class BoardServiceTest {
     public void setUp() {
         boardSaveDto = new BoardSaveDto("제목", "내용");
 
-        member = new Member("ajeong", "password1234", "ajung7038@gmail.com");
+        member = new Member("ajeong", "password1234", "ajeong", "ajung7038@gmail.com");
         board = Board.builder()
                 .member(member)
                 .title(boardSaveDto.getTitle())
@@ -46,7 +47,6 @@ public class BoardServiceTest {
                 .build();
 
         boardUpdateDto = new BoardUpdateDto("제목(new)", "내용(new)");
-        when(authService.loadUser().getId()).thenReturn(memberId);
     }
 
 
@@ -57,11 +57,11 @@ public class BoardServiceTest {
         // static board
 
         // when
-//        when(authService.loadUser()).thenReturn(member);
-        when(authService.loadUser().getId()).thenReturn(memberId);
-        when(board.getMember().getId()).thenReturn(memberId);
+        when(authService.loadUser()).thenReturn(member);
+//        when(authService.loadUser().getId()).thenReturn(memberId);
+//        when(board.getMember()).thenReturn(member);
 
-        when(boardRepository.findById(boardId)).thenReturn(Optional.ofNullable(board));
+        when(boardRepository.findById(anyLong())).thenReturn(Optional.ofNullable(board));
 
 
         BoardUpdateDto updateBoard = boardService.updateBoard(boardId, boardUpdateDto);

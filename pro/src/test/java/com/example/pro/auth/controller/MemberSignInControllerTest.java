@@ -2,10 +2,6 @@ package com.example.pro.auth.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.example.pro.auth.domain.Member;
-<<<<<<< HEAD
-import com.example.pro.auth.dto.BoardRequest;
-=======
->>>>>>> 286ada611bc872edbd1ad8833c22b0b64d8ac40f
 import com.example.pro.auth.dto.LoginRequest;
 import com.example.pro.auth.exception.AuthErrorCode;
 import com.example.pro.auth.exception.AuthException;
@@ -150,11 +146,6 @@ public class MemberSignInControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 로그인 사용자 조회")
     void requestMe() throws Exception {
-<<<<<<< HEAD
-        Member member = new Member(USERNAME, "password1234", "ajung7038@gmail.com");
-        when(authService.loadUser()).thenReturn(member);
-        String userName = member.getUsername();
-=======
         Member member = Member.builder()
                 .username(USERNAME)
                 .password("password")
@@ -163,7 +154,6 @@ public class MemberSignInControllerTest extends ControllerTest {
                 .build();
 
         when(authService.loadUser()).thenReturn(member);
->>>>>>> 286ada611bc872edbd1ad8833c22b0b64d8ac40f
 
         ResultActions perform = mockMvc.perform(get("/members/me")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +164,7 @@ public class MemberSignInControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response").value("인증된 사용자: " + userName));
+                .andExpect(jsonPath("$.response").value("인증된 사용자: " + USERNAME));
 
         perform.andDo(document("request me-success",
                 preprocessRequest(prettyPrint()),

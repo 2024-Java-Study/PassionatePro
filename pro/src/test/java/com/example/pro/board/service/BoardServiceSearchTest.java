@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
@@ -38,8 +39,18 @@ public class BoardServiceSearchTest {
 
     @BeforeEach
     public void setUp() {
-        boardSaveDto = new BoardSaveDto("제목", "내용");
-        member = new Member("ajeong", "password1234", "ajung7038@gmail.com");
+        boardSaveDto = BoardSaveDto.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
         board = Board.builder()
                 .member(member)
                 .title(boardSaveDto.getTitle())
@@ -54,12 +65,12 @@ public class BoardServiceSearchTest {
         // static board
 
         // when
-        when(authService.loadUser()).thenReturn(member);
-        when(boardRepository.save(ArgumentMatchers.any())).thenReturn(board);
+        when(boardRepository.save(any())).thenReturn(board);
+
 
         // then
-        assertThat(boardService.createBoard(boardSaveDto).getTitle()).isEqualTo("제목");
-        assertThat(boardService.createBoard(boardSaveDto).getMember().getUsername()).isEqualTo("ajeong");
+        assertThat(boardService.createBoard(boardSaveDto, member).getTitle()).isEqualTo("제목");
+        assertThat(boardService.createBoard(boardSaveDto, member).getMember().getNickname()).isEqualTo("ajeong");
     }
     
     @Test
