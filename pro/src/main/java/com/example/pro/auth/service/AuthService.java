@@ -1,5 +1,6 @@
 package com.example.pro.auth.service;
 
+import com.example.pro.auth.dto.BoardRequest;
 import com.example.pro.auth.repository.MemberRepository;
 import com.example.pro.auth.repository.UserSessionRepository;
 import com.example.pro.auth.dto.LoginRequest;
@@ -51,9 +52,8 @@ public class AuthService {
 
     public Member loadUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Member user = memberRepository.findByUsername(authentication.getName()).orElseThrow(
+        return memberRepository.findByUsername(authentication.getName()).orElseThrow(
                 () -> new AuthException(AuthErrorCode.MEMBER_NOT_FOUND)
         );
-        return user;
     }
 }

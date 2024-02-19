@@ -14,10 +14,12 @@ public class BoardResponseDto {
     public String title;
     @NotBlank
     public String content;
+    public String username;
     public String createdAt;
 
     @Builder
-    public BoardResponseDto(String title, String content, String createdAt) {
+    public BoardResponseDto(String username, String title, String content, String createdAt) {
+        this.username = username;
         this.title = title;
         this.content = content;
         this.createdAt = createdAt;
@@ -25,6 +27,7 @@ public class BoardResponseDto {
 
     public static BoardResponseDto toBoardDto(Board board) {
         return BoardResponseDto.builder()
+                .username(board.getMember().getUsername())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .createdAt(String.valueOf(board.getCreatedAt()))

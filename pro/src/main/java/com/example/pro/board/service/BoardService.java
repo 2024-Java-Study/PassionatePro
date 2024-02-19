@@ -1,7 +1,9 @@
 package com.example.pro.board.service;
 
+import com.example.pro.auth.domain.Member;
+import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.exception.BoardErrorCode;
-import com.example.pro.board.exception.NoSearchBoardException;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
@@ -21,16 +23,21 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final AuthService authService;
 
     @Transactional
-    public Board createBoard(BoardSaveDto boardDto) {
-        Board board = BoardSaveDto.toBoardEntity(boardDto);
+    public Board createBoard(BoardSaveDto boardDto, Member member) {
+        Board board = Board.builder()
+                .member(member)
+                .title(boardDto.getTitle())
+                .content(boardDto.getContent())
+                .build();
         return boardRepository.save(board);
     }
 
     public BoardResponseDto findBoard(Long boardId) {
         Board findBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         return BoardResponseDto.toBoardDto(findBoard);
     }
 
@@ -53,18 +60,30 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto) {
+    public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
+        // 게시물 수정 로직
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+
+        // 권한 확인 로직
+        if (!member.getUsername().equals(board.getMember().getUsername())) {
+            throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
+        }
+
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
         return BoardUpdateDto.toBoardUpdateDto(board);
     }
 
     @Transactional
-    public void deleteBoard(Long boardId) {
+    public void deleteBoard(Long boardId, Member member) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(
-                        () -> new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+                        () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        // 권한 확인 로직
+        if (!member.getUsername().equals(board.getMember().getUsername())) {
+            throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
+        }
+
         boardRepository.delete(board);
     }
 }

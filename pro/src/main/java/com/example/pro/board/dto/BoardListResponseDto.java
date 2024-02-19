@@ -1,6 +1,7 @@
 package com.example.pro.board.dto;
 
 import com.example.pro.board.domain.Board;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -14,6 +15,7 @@ public class BoardListResponseDto {
     @NotNull
     public Long id;
     public String username;
+    @NotBlank
     public String title;
     public String createdAt; // 날짜
 
@@ -28,6 +30,7 @@ public class BoardListResponseDto {
     public static BoardListResponseDto toBoardListDto(Board board) {
         return BoardListResponseDto.builder()
                 .id(board.getId())
+                .username(board.getMember().getUsername())
                 .title(board.getTitle())
                 .createdAt(String.valueOf(board.getCreatedAt()))
                 .build();

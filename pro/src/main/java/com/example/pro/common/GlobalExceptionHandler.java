@@ -1,7 +1,7 @@
 package com.example.pro.common;
 
 import com.example.pro.auth.exception.AuthException;
-import com.example.pro.board.exception.NoSearchBoardException;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ErrorEntity;
 import com.example.pro.common.response.ResponseUtil;
@@ -46,9 +46,9 @@ public class GlobalExceptionHandler {
     }
 
     // board
-    @ExceptionHandler(NoSearchBoardException.class)
+    @ExceptionHandler(BoardException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND) // 상태 코드 204...?
-    public BasicResponse<ErrorEntity> boardException(NoSearchBoardException e) {
+    public BasicResponse<ErrorEntity> boardException(BoardException e) {
         log.error("Board Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
     }

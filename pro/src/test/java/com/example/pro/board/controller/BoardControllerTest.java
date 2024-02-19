@@ -1,14 +1,15 @@
 package com.example.pro.board.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import com.example.pro.auth.exception.AuthException;
+import com.example.pro.auth.domain.Member;
+import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
 import com.example.pro.board.exception.BoardErrorCode;
-import com.example.pro.board.exception.NoSearchBoardException;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +21,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BoardControllerTest extends ControllerTest {
 
     private final BoardService boardService = mock(BoardService.class);
+    private final AuthService authService = mock(AuthService.class);
     static Long boardId = 1L;
 
     @Test
@@ -47,8 +48,21 @@ class BoardControllerTest extends ControllerTest {
                 .content("내용")
                 .build();
 
-        Board board = BoardSaveDto.toBoardEntity(dto);
-        when(boardService.createBoard(any())).thenReturn(board);
+        Member member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
+        Board board = Board.builder()
+                .member(member)
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .build();
+
+        when(authService.loadUser()).thenReturn(member);
+        when(boardService.createBoard(any(), any())).thenReturn(board);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(post("/boards")
@@ -120,7 +134,7 @@ class BoardControllerTest extends ControllerTest {
         List<BoardListResponseDto> boards = new ArrayList<>();
         BoardListResponseDto dto = BoardListResponseDto.builder()
                 .id(1L)
-                .username("ajeong")
+                .username("ajeong7038")
                 .title("제목")
                 .createdAt("2024-02-07 18:32:25")
                 .build();
@@ -158,15 +172,16 @@ class BoardControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("[성공] 게시물 조회 - id 값이 null")
+    @DisplayName("[성공] 게시물 조회")
     void findById() throws Exception{
         BoardResponseDto dto = BoardResponseDto.builder()
+                .username("ajeong7038")
                 .title("제목")
                 .content("내용")
                 .createdAt("2024-02-08 11:59:07")
                 .build();
 
-        when(boardService.findBoard(boardId)).thenReturn(dto);
+        when(boardService.findBoard(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,9 +191,10 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.title").value("제목"))
-                .andExpect(jsonPath("$.response.content").value("내용"))
-                .andExpect(jsonPath("$.response.createdAt").value("2024-02-08 11:59:07"));
+                .andExpect(jsonPath("$.response.username").value(dto.getUsername()))
+                .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
+                .andExpect(jsonPath("$.response.content").value(dto.getContent()))
+                .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()));
 
         // 문서 자동화
         perform.andDo(document("board findById-success",
@@ -188,6 +204,7 @@ class BoardControllerTest extends ControllerTest {
                         .tag("API-Board")
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.username").type(JsonFieldType.STRING).description("응답 메시지 - 유저 아이디"),
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
                                 fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
@@ -195,52 +212,12 @@ class BoardControllerTest extends ControllerTest {
         ));
     }
 
-//    @Test
-//    @DisplayName("[성공] 게시물 조회 - id 값이 null")
-//    void findByIdWithIdNull() throws Exception{
-//        Long boardId = null;
-//
-//        BoardResponseDto dto = BoardResponseDto.builder()
-//                .title("제목")
-//                .content("내용")
-//                .createdAt("2024-02-08 11:59:07")
-//                .build();
-//
-//        when(boardService.findBoard(boardId)).thenReturn(dto);
-//
-//        ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
-//                .contentType(MediaType.APPLICATION_JSON)
-//        );
-//
-//        perform.andDo(print())
-//                .andExpect(status().isOk())
-//    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(jsonPath("$.success").value(true))
-//                .andExpect(jsonPath("$.response.title").value("제목"))
-//                .andExpect(jsonPath("$.response.content").value("내용"))
-//                .andExpect(jsonPath("$.response.createdAt").value("2024-02-08 11:59:07"));
-//
-//        // 문서 자동화
-//        perform.andDo(document("board findById-success",
-//                preprocessRequest(prettyPrint()),
-//                preprocessResponse(prettyPrint()),
-//                resource(ResourceSnippetParameters.builder()
-//                        .tag("API-Board")
-//                        .responseFields(
-//                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
-//                                fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
-//                                fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
-//                                fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
-//                        ).build())
-//        ));
-//    }
-
     @Test
     @DisplayName("[실패] 게시물 조회 - 게시물을 찾을 수 없는 경우")
     void findByIdWithBoardNull() throws Exception{
         Long boardId = 1L;
 
-        when(boardService.findBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardService.findBoard(boardId)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -249,7 +226,7 @@ class BoardControllerTest extends ControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
                 .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
@@ -277,7 +254,7 @@ class BoardControllerTest extends ControllerTest {
                 .content("내용(new)")
                 .build();
 
-        when(boardService.updateBoard(any(), any())).thenReturn(dto);
+        when(boardService.updateBoard(any(), any(), any())).thenReturn(dto);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -314,7 +291,7 @@ class BoardControllerTest extends ControllerTest {
                 .content(null)
                 .build();
 
-        when(boardService.updateBoard(any(), any())).thenReturn(dto);
+        when(boardService.updateBoard(any(), any(), any())).thenReturn(dto);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -357,8 +334,7 @@ class BoardControllerTest extends ControllerTest {
                 .content("null")
                 .build();
 
-//        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        when(boardService.updateBoard(any(), any())).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardService.updateBoard(any(), any(), any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
@@ -369,7 +345,7 @@ class BoardControllerTest extends ControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
                 .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
@@ -418,9 +394,9 @@ class BoardControllerTest extends ControllerTest {
     @DisplayName("[실패] 게시물 삭제 - 게시물을 찾을 수 없는 경우")
     void deleteWithBoardNull() throws Exception{
 //        when(boardService.deleteBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        doThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND))
+        doThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND))
                 .when(boardService)
-                .deleteBoard(any());
+                .deleteBoard(any(), any());
         ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
         );
@@ -428,7 +404,7 @@ class BoardControllerTest extends ControllerTest {
         perform.andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(NoSearchBoardException.class))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.response.errorCode").value("BOARD_NOT_FOUND"))
                 .andExpect(jsonPath("$.response.errorMessage").value("게시물을 찾을 수 없습니다."));
@@ -450,6 +426,6 @@ class BoardControllerTest extends ControllerTest {
 
     @Override
     protected Object injectController() {
-        return new BoardController(boardService);
+        return new BoardController(boardService, authService);
     }
 }

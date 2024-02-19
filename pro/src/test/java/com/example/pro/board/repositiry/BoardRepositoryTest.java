@@ -1,7 +1,9 @@
 package com.example.pro.board.repositiry;
 
+import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 db 이용
@@ -21,14 +23,26 @@ class BoardRepositoryTest {
     BoardRepository boardRepository;
 
     public static Board board;
+    public static Member member;
 
     @BeforeEach
     public void setUp() {
-        board = new Board("제목", "내용");
+        member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .build();
     }
 
     @Test
-    @DisplayName("게시글 생성")
+    @DisplayName("게시물 생성")
     public void CreateBoard() throws Exception {
         // given
         // static board
@@ -37,11 +51,9 @@ class BoardRepositoryTest {
         Board createdBoard = boardRepository.save(board);
 
         // then
-        assertThat(board).isEqualTo(createdBoard);
-        assertThat(board.getId()).isEqualTo(createdBoard.getId());
-        assertThat(board.getTitle()).isEqualTo(createdBoard.getTitle());
-        assertThat(board.getContent()).isEqualTo(createdBoard.getContent());
-        assertThat(board.getCreatedAt()).isEqualTo(createdBoard.getCreatedAt());
+        assertThat(createdBoard).isEqualTo(board);
+        assertThat(createdBoard.getTitle()).isEqualTo("제목");
+        assertThat(createdBoard.getContent()).isEqualTo("내용");
 
     }
     
@@ -50,23 +62,29 @@ class BoardRepositoryTest {
     public void validateCreateBoard() throws Exception {
         // given
         // static board
+        Board boardWithNull = Board.builder()
+                .member(member)
+                .title(null)
+                .content(null)
+                .build();
 
         // when
-        Board createdBoard = boardRepository.save(board);
-
         // then
-//        assertThat(createdBoard.getMember()).isNotNull();
-        assertThat(createdBoard.getId()).isNotNull();
-        assertThat(createdBoard.getTitle()).isNotNull();
-        assertThat(createdBoard.getContent()).isNotNull();
+        assertThrows(ConstraintViolationException.class, () -> {
+            boardRepository.save(boardWithNull);
+        });
     }
 
     @Test
-    @DisplayName("게시글 전체 조회")
+    @DisplayName("게시물 전체 조회")
     public void findAll() throws Exception {
         // given
         // static board
-        Board board1 = new Board("제목", "내용");
+        Board board1 = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .build();
 
         // when
         boardRepository.save(board);
@@ -78,7 +96,7 @@ class BoardRepositoryTest {
     }
 
     @Test
-    @DisplayName("게시글 단건 조회")
+    @DisplayName("게시물 단건 조회")
     public void findById() throws Exception {
         // given
         // static board

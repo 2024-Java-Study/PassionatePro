@@ -19,11 +19,4 @@ public class BoardSaveDto {
         this.title = title;
         this.content = content;
     }
-
-    public static Board toBoardEntity(BoardSaveDto boardDto) {
-        return Board.builder()
-                .title(boardDto.title)
-                .content(boardDto.content)
-                .build();
-    }
 }
