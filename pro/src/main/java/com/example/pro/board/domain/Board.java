@@ -36,8 +36,8 @@ public class Board extends BaseTimeEntity {
     private String title;
 
     @OneToMany(mappedBy = "board")
-    private List<Comment> comment = new ArrayList<>();
-
+    private final List<Comment> comments = new ArrayList<>();
+    
     @Column(nullable = false)
     @NotBlank
     private String content;
