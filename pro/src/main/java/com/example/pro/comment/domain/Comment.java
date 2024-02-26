@@ -3,6 +3,7 @@ package com.example.pro.comment.domain;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.common.BaseTimeEntity;
+import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,6 +43,6 @@ public class Comment extends BaseTimeEntity {
     public Comment(Member member, Board board, String content) {
         this.member = member;
         this.board = board;
-        this.content = content;
+        this.content = Validator.validString(content);
     }
 }

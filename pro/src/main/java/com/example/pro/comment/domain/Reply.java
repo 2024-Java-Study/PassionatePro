@@ -2,7 +2,9 @@ package com.example.pro.comment.domain;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.common.BaseTimeEntity;
+import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +26,7 @@ public class Reply extends BaseTimeEntity {
     @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
+    @NotBlank
     private String content;
 
     /**
@@ -32,6 +35,6 @@ public class Reply extends BaseTimeEntity {
     public Reply(Member member, Comment comment, String content) {
         this.member = member;
         this.comment = comment;
-        this.content = content;
+        this.content = Validator.validString(content);
     }
 }
