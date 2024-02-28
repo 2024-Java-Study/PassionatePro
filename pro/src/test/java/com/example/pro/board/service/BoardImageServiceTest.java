@@ -69,8 +69,9 @@ class BoardImageServiceTest {
 
         when(fileUploader.uploadFile(any(), any()))
                 .thenReturn(URL);
-        boardImageService.uploadBoardImage(multipartFiles, board);
+        boardImageService.uploadBoardImage(multipartFiles);
         List<BoardImage> images = board.getImage();
+
         for (BoardImage img : images) {
             String url = img.getUrl();
             assertThat(url).isEqualTo(URL);
