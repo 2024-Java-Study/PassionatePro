@@ -20,7 +20,6 @@ public class CommentService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
-    private final ReplyRepository replyRepository;
 
     @Transactional
     public Comment saveComment(Member writer, CommentSaveRequestDto saveRequest) {
