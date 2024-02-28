@@ -40,7 +40,8 @@ public class Comment extends BaseTimeEntity {
      * 생성 메서드
      */
     @Builder
-    public Comment(Member member, Board board, String content) {
+    public Comment(Long id, Member member, Board board, String content) {
+        this.id = id;
         this.member = member;
         this.board = board;
         this.content = Validator.validString(content);

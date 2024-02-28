@@ -11,13 +11,7 @@ import lombok.Getter;
 
 import java.util.Objects;
 
-public class CommentSaveRequestDto {
-
-    @Getter
-    @NotNull
-    private final Long boardId;
-    @NotBlank
-    private final String content;
+public record CommentSaveRequestDto(@NotNull Long boardId, @NotBlank String content) {
 
     public Comment toComment(Board board, Member writer) {
         if (!Objects.equals(boardId, board.getId()))

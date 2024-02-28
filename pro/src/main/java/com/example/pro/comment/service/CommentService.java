@@ -24,7 +24,7 @@ public class CommentService {
 
     @Transactional
     public Comment saveComment(Member writer, CommentSaveRequestDto saveRequest) {
-        Board board = boardRepository.findById(saveRequest.getBoardId())
+        Board board = boardRepository.findById(saveRequest.boardId())
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         Comment comment = commentRepository.save(saveRequest.toComment(board, writer));
         board.getComments().add(comment);
