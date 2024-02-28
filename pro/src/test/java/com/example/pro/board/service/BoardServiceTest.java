@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 public class BoardServiceTest {
 
     @Mock BoardRepository boardRepository;
-    @Mock AuthService authService;
     @InjectMocks BoardService boardService;
 
     public BoardSaveDto boardSaveDto;

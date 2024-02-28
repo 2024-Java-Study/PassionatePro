@@ -69,7 +69,7 @@ public class BoardUploadControllerTest extends ControllerTest {
                 .member(member)
                 .title(board.getTitle())
                 .content(board.getContent())
-                .images(images)
+                .image(images)
                 .build();
     }
 //    @Test

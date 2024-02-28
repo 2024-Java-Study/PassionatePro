@@ -1,0 +1,79 @@
+package com.example.pro.board.service;
+
+import com.example.pro.auth.domain.Member;
+import com.example.pro.board.domain.Board;
+import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.dto.BoardImageResponseDto;
+import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.files.FileUploader;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class BoardImageServiceTest {
+
+    @Mock private FileUploader fileUploader;
+    @InjectMocks BoardImageService boardImageService;
+    public static Board board;
+    public static Member member;
+    public static List<MultipartFile> multipartFiles = new ArrayList<>();
+    public static List<BoardImage> boardImageList = new ArrayList<>();
+    public static final String URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg";
+    @BeforeEach
+    public void setUp() {
+
+        member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .image(null)
+                .build();
+
+        MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
+        multipartFiles.add(file);
+
+        BoardImage boardImage = BoardImage.builder()
+                .board(board)
+                .url(URL)
+                .build();
+        boardImageList.add(boardImage);
+    }
+
+    @Test
+    @DisplayName("[성공] 게시물 이미지 업로드")
+    public void uploadFile() throws Exception {
+        // when
+        // static board
+
+        when(fileUploader.uploadFile(any(), any()))
+                .thenReturn(URL);
+        boardImageService.uploadBoardImage(multipartFiles, board);
+        List<BoardImage> images = board.getImage();
+        for (BoardImage img : images) {
+            String url = img.getUrl();
+            assertThat(url).isEqualTo(URL);
+        }
+    }
+}
