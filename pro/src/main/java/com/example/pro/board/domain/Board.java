@@ -47,7 +47,8 @@ public class Board extends BaseTimeEntity {
      */
     // 유저 추가
     @Builder
-    public Board (Member member, String title, String content) {
+    public Board (Long id, Member member, String title, String content) {
+        this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;

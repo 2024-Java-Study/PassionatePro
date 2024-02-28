@@ -17,7 +17,7 @@ public class CommentSaveRequestDto {
     @NotNull
     private final Long boardId;
     @NotBlank
-    private final String comment;
+    private final String content;
 
     public Comment toComment(Board board, Member writer) {
         if (!Objects.equals(boardId, board.getId()))
@@ -26,12 +26,12 @@ public class CommentSaveRequestDto {
         return Comment.builder()
                 .board(board)
                 .member(writer)
-                .content(this.comment)
+                .content(this.content)
                 .build();
     }
 
-    public CommentSaveRequestDto(Long boardId, String comment) {
+    public CommentSaveRequestDto(Long boardId, String content) {
         this.boardId = boardId;
-        this.comment = comment;
+        this.content = content;
     }
 }
