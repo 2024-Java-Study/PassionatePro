@@ -3,18 +3,18 @@ package com.example.pro.board.controller;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardResponseDto;
-import com.example.pro.board.dto.BoardSaveDto;
-import com.example.pro.board.dto.BoardUpdateDto;
+import com.example.pro.board.dto.*;
+import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/boards")
@@ -22,6 +22,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardImageService boardImageService;
     private final AuthService authService;
 
     @PostMapping
@@ -53,5 +54,13 @@ public class BoardController {
         Member member = authService.loadUser();
         boardService.deleteBoard(id, member);
         return ResponseUtil.success("게시물 삭제에 성공하였습니다. 게시물id: " + id);
+    }
+
+    @PostMapping("/{id}/upload")
+    public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
+        Board board = boardImageService.findBoard(id);
+//        BoardResponseDto board = boardService.findBoard(id);
+        boardImageService.uploadBoardImage(request, board);
+        return ResponseUtil.success("게시물 id: " + id + "번 사진 추가에 성공하였습니다.");
     }
 }

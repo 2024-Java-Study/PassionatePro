@@ -10,6 +10,7 @@ import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
+import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BoardControllerTest extends ControllerTest {
 
     private final BoardService boardService = mock(BoardService.class);
+    private final BoardImageService boardImageService = mock(BoardImageService.class);
     private final AuthService authService = mock(AuthService.class);
     static Long boardId = 1L;
 
@@ -426,6 +428,6 @@ class BoardControllerTest extends ControllerTest {
 
     @Override
     protected Object injectController() {
-        return new BoardController(boardService, authService);
+        return new BoardController(boardService, boardImageService, authService);
     }
 }

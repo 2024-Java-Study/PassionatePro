@@ -1,4 +1,4 @@
-package com.example.pro.board.repositiry;
+package com.example.pro.board.repository;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
