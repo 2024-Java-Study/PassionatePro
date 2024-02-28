@@ -21,6 +21,10 @@ public record ReplySaveRequestDto(@NotNull Long commentId, @NotBlank String cont
         if (!Objects.equals(commentId, comment.getId()))
             throw new ReplyException(ReplyErrorCode.REPLY_ID_NOT_MATCH);
 
-        return new Reply(member, comment, content);
+        return Reply.builder()
+                .member(member)
+                .comment(comment)
+                .content(content)
+                .build();
     }
 }

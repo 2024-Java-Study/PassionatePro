@@ -1,8 +1,7 @@
-package com.example.pro.comment;
+package com.example.pro.comment.controller;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.example.pro.auth.domain.Member;
-import com.example.pro.auth.exception.AuthException;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.exception.BoardErrorCode;

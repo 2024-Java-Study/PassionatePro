@@ -1,4 +1,4 @@
-package com.example.pro.comment;
+package com.example.pro.comment.controller;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;

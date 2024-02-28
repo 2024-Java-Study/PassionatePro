@@ -6,6 +6,7 @@ import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,7 +33,9 @@ public class Reply extends BaseTimeEntity {
     /**
      * 생성 메서드
      */
-    public Reply(Member member, Comment comment, String content) {
+    @Builder
+    public Reply(Long id, Member member, Comment comment, String content) {
+        this.id = id;
         this.member = member;
         this.comment = comment;
         this.content = Validator.validString(content);
