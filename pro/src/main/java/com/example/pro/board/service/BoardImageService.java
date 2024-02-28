@@ -2,12 +2,6 @@ package com.example.pro.board.service;
 
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
-import com.example.pro.board.dto.BoardImageUploadDto;
-import com.example.pro.board.dto.BoardResponseDto;
-import com.example.pro.board.exception.BoardErrorCode;
-import com.example.pro.board.exception.BoardException;
-import com.example.pro.board.repository.BoardImageRepository;
-import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.files.FileUploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,26 +10,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardImageService {
 
-    private final BoardImageRepository boardImageRepository;
-//    private final BoardRepository boardRepository;
     private final FileUploader fileUploader;
 
     static final String BOARD_KEY = "boards/";
-
-//    public Board findBoard (Long boardId) {
-////        return boardImageRepository.findByBoardId(boardId);
-////                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-////        return boardImageRepository.findByBoardId(boardId).getBoard();
-//        return boardImageRepository.findByBoardId(boardId).getBoard();
-////                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND)));
-//    }
 
     @Transactional
     public void uploadBoardImage (List<MultipartFile> images, Board board) {

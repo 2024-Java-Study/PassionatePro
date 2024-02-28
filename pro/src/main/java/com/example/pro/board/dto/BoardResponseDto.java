@@ -1,6 +1,7 @@
 package com.example.pro.board.dto;
 
 import com.example.pro.board.domain.Board;
+import com.example.pro.board.domain.BoardImage;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,8 +26,8 @@ public class BoardResponseDto {
         this.username = username;
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
         this.url = url;
+        this.createdAt = createdAt;
     }
 
     public static BoardResponseDto toBoardDto(Board board) {
@@ -34,6 +35,7 @@ public class BoardResponseDto {
                 .username(board.getMember().getUsername())
                 .title(board.getTitle())
                 .content(board.getContent())
+                .url(BoardImageResponseDto.toBoardImageUrl(board.getImage()))
                 .createdAt(String.valueOf(board.getCreatedAt()))
                 .build();
     }

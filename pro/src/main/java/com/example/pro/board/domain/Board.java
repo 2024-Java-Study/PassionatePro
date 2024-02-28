@@ -27,9 +27,7 @@ public class Board extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "member_id")
     private Member member;
-
-//    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
-//    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    
     @OneToMany(mappedBy = "board")
     private List<BoardImage> image = new ArrayList<>();
 
