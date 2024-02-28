@@ -1,5 +1,8 @@
 package com.example.pro.comment.exception;
 
+import lombok.Getter;
+
+@Getter
 public class CommentException extends RuntimeException{
 
     private final CommentErrorCode code;
