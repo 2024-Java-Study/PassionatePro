@@ -3,6 +3,7 @@ package com.example.pro.board.controller;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
+import com.example.pro.board.domain.BoardImage;
 import com.example.pro.board.dto.*;
 import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
@@ -58,9 +59,9 @@ public class BoardController {
 
     @PostMapping("/{id}/upload")
     public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
-        Board board = boardImageService.findBoard(id);
-//        BoardResponseDto board = boardService.findBoard(id);
-        boardImageService.uploadBoardImage(request, board);
+        Board board = boardService.findBoardReturnBoard(id);
+        boardImageService.uploadBoardImage(request.getImages(), board);
         return ResponseUtil.success("게시물 id: " + id + "번 사진 추가에 성공하였습니다.");
+        // url 추가할 것
     }
 }

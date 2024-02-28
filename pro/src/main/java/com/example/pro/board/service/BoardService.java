@@ -40,6 +40,11 @@ public class BoardService {
         return BoardResponseDto.toBoardDto(findBoard);
     }
 
+    public Board findBoardReturnBoard(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+    }
+
     public List<BoardListResponseDto> findAllBoards() {
         List<Board> boards = boardRepository.findAll();
 

@@ -28,7 +28,9 @@ public class Board extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+//    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+//    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board")
     private List<BoardImage> image = new ArrayList<>();
 
     @Column(length = 50, nullable = false)
@@ -47,11 +49,11 @@ public class Board extends BaseTimeEntity {
      */
     // 유저 추가
     @Builder
-    public Board (Member member, String title, String content, List<BoardImage> images) {
+    public Board (Member member, String title, String content, List<BoardImage> image) {
         this.member = member;
         this.title = title;
         this.content = content;
-        this.image = images;
+        this.image = image;
     }
 
     public void updateBoard(String title, String content) {

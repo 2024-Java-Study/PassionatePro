@@ -29,16 +29,16 @@ public class BoardImageService {
 
     static final String BOARD_KEY = "boards/";
 
-    public Board findBoard (Long boardId) {
-//        return boardImageRepository.findByBoardId(boardId);
-//                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        return boardImageRepository.findByBoardId(boardId).getBoard();
-//                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND)));
-    }
+//    public Board findBoard (Long boardId) {
+////        return boardImageRepository.findByBoardId(boardId);
+////                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+////        return boardImageRepository.findByBoardId(boardId).getBoard();
+//        return boardImageRepository.findByBoardId(boardId).getBoard();
+////                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND)));
+//    }
 
     @Transactional
-    public void uploadBoardImage (BoardImageUploadDto dto, Board board) {
-        List<MultipartFile> images = dto.getImages();
+    public void uploadBoardImage (List<MultipartFile> images, Board board) {
         List<BoardImage> imageList = new ArrayList<>();
 
         for (MultipartFile image : images) {
@@ -49,5 +49,7 @@ public class BoardImageService {
                     .build();
             imageList.add(boardImage);
         }
+
+        board.uploadFile(imageList);
     }
 }
