@@ -224,7 +224,7 @@ class BoardControllerTest extends ControllerTest {
         );
 
         perform.andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
@@ -343,7 +343,7 @@ class BoardControllerTest extends ControllerTest {
         );
 
         perform.andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))
@@ -402,7 +402,7 @@ class BoardControllerTest extends ControllerTest {
         );
 
         perform.andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardException.class))
                 .andExpect(jsonPath("$.success").value(false))

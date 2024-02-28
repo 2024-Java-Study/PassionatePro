@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
     // board
     @ExceptionHandler(BoardException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND) // 상태 코드 204...?
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 상태 코드 204...?
     public BasicResponse<ErrorEntity> boardException(BoardException e) {
         log.error("Board Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
