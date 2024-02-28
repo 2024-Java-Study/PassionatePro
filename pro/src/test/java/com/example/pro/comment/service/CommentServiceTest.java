@@ -2,9 +2,12 @@ package com.example.pro.comment.service;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.dto.CommentSaveRequestDto;
+import com.example.pro.comment.exception.CommentException;
 import com.example.pro.comment.repository.CommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -60,5 +64,15 @@ class CommentServiceTest {
 
         Comment comment = commentService.saveComment(member, request);
         assertThat(comment.getContent()).isEqualTo("댓글 내용");
+        assertThat(board.getComments().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("[실패] 존재하지 않는 게시글 id")
+    void boardNotFound() {
+        when(boardRepository.findById(1L)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        assertThatThrownBy(() -> commentService.saveComment(member, request))
+                .isInstanceOf(BoardException.class)
+                .hasMessageContaining("게시물을 찾을 수 없습니다.");
     }
 }
