@@ -23,7 +23,18 @@ public class BoardImageService {
     private final BoardImageRepository boardImageRepository;
 
     @Transactional
-    public void saveImage(Board board, List<String> urlList) {
+    public List<String> saveImages(List<MultipartFile> images) {
+        List<String> urlList = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            String url = fileUploader.uploadFile(image, BOARD_KEY);
+            urlList.add(url);
+        }
+        return urlList;
+    }
+
+    @Transactional
+    public void uploadImages(Board board, List<String> urlList) {
         for (String url : urlList) {
             BoardImage boardImage = BoardImage.builder()
                     .board(board)
@@ -32,16 +43,5 @@ public class BoardImageService {
             boardImageRepository.save(boardImage);
         }
         board.uploadFile(boardImageRepository.findByBoard(board));
-    }
-
-    @Transactional
-    public List<String> uploadBoardImage (List<MultipartFile> images) {
-        List<String> urlList = new ArrayList<>();
-
-        for (MultipartFile image : images) {
-            String url = fileUploader.uploadFile(image, BOARD_KEY);
-            urlList.add(url);
-        }
-        return urlList;
     }
 }
