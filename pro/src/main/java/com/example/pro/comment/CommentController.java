@@ -24,7 +24,7 @@ public class CommentController {
     @PostMapping
     public BasicResponse<String> saveComment(@Valid @RequestBody CommentSaveRequestDto saveRequest) {
         Member member = authService.loadUser();
-        commentService.saveComment(member, saveRequest);
-        return ResponseUtil.success("댓글이 성공적으로 등록되었습니다.");
+        Long commentId = commentService.saveComment(member, saveRequest);
+        return ResponseUtil.success("댓글이 성공적으로 등록되었습니다. Comment Id: " + commentId);
     }
 }

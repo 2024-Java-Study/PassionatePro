@@ -23,11 +23,11 @@ public class CommentService {
     private final ReplyRepository replyRepository;
 
     @Transactional
-    public Comment saveComment(Member writer, CommentSaveRequestDto saveRequest) {
+    public Long saveComment(Member writer, CommentSaveRequestDto saveRequest) {
         Board board = boardRepository.findById(saveRequest.getBoardId())
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         Comment comment = commentRepository.save(saveRequest.toComment(board, writer));
         board.getComments().add(comment);
-        return comment;
+        return comment.getId();
     }
 }
