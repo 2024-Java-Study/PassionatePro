@@ -3,6 +3,7 @@ package com.example.pro.board.service;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
+import com.example.pro.board.exception.BoardUnauthorizedException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
@@ -60,7 +61,7 @@ public class BoardService {
 
         // 권한 확인 로직
         if (!member.getUsername().equals(board.getMember().getUsername())) {
-            throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
+            throw new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD);
         }
 
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
@@ -74,7 +75,7 @@ public class BoardService {
                         () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         // 권한 확인 로직
         if (!member.getUsername().equals(board.getMember().getUsername())) {
-            throw new BoardException(BoardErrorCode.UNAUTHORIZED_USER);
+            throw new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD);
         }
 
         boardRepository.delete(board);

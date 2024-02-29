@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum BoardErrorCode {
 
     BOARD_NOT_FOUND("게시물을 찾을 수 없습니다."),
-    UNAUTHORIZED_USER("인증된 사용자가 아닙니다.");
+    UNAUTHORIZED_BOARD("게시물 권한이 없습니다.");
 
     private final String message;
 }

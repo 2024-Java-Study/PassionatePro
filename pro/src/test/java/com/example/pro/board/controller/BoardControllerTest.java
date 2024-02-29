@@ -8,6 +8,7 @@ import com.example.pro.board.domain.BoardImage;
 import com.example.pro.board.dto.*;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
+import com.example.pro.board.exception.BoardUnauthorizedException;
 import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
@@ -401,6 +402,46 @@ class BoardControllerTest extends ControllerTest {
     }
 
     @Test
+    @DisplayName("[실패] 게시물 수정 - 권한이 없는 경우")
+    void updateBoardNotValidation() throws Exception {
+        BoardUpdateDto dto = BoardUpdateDto.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        when(boardService.updateBoard(any(), any(), any())).thenThrow(new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD));
+        String body = objectMapper.writeValueAsString(dto);
+
+        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardUnauthorizedException.class))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("UNAUTHORIZED_BOARD"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물 권한이 없습니다."));
+
+        // 문서 자동화
+        perform.andDo(document("board update-unAuthorized board",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
+
+    @Test
     @DisplayName("[성공] 게시물 삭제")
     void deleteBoard() throws Exception{
 
@@ -428,7 +469,6 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 게시물 삭제 - 게시물을 찾을 수 없는 경우")
     void deleteWithBoardNull() throws Exception{
-//        when(boardService.deleteBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
         doThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND))
                 .when(boardService)
                 .deleteBoard(any(), any());
@@ -446,6 +486,38 @@ class BoardControllerTest extends ControllerTest {
 
         // 문서 자동화
         perform.andDo(document("board delete-board not found",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
+
+    @Test
+    @DisplayName("[실패] 게시물 삭제 - 권한이 없는 경우")
+    void deleteBoardNotValidation() throws Exception {
+        doThrow(new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD))
+                .when(boardService)
+                .deleteBoard(any(), any());
+        ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardUnauthorizedException.class))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("UNAUTHORIZED_BOARD"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물 권한이 없습니다."));
+        // 문서 자동화
+        perform.andDo(document("board delete- unauthorized board",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 resource(ResourceSnippetParameters.builder()
