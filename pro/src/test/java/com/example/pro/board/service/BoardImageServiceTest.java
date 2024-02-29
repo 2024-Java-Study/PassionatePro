@@ -3,6 +3,8 @@ package com.example.pro.board.service;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardImageRepository;
 import com.example.pro.files.FileUploader;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -96,7 +101,7 @@ class BoardImageServiceTest {
 
     @Test
     @DisplayName("[성공] 사진 저장 - 사진이 존재하지 않은 경우")
-    void saveFileWithImageNull () throws Exception {
+    void saveFileWithImageNull() throws Exception {
         // 로직 : List<MultipartFile> images -> List<String> urlList
         // when
         // static board
@@ -106,5 +111,24 @@ class BoardImageServiceTest {
 
         // then
         assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(urlList.size());
+    }
+
+    @Test
+    @DisplayName("[실패] 사진 저장 - 게시물을 찾을 수 없는 경우")
+    void uploadImagesWithBoardNull() throws Exception {
+        board = null;
+
+        BoardImage boardImage = BoardImage.builder()
+                .board(board)
+                .url(URL)
+                .build();
+
+        // when
+        when(boardImageRepository.save(any())).thenReturn(boardImage);
+        // then
+        BoardException exception = assertThrows(BoardException.class, () -> {
+            boardImageService.uploadImages(board, urlList);
+        });
+        assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
 }

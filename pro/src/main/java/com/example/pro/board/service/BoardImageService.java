@@ -3,6 +3,8 @@ package com.example.pro.board.service;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
 import com.example.pro.board.dto.BoardImageResponseDto;
+import com.example.pro.board.exception.BoardErrorCode;
+import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardImageRepository;
 import com.example.pro.files.FileUploader;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class BoardImageService {
     public void uploadImages(Board board, List<String> urlList) {
         List<BoardImage> boardImages = new ArrayList<>();
 
+
         for (String url : urlList) {
             BoardImage boardImage = BoardImage.builder()
                     .board(board)
@@ -48,7 +51,9 @@ public class BoardImageService {
             boardImageRepository.save(boardImage);
             boardImages.add(boardImage);
         }
-        board.uploadFile(boardImages);
+
+        if (board == null) throw new BoardException(BoardErrorCode.BOARD_NOT_FOUND);
+        else board.uploadFile(boardImages);
     }
 
     @Transactional
