@@ -68,7 +68,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[실패] 존재하지 않는 게시글 id")
+    @DisplayName("[실패] 댓글 작성-존재하지 않는 게시글 id")
     void boardNotFound() {
         when(boardRepository.findById(1L)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         assertThatThrownBy(() -> commentService.saveComment(member, request))
