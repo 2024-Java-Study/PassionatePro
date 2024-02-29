@@ -80,26 +80,6 @@ class BoardImageServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 사진 업로드")
-    public void uploadFile() throws Exception {
-        // 로직 : List<String> urlList -> List<BoardImage> boardImageList
-        // when
-        List<BoardImage> boardImageList = new ArrayList<>();
-        BoardImage boardImage = BoardImage.builder()
-                .board(board)
-                .url(URL)
-                .build();
-        boardImageList.add(boardImage);
-
-        // when
-        when(boardImageRepository.save(any())).thenReturn(boardImage);
-        boardImageService.uploadImages(board, urlList);
-
-        // then
-        assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
-    }
-
-    @Test
     @DisplayName("[성공] 사진 저장 - 사진이 존재하지 않은 경우")
     void saveFileWithImageNull() throws Exception {
         // 로직 : List<MultipartFile> images -> List<String> urlList
@@ -130,5 +110,38 @@ class BoardImageServiceTest {
             boardImageService.uploadImages(board, urlList);
         });
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
+    }
+
+    @Test
+    @DisplayName("[성공] 사진 업로드")
+    public void uploadFile() throws Exception {
+        // 로직 : List<String> urlList -> List<BoardImage> boardImageList
+        // when
+        List<BoardImage> boardImageList = new ArrayList<>();
+        BoardImage boardImage = BoardImage.builder()
+                .board(board)
+                .url(URL)
+                .build();
+        boardImageList.add(boardImage);
+
+        // when
+        when(boardImageRepository.save(any())).thenReturn(boardImage);
+        boardImageService.uploadImages(board, urlList);
+
+        // then
+        assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
+    }
+
+    @Test
+    @DisplayName("[성공] 사진 업로드 - urlList가 null인 경우")
+    void uploadImagesWithUrlListNull() {
+        // given
+        urlList = new ArrayList<>();
+
+        // when
+        boardImageService.uploadImages(board, urlList);
+
+        // then
+        assertThat(board.getImage().size()).isEqualTo(0);
     }
 }

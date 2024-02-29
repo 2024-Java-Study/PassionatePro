@@ -42,14 +42,15 @@ public class BoardImageService {
     public void uploadImages(Board board, List<String> urlList) {
         List<BoardImage> boardImages = new ArrayList<>();
 
-
-        for (String url : urlList) {
-            BoardImage boardImage = BoardImage.builder()
-                    .board(board)
-                    .url(url)
-                    .build();
-            boardImageRepository.save(boardImage);
-            boardImages.add(boardImage);
+        if (!(urlList == null) && !urlList.isEmpty()) {
+            for (String url : urlList) {
+                BoardImage boardImage = BoardImage.builder()
+                        .board(board)
+                        .url(url)
+                        .build();
+                boardImageRepository.save(boardImage);
+                boardImages.add(boardImage);
+            }
         }
 
         if (board == null) throw new BoardException(BoardErrorCode.BOARD_NOT_FOUND);
