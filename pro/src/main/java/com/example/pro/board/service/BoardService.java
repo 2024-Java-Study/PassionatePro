@@ -1,13 +1,11 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +32,8 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
-    public BoardResponseDto findBoard(Long boardId) {
-        Board findBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        return BoardResponseDto.toBoardDto(findBoard);
-    }
 
-    public Board findBoardReturnBoard(Long boardId) {
+    public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
     }
@@ -54,13 +47,9 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    public List<BoardResponseDto> searchTitle(String title) {
-        List<Board> boards = boardRepository.findByTitle(title);
+    public List<Board> searchTitle(String title) {
+        return boardRepository.findByTitle(title);
 
-        // 엔티티를 Dto로 변환하는 로직
-        return boards.stream()
-                .map(BoardResponseDto::toBoardDto)
-                .collect(Collectors.toList());
     }
 
     @Transactional

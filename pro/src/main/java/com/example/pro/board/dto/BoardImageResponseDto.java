@@ -1,6 +1,7 @@
 package com.example.pro.board.dto;
 
 import com.example.pro.board.domain.BoardImage;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,19 +13,21 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardImageResponseDto {
-    public List<BoardImage> boardImageList;
+    @NotBlank
+    public String title;
+    @NotBlank
+    public String content;
+    @NotBlank
+    public String username;
+    public String createdAt;
+    public List<String> urlList;
 
     @Builder
-    public BoardImageResponseDto(List<BoardImage> boardImageList) {
-        this.boardImageList = boardImageList;
-    }
-
-    public static List<String> toBoardImageUrl(List<BoardImage> boardImages) {
-        List<String> boardUrl = new ArrayList<>();
-        for (BoardImage image : boardImages) {
-            String url = image.getUrl();
-            boardUrl.add(url);
-        }
-        return boardUrl;
+    public BoardImageResponseDto(String username, String title, String content, String createdAt, List<String> urlList) {
+        this.username = username;
+        this.title = title;
+        this.content = content;
+        this.urlList = urlList;
+        this.createdAt = createdAt;
     }
 }

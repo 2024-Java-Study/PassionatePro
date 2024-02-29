@@ -56,7 +56,7 @@ class BoardImageServiceTest {
 
     @Test
     @DisplayName("[성공] 게시물 저장")
-    public void uploadFile() throws Exception {
+    public void saveImage() throws Exception {
         // 로직 : List<MultipartFile> images -> List<String> urlList
         // when
         // static board
@@ -75,7 +75,7 @@ class BoardImageServiceTest {
 
     @Test
     @DisplayName("[성공] 게시물 업로드")
-    public void saveImage() throws Exception {
+    public void uploadFile() throws Exception {
         // 로직 : List<String> urlList -> List<BoardImage> boardImageList
         // when
         List<BoardImage> boardImageList = new ArrayList<>();
@@ -87,10 +87,9 @@ class BoardImageServiceTest {
 
         // when
         when(boardImageRepository.save(any())).thenReturn(boardImage);
-        when(boardImageRepository.findByBoard(any())).thenReturn(boardImageList); //List<BoardImage>
         boardImageService.uploadImages(board, urlList);
 
         // then
-        assertThat(board.getImage()).isEqualTo(boardImageList);
+        assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
     }
 }

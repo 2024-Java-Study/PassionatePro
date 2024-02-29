@@ -16,7 +16,7 @@ public class BoardImage {
     @Column(name = "board_image_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 

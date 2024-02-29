@@ -36,8 +36,9 @@ public class BoardController {
     }
 
     @GetMapping("{id}") // 게시물 조회
-    public BasicResponse<BoardResponseDto> findById(@PathVariable Long id) {
-        return ResponseUtil.success(boardService.findBoard(id));
+    public BasicResponse<BoardImageResponseDto> findById(@PathVariable Long id) {
+        Board board = boardService.findBoard(id);
+    return ResponseUtil.success(boardImageService.imageListToDto(board));
     }
 
     @PutMapping("/{id}") // 게시물 수정
@@ -56,7 +57,7 @@ public class BoardController {
 
     @PostMapping("/{id}/upload") // 게시물 사진 업로드 : List<BoardImage>
     public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
-        Board board = boardService.findBoardReturnBoard(id);
+        Board board = boardService.findBoard(id);
         // 사진 업로드 -> 리스트 형태의 url
         List<String> urlList = boardImageService.saveImages(request.getImages());
         // 그 url 가지고 saveImage 호출해서 board 업데이트 -> boardImage 생성 + DB 저장

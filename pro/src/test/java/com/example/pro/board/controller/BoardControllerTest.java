@@ -4,15 +4,14 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardResponseDto;
-import com.example.pro.board.dto.BoardSaveDto;
-import com.example.pro.board.dto.BoardUpdateDto;
+import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.dto.*;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -42,6 +41,26 @@ class BoardControllerTest extends ControllerTest {
     private final AuthService authService = mock(AuthService.class);
     static Long boardId = 1L;
 
+    static Board board;
+    static Member member;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        member = Member.builder()
+                .username("ajeong7038")
+                .password("password1234")
+                .nickname("ajeong")
+                .email("ajung7038@gmail.com")
+                .build();
+
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .image(null)
+                .build();
+    }
+
     @Test
     @DisplayName("[성공] 게시물 생성")
     void create() throws Exception{
@@ -50,14 +69,7 @@ class BoardControllerTest extends ControllerTest {
                 .content("내용")
                 .build();
 
-        Member member = Member.builder()
-                .username("ajeong7038")
-                .password("password1234")
-                .nickname("ajeong")
-                .email("ajung7038@gmail.com")
-                .build();
-
-        Board board = Board.builder()
+        board = Board.builder()
                 .member(member)
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -176,14 +188,34 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 조회")
     void findById() throws Exception{
-        BoardResponseDto dto = BoardResponseDto.builder()
+        List<String> urlList = new ArrayList<>();
+        urlList.add("https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg");
+
+        BoardImage boardImage = BoardImage.builder()
+                .board(board)
+                .url(urlList.get(0))
+                .build();
+
+        List<BoardImage> boardImages = new ArrayList<>();
+        boardImages.add(boardImage);
+
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .image(boardImages)
+                .build();
+
+        BoardImageResponseDto dto = BoardImageResponseDto.builder()
                 .username("ajeong7038")
                 .title("제목")
                 .content("내용")
+                .urlList(urlList)
                 .createdAt("2024-02-08 11:59:07")
                 .build();
 
-        when(boardService.findBoard(any())).thenReturn(dto);
+        when(boardService.findBoard(any())).thenReturn(board);
+        when(boardImageService.imageListToDto(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -196,8 +228,8 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.username").value(dto.getUsername()))
                 .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.content").value(dto.getContent()))
-                .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()));
-
+                .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()))
+                .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()));
         // 문서 자동화
         perform.andDo(document("board findById-success",
                 preprocessRequest(prettyPrint()),
@@ -209,6 +241,7 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.username").type(JsonFieldType.STRING).description("응답 메시지 - 유저 아이디"),
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
+                                fieldWithPath("response.urlList").type(JsonFieldType.ARRAY).description("응답 메시지 - url"),
                                 fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
                         ).build())
         ));

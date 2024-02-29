@@ -2,6 +2,7 @@ package com.example.pro.board.service;
 
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.dto.BoardImageResponseDto;
 import com.example.pro.board.repository.BoardImageRepository;
 import com.example.pro.files.FileUploader;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +36,36 @@ public class BoardImageService {
 
     @Transactional
     public void uploadImages(Board board, List<String> urlList) {
+        List<BoardImage> boardImages = new ArrayList<>();
+
         for (String url : urlList) {
             BoardImage boardImage = BoardImage.builder()
                     .board(board)
                     .url(url)
                     .build();
             boardImageRepository.save(boardImage);
+            boardImages.add(boardImage);
         }
-        board.uploadFile(boardImageRepository.findByBoard(board));
+        board.uploadFile(boardImages);
+    }
+
+    @Transactional
+    public BoardImageResponseDto imageListToDto(Board board) {
+        List<BoardImageResponseDto> dtoList = new ArrayList<>();
+        List<String> urlList = new ArrayList<>();
+
+        // List<BoardImage> -> List<String>
+        for (BoardImage image : board.getImage()) {
+            urlList.add(image.getUrl());
+        }
+
+        // dto 생성
+        return BoardImageResponseDto.builder()
+                .title(board.getTitle())
+                .content(board.getContent())
+                .username(board.getMember().getUsername())
+                .createdAt(board.getCreatedAt())
+                .urlList(urlList)
+                .build();
     }
 }

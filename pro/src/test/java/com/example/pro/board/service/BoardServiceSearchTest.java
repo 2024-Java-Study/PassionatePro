@@ -4,14 +4,12 @@ import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -55,6 +53,7 @@ public class BoardServiceSearchTest {
                 .member(member)
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
+                .image(null)
                 .build();
     }
 
@@ -97,11 +96,11 @@ public class BoardServiceSearchTest {
         
         // when
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
-        BoardResponseDto findBoard = boardService.findBoard(1L);
+        Board findBoard = boardService.findBoard(1L);
 
         // then
         assertThat(findBoard.getTitle()).isEqualTo("제목");
-        assertThat(findBoard.getUsername()).isEqualTo("ajeong7038");
+        assertThat(findBoard.getMember().getUsername()).isEqualTo("ajeong7038");
     }
 
     
@@ -132,7 +131,7 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.findByTitle(any())).thenReturn(boardWithTitle);
-        List<BoardResponseDto> boardWithTitleList = boardService.searchTitle(title);
+        List<Board> boardWithTitleList = boardService.searchTitle(title);
 
         // then
         assertThat(boardWithTitleList.size()).isEqualTo(1);
