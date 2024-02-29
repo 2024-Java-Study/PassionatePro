@@ -27,9 +27,11 @@ public class BoardImageService {
     public List<String> saveImages(List<MultipartFile> images) {
         List<String> urlList = new ArrayList<>();
 
-        for (MultipartFile image : images) {
-            String url = fileUploader.uploadFile(image, BOARD_KEY);
-            urlList.add(url);
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                String url = fileUploader.uploadFile(image, BOARD_KEY);
+                urlList.add(url);
+            }
         }
         return urlList;
     }

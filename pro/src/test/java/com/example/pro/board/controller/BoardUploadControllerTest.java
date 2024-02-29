@@ -24,8 +24,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -38,10 +37,10 @@ public class BoardUploadControllerTest extends ControllerTest {
     private final AuthService authService = mock(AuthService.class);
 
     static Board board;
-    static Board boardWithImage;
+//    static Board boardWithImage;
     private static final String SAMPLE_URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/e0aa3d71-b098-4926-a0da-2b14d64546fe.png";
-
-    static List<BoardImage> images = new ArrayList<>();
+//
+//    static List<BoardImage> images = new ArrayList<>();
 
     @BeforeEach
     void init() {
@@ -57,28 +56,32 @@ public class BoardUploadControllerTest extends ControllerTest {
                 .title("제목")
                 .content("내용")
                 .build();
-
-        BoardImage boardImage = BoardImage.builder()
-                .board(board)
-                .url(SAMPLE_URL)
-                .build();
-
-        images.add(boardImage);
-
-        boardWithImage = Board.builder()
-                .member(member)
-                .title(board.getTitle())
-                .content(board.getContent())
-                .image(images)
-                .build();
+//
+//        BoardImage boardImage = BoardImage.builder()
+//                .board(board)
+//                .url(SAMPLE_URL)
+//                .build();
+//
+//        images.add(boardImage);
+//
+//        boardWithImage = Board.builder()
+//                .member(member)
+//                .title(board.getTitle())
+//                .content(board.getContent())
+//                .image(images)
+//                .build();
     }
 //    @Test
 //    @DisplayName("[성공] 게시물 이미지 업로드")
 //    void uploadFile() throws Exception {
 //        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
-//        when(boardImageService.findBoard(anyLong())).thenReturn(board);
-//        when(boardImageService.uploadBoardImage(any(), any())).thenReturn(boardWithImage);
+//        List<String> urlList = new ArrayList<>();
+//        urlList.add(SAMPLE_URL);
 //
+//        when(boardService.findBoard(anyLong())).thenReturn(board);
+//        when(boardImageService.saveImages(any())).thenReturn(urlList);
+////        when(boardImageService.uploadImages(any(), any())).thenReturn()
+//        doReturn(board);
 //        MockMultipartHttpServletRequestBuilder builder = multipart("/boards/images");
 //        builder.with(request -> {
 //            request.setMethod("PUT");
@@ -86,13 +89,13 @@ public class BoardUploadControllerTest extends ControllerTest {
 //        });
 //
 //        ResultActions perform = mockMvc.perform(builder.file(image));
-
+//
 //        perform.andDo(print())
 //                .andExpect(status().isOk())
 //                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(jsonPath("$.success").value(true))
 //                .andExpect(jsonPath("$.response").value(USERNAME + "님의 프로필 이미지가 변경되었습니다."));
-
+//
 //    }
 
     @Override

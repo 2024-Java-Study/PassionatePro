@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,7 +56,7 @@ class BoardImageServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 게시물 저장")
+    @DisplayName("[성공] 사진 저장")
     public void saveImage() throws Exception {
         // 로직 : List<MultipartFile> images -> List<String> urlList
         // when
@@ -74,7 +75,7 @@ class BoardImageServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 게시물 업로드")
+    @DisplayName("[성공] 사진 업로드")
     public void uploadFile() throws Exception {
         // 로직 : List<String> urlList -> List<BoardImage> boardImageList
         // when
@@ -91,5 +92,19 @@ class BoardImageServiceTest {
 
         // then
         assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
+    }
+
+    @Test
+    @DisplayName("[성공] 사진 저장 - 사진이 존재하지 않은 경우")
+    void saveFileWithImageNull () throws Exception {
+        // 로직 : List<MultipartFile> images -> List<String> urlList
+        // when
+        // static board
+         urlList = new ArrayList<>();
+
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        // then
+        assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(urlList.size());
     }
 }
