@@ -48,14 +48,14 @@ public class GlobalExceptionHandler {
 
     // board
     @ExceptionHandler(BoardException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BasicResponse<ErrorEntity> boardException(BoardException e) {
         log.error("Board Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
     }
 
     @ExceptionHandler(BoardUnauthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public BasicResponse<ErrorEntity> boardUnauthorized (BoardUnauthorizedException e) {
         log.error("Board Unauthorized Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
