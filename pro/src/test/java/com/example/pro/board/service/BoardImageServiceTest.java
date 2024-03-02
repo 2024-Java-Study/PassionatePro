@@ -3,6 +3,7 @@ package com.example.pro.board.service;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.dto.BoardImageUploadDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardImageRepository;
@@ -34,11 +35,15 @@ class BoardImageServiceTest {
     @Mock private FileUploader fileUploader;
     @Mock private BoardImageRepository boardImageRepository;
     @InjectMocks BoardImageService boardImageService;
+
     public static Board board;
     public static Member member;
 
     public static final String URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg";
-    public static List<String> urlList;
+
+    static MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
+
+    static BoardImageUploadDto dto;
     @BeforeEach
     public void setUp() {
 
@@ -56,24 +61,29 @@ class BoardImageServiceTest {
                 .image(null)
                 .build();
 
-        urlList = new ArrayList<>();
-        urlList.add(URL);
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        multipartFiles.add(file);
+
+        dto = BoardImageUploadDto.builder()
+                .images(multipartFiles)
+                .build();
     }
 
     @Test
     @DisplayName("[성공] 사진 저장")
-    public void saveImage() throws Exception {
-        // 로직 : List<MultipartFile> images -> List<String> urlList
+    public void saveImages() throws Exception {
         // when
         // static board
         // urlList
 
-        MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
-        List<MultipartFile> multipartFiles = new ArrayList<>();
-        multipartFiles.add(file);
-
         when(fileUploader.uploadFile(any(), any()))
                 .thenReturn(URL);
+
+        List<String> urlList = new ArrayList<>();
+        urlList.add(URL);
+
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        multipartFiles.add(file);
 
         // then
         assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(urlList.size());
@@ -85,12 +95,10 @@ class BoardImageServiceTest {
         // 로직 : List<MultipartFile> images -> List<String> urlList
         // when
         // static board
-         urlList = new ArrayList<>();
-
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
         // then
-        assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(urlList.size());
+        assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(0);
     }
 
     @Test
@@ -105,9 +113,10 @@ class BoardImageServiceTest {
 
         // when
         when(boardImageRepository.save(any())).thenReturn(boardImage);
+
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardImageService.uploadImages(board, urlList);
+            boardImageService.uploadImages(dto, board);
         });
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
@@ -115,8 +124,7 @@ class BoardImageServiceTest {
     @Test
     @DisplayName("[성공] 사진 업로드")
     public void uploadFile() throws Exception {
-        // 로직 : List<String> urlList -> List<BoardImage> boardImageList
-        // when
+        // given
         List<BoardImage> boardImageList = new ArrayList<>();
         BoardImage boardImage = BoardImage.builder()
                 .board(board)
@@ -126,22 +134,9 @@ class BoardImageServiceTest {
 
         // when
         when(boardImageRepository.save(any())).thenReturn(boardImage);
-        boardImageService.uploadImages(board, urlList);
+        boardImageService.uploadImages(dto, board);
 
         // then
         assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
-    }
-
-    @Test
-    @DisplayName("[성공] 사진 업로드 - urlList가 null인 경우")
-    void uploadImagesWithUrlListNull() {
-        // given
-        urlList = new ArrayList<>();
-
-        // when
-        boardImageService.uploadImages(board, urlList);
-
-        // then
-        assertThat(board.getImage().size()).isEqualTo(0);
     }
 }

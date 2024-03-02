@@ -58,10 +58,8 @@ public class BoardController {
     @PostMapping("/{id}/upload") // 게시물 사진 업로드 : List<BoardImage>
     public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
         Board board = boardService.findBoard(id);
-        // 사진 업로드 -> 리스트 형태의 url
-        List<String> urlList = boardImageService.saveImages(request.getImages());
         // 그 url 가지고 saveImage 호출해서 board 업데이트 -> boardImage 생성 + DB 저장
-        boardImageService.uploadImages(board, urlList);
+        boardImageService.uploadImages(request, board);
         return ResponseUtil.success("게시물 id: " + id + "번 사진 추가에 성공하였습니다.");
     }
 }
