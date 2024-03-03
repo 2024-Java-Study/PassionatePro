@@ -130,6 +130,7 @@ class ReplyControllerTest extends ControllerTest {
                 .characterEncoding(StandardCharsets.UTF_8)
         );
 
+
         perform.andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
