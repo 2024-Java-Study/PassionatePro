@@ -24,9 +24,10 @@ public class BoardController {
     private final AuthService authService;
 
     @PostMapping
-    public BasicResponse<String> create(@RequestBody @Valid BoardSaveDto boardDto) {
+    public BasicResponse<String> create(@ModelAttribute @Valid BoardSaveDto boardDto) {
         Member member = authService.loadUser();
         Board board = boardService.createBoard(boardDto, member);
+        boardImageService.uploadBoardImage(boardDto.getImages(), board);
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }
 
@@ -38,7 +39,7 @@ public class BoardController {
     @GetMapping("{id}") // 게시물 조회
     public BasicResponse<BoardImageResponseDto> findById(@PathVariable Long id) {
         Board board = boardService.findBoard(id);
-    return ResponseUtil.success(boardImageService.imageListToDto(board));
+    return ResponseUtil.success(boardImageService.findBoardImage(board));
     }
 
     @PutMapping("/{id}") // 게시물 수정
@@ -55,11 +56,10 @@ public class BoardController {
         return ResponseUtil.success("게시물 삭제에 성공하였습니다. 게시물id: " + id);
     }
 
-    @PostMapping("/{id}/upload") // 게시물 사진 업로드 : List<BoardImage>
+    @PutMapping("/{id}/upload")
     public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
         Board board = boardService.findBoard(id);
-        // 그 url 가지고 saveImage 호출해서 board 업데이트 -> boardImage 생성 + DB 저장
-        boardImageService.uploadImages(request, board);
+        boardImageService.uploadBoardImage(request.getImages(), board);
         return ResponseUtil.success("게시물 id: " + id + "번 사진 추가에 성공하였습니다.");
     }
 }

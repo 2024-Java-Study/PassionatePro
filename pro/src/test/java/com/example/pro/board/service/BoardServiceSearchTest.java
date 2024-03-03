@@ -8,11 +8,14 @@ import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.files.FileUploader;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class BoardServiceSearchTest {
 
     @Mock BoardRepository boardRepository; // 의존성 주입
-    @Mock AuthService authService;
+    @Mock FileUploader fileUploader;
     @InjectMocks BoardService boardService;
 
 
@@ -35,11 +38,19 @@ public class BoardServiceSearchTest {
     public static Member member;
     public BoardSaveDto boardSaveDto;
 
+    public static final String URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg";
+    static MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
+
+
     @BeforeEach
     public void setUp() {
+
+        List<MultipartFile> fileList = new ArrayList<>();
+        fileList.add(file);
         boardSaveDto = BoardSaveDto.builder()
                 .title("제목")
                 .content("내용")
+                .images(fileList)
                 .build();
 
         member = Member.builder()

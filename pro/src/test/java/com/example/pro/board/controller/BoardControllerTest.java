@@ -16,8 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,10 @@ class BoardControllerTest extends ControllerTest {
     private final BoardService boardService = mock(BoardService.class);
     private final BoardImageService boardImageService = mock(BoardImageService.class);
     private final AuthService authService = mock(AuthService.class);
+
+    public static final String URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg";
+
+    static MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
     static Long boardId = 1L;
 
     static Board board;
@@ -47,6 +54,7 @@ class BoardControllerTest extends ControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
+
         member = Member.builder()
                 .username("ajeong7038")
                 .password("password1234")
@@ -65,9 +73,15 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 생성")
     void create() throws Exception{
+
+        List<MultipartFile> fileList = new ArrayList<>();
+        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
+        fileList.add(image);
+
         BoardSaveDto dto = BoardSaveDto.builder()
                 .title("제목")
                 .content("내용")
+                .images(fileList)
                 .build();
 
         board = Board.builder()
@@ -76,13 +90,22 @@ class BoardControllerTest extends ControllerTest {
                 .content(dto.getContent())
                 .build();
 
+
         when(authService.loadUser()).thenReturn(member);
         when(boardService.createBoard(any(), any())).thenReturn(board);
-        String body = objectMapper.writeValueAsString(dto);
 
-        ResultActions perform = mockMvc.perform(post("/boards")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body));
+        MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
+
+        builder.with(request -> {
+            request.setMethod("POST");
+            return request;
+        });
+
+        ResultActions perform = mockMvc.perform(builder
+                .file(image)
+                .param("title", "제목")
+                .param("content", "내용")
+                .contentType(MediaType.APPLICATION_JSON));
 
         perform.andDo(print())
                 .andExpect(status().isOk())
@@ -90,10 +113,10 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response", containsString("게시물 생성에 성공하였습니다. 게시물id:")));
 
-        perform.andDo(document("board creation-success"
-        , preprocessRequest(prettyPrint())
-        , preprocessResponse(prettyPrint())
-        , resource(ResourceSnippetParameters.builder()
+        perform.andDo(document("board creation-success",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
                         .tag("API-Board") // 큰 태그
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
@@ -216,7 +239,7 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         when(boardService.findBoard(any())).thenReturn(board);
-        when(boardImageService.imageListToDto(any())).thenReturn(dto);
+        when(boardImageService.findBoardImage(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)

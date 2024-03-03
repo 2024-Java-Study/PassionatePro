@@ -3,7 +3,6 @@ package com.example.pro.board.service;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
 import com.example.pro.board.dto.BoardImageResponseDto;
-import com.example.pro.board.dto.BoardImageUploadDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardImageRepository;
@@ -39,10 +38,10 @@ public class BoardImageService {
     }
 
     @Transactional
-    public void uploadImages(BoardImageUploadDto dto, Board board) {
+    public void uploadBoardImage(List<MultipartFile> file, Board board) {
 
         // 사진 업로드 -> 리스트 형태의 url
-        List<String> urlList = saveImages(dto.getImages());
+        List<String> urlList = saveImages(file);
         List<BoardImage> boardImages = new ArrayList<>();
 
         if (!(urlList == null) && !urlList.isEmpty()) {
@@ -61,7 +60,7 @@ public class BoardImageService {
     }
 
     @Transactional
-    public BoardImageResponseDto imageListToDto(Board board) {
+    public BoardImageResponseDto findBoardImage (Board board) {
         List<BoardImageResponseDto> dtoList = new ArrayList<>();
         List<String> urlList = new ArrayList<>();
 

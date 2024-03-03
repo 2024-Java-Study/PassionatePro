@@ -20,12 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -116,7 +114,7 @@ class BoardImageServiceTest {
 
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardImageService.uploadImages(dto, board);
+            boardImageService.uploadBoardImage(dto.getImages(), board);
         });
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
@@ -134,7 +132,7 @@ class BoardImageServiceTest {
 
         // when
         when(boardImageRepository.save(any())).thenReturn(boardImage);
-        boardImageService.uploadImages(dto, board);
+        boardImageService.uploadBoardImage(dto.getImages(), board);
 
         // then
         assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
