@@ -3,6 +3,7 @@ package com.example.pro.files;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,8 @@ public class TestFileUploader extends FileUploader{
     @Override
     public void deleteFile(String url) {
         try {
-            amazonS3Client.deleteObject(bucket, url);
-            log.debug("S3 이미지 삭제 성공");
+            String fileName = url.substring(url.indexOf(TEST_KEY));
+            amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
         } catch(SdkClientException e) {
             throw new S3IOException(e.getMessage());
         }

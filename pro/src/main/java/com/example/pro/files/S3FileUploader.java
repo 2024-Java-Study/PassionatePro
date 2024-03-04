@@ -3,6 +3,7 @@ package com.example.pro.files;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +44,12 @@ public class S3FileUploader extends FileUploader {
 
     @Override
     public void deleteFile(String url) {
-        try {
-            amazonS3Client.deleteObject(bucket, url);
-        } catch(SdkClientException e) {
-            throw new S3IOException(e.getMessage());
-        }
+//        try {
+//            String key = url.substring(url.lastIndexOf(".com/"), "/");
+//            String fileName = url.substring(url.lastIndexOf(key) + key.length());
+//            amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+//        } catch(SdkClientException e) {
+//            throw new S3IOException(e.getMessage());
+//        }
     }
 }
