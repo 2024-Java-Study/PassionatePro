@@ -28,7 +28,7 @@ public class Board extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
     
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardImage> image = new ArrayList<>();
 
     @Column(length = 50, nullable = false)

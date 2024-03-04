@@ -239,7 +239,7 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         when(boardService.findBoard(any())).thenReturn(board);
-        when(boardImageService.findBoardImage(any())).thenReturn(dto);
+        when(boardImageService.changeBoardImageToUrlList(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)

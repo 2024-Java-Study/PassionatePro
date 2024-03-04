@@ -1,5 +1,6 @@
 package com.example.pro.files;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -37,5 +38,15 @@ public class TestFileUploader extends FileUploader{
         }
 
         return amazonS3Client.getUrl(bucket, key).toString();
+    }
+
+    @Override
+    public void deleteFile(String url) {
+        try {
+            amazonS3Client.deleteObject(bucket, url);
+            log.debug("S3 이미지 삭제 성공");
+        } catch(SdkClientException e) {
+            throw new S3IOException(e.getMessage());
+        }
     }
 }

@@ -21,7 +21,6 @@ import java.util.List;
 public class BoardImageService {
 
     private final FileUploader fileUploader;
-
     static final String BOARD_KEY = "boards/";
     private final BoardImageRepository boardImageRepository;
 
@@ -60,12 +59,12 @@ public class BoardImageService {
     }
 
     @Transactional
-    public BoardImageResponseDto findBoardImage (Board board) {
-        List<BoardImageResponseDto> dtoList = new ArrayList<>();
+    public BoardImageResponseDto changeBoardImageToUrlList(Board board) {
+        List<BoardImage> boardImages = findBoardImages(board);
         List<String> urlList = new ArrayList<>();
 
         // List<BoardImage> -> List<String>
-        for (BoardImage image : board.getImage()) {
+        for (BoardImage image : boardImages) {
             urlList.add(image.getUrl());
         }
 
@@ -77,5 +76,20 @@ public class BoardImageService {
                 .createdAt(board.getCreatedAt())
                 .urlList(urlList)
                 .build();
+    }
+
+    public List<BoardImage> findBoardImages (Board board) {
+        return board.getImage();
+    }
+
+    @Transactional
+    public void deleteBoardImage (Board board) {
+        List<String> urlList = changeBoardImageToUrlList(board).getUrlList();
+        for (String url : urlList) {
+            fileUploader.deleteFile(url);
+        }
+
+        List<BoardImage> boardImageList = boardImageRepository.findByBoardId(board.getId());
+        boardImageRepository.deleteAll(boardImageList);
     }
 }

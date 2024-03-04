@@ -39,7 +39,7 @@ public class BoardController {
     @GetMapping("{id}") // 게시물 조회
     public BasicResponse<BoardImageResponseDto> findById(@PathVariable Long id) {
         Board board = boardService.findBoard(id);
-    return ResponseUtil.success(boardImageService.findBoardImage(board));
+    return ResponseUtil.success(boardImageService.changeBoardImageToUrlList(board));
     }
 
     @PutMapping("/{id}") // 게시물 수정
@@ -59,6 +59,7 @@ public class BoardController {
     @PutMapping("/{id}/upload")
     public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
         Board board = boardService.findBoard(id);
+        boardImageService.deleteBoardImage(board);
         boardImageService.uploadBoardImage(request.getImages(), board);
         return ResponseUtil.success("게시물 id: " + id + "번 사진 추가에 성공하였습니다.");
     }
