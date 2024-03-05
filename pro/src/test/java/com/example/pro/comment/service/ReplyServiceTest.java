@@ -8,6 +8,8 @@ import com.example.pro.comment.dto.ReplySaveRequestDto;
 import com.example.pro.comment.dto.ReplyUpdateRequestDto;
 import com.example.pro.comment.exception.CommentErrorCode;
 import com.example.pro.comment.exception.CommentException;
+import com.example.pro.comment.exception.ReplyErrorCode;
+import com.example.pro.comment.exception.ReplyException;
 import com.example.pro.comment.repository.CommentRepository;
 import com.example.pro.comment.repository.ReplyRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,14 +29,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReplyServiceTest {
-
     @Mock
     ReplyRepository replyRepository;
     @Mock
     CommentRepository commentRepository;
     @InjectMocks
     ReplyService replyService;
-
     Member member;
     Board board;
     Comment comment;
@@ -100,9 +100,36 @@ class ReplyServiceTest {
 
     @Test
     @DisplayName("[성공] 대댓글 수정")
-    public void updateReply() {
+    void updateReply() {
         when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
         Reply updated = replyService.updateReply(member, 1L, updateRequest);
         assertThat(updated.getContent()).isEqualTo("수정된 내용의 답글");
+    }
+
+    @Test
+    @DisplayName("[실패] 대댓글 수정-존재하지 않는 답글id")
+    void updateReplyIdNotFound() {
+        when(replyRepository.findById(any()))
+                .thenThrow(new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
+
+        assertThatThrownBy(() -> replyService.updateReply(member, 2L, updateRequest))
+                .isInstanceOf(ReplyException.class)
+                .hasMessageContaining("해당 id의 답글을 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("[실패] 대댓글 수정-권한 없음")
+    void updateReplyNotPermitted() {
+        Member otherMember = Member.builder()
+                .username("not-writer")
+                .password("password4321")
+                .nickname("nickname11")
+                .email("helloworld@naver.com")
+                .build();
+
+        when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
+        assertThatThrownBy(() -> replyService.updateReply(otherMember, 1L, updateRequest))
+                .isInstanceOf(ReplyException.class)
+                .hasMessageContaining("해당 답글을 수정할 권한이 없습니다.");
     }
 }
