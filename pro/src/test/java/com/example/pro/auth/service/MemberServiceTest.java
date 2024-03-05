@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static com.example.pro.auth.service.MemberService.PROFILE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +46,7 @@ class MemberServiceTest {
     @DisplayName("[성공] 프로필 이미지 수정")
     void updateProfile() {
         Assertions.assertNull(member.getProfile());
-        when(fileUploader.uploadFile(file, PROFILE_KEY))
+        when(fileUploader.uploadFile(any(), any()))
                 .thenReturn("https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg");
         Member updatedMember = memberService.updateProfile(file, member);
         assertThat(updatedMember.getProfile()).isNotBlank();

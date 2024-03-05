@@ -3,6 +3,8 @@ package com.example.pro.common;
 import com.example.pro.auth.exception.AuthException;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.exception.BoardUnauthorizedException;
+import com.example.pro.comment.exception.CommentException;
+import com.example.pro.comment.exception.ReplyException;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ErrorEntity;
 import com.example.pro.common.response.ResponseUtil;
@@ -58,6 +60,20 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public BasicResponse<ErrorEntity> boardUnauthorized (BoardUnauthorizedException e) {
         log.error("Board Unauthorized Exception({})={}", e.getCode(), e.getMessage());
+        return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
+    }
+
+    @ExceptionHandler(CommentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BasicResponse<ErrorEntity> commentException(CommentException e) {
+        log.error("Comment Exception({})={}", e.getCode(), e.getMessage());
+        return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
+    }
+
+    @ExceptionHandler(ReplyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BasicResponse<ErrorEntity> replyException(ReplyException e) {
+        log.error("Reply Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
     }
 }
