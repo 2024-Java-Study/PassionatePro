@@ -5,6 +5,7 @@ import com.example.pro.board.domain.Board;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
 import com.example.pro.comment.dto.ReplySaveRequestDto;
+import com.example.pro.comment.dto.ReplyUpdateRequestDto;
 import com.example.pro.comment.exception.CommentErrorCode;
 import com.example.pro.comment.exception.CommentException;
 import com.example.pro.comment.repository.CommentRepository;
@@ -37,7 +38,9 @@ class ReplyServiceTest {
     Member member;
     Board board;
     Comment comment;
+    Reply reply;
     ReplySaveRequestDto saveRequest;
+    ReplyUpdateRequestDto updateRequest;
 
     @BeforeEach
     void init() {
@@ -62,7 +65,15 @@ class ReplyServiceTest {
                 .content("댓글 빈킨 아님")
                 .build();
 
+        reply = Reply.builder()
+                .id(1L)
+                .member(member)
+                .comment(comment)
+                .content("댓글에 대한 답글 빈칸 아님")
+                .build();
+
         saveRequest = new ReplySaveRequestDto(1L, "대댓글 내용");
+        updateRequest = new ReplyUpdateRequestDto("수정된 내용의 답글");
     }
 
     @Test
@@ -85,5 +96,13 @@ class ReplyServiceTest {
         assertThatThrownBy(() -> replyService.saveReply(member, saveRequest))
                 .isInstanceOf(CommentException.class)
                 .hasMessageContaining("해당 댓글을 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("[성공] 대댓글 수정")
+    public void updateReply() {
+        when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
+        Reply updated = replyService.updateReply(member, 1L, updateRequest);
+        assertThat(updated.getContent()).isEqualTo("수정된 내용의 답글");
     }
 }
