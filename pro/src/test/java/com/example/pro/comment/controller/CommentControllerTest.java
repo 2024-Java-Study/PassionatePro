@@ -291,6 +291,42 @@ class CommentControllerTest extends ControllerTest {
         ));
     }
 
+    @Test
+    @DisplayName("[실패] 댓글 수정-유효성 검사 실패")
+    void updateReplyValidationFail() throws Exception {
+        updateRequest = new CommentUpdateRequestDto("  ");
+
+        String body = objectMapper.writeValueAsString(updateRequest);
+
+        ResultActions perform = mockMvc.perform(put("/comments/{commentId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(Locale.KOREAN)
+                .content(body)
+                .characterEncoding(StandardCharsets.UTF_8)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("BAD_INPUT"))
+                .andExpect(jsonPath("$.response.errorMessage").value("입력이 올바르지 않습니다."))
+                .andExpect(jsonPath("$.response.errors.content").value("공백일 수 없습니다"));
+
+        perform.andDo(document("comment update-validation failed",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Comment")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors.content").type(JsonFieldType.STRING).description("댓글 내용 공백 검사")
+                        ).build())
+        ));
+    }
+
     @Override
     protected Object injectController() {
         return new CommentController(authService, commentService);
