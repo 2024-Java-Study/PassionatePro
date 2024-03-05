@@ -1,24 +1,17 @@
 package com.example.pro.comment.dto;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.pro.comment.domain.Comment;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommentResponseDto {
-    public String username;
-    public String content;
-    public String createdAt;
+import java.util.List;
 
-    @Builder
-    public CommentResponseDto (String username, String content) {
-        this.username = username;
-        this.content = content;
+public record CommentResponseDto(String username, String content, String createdAt, List<ReplyResponseDto> replies) {
+
+    public static CommentResponseDto toCommentDto(Comment comment) {
+        return new CommentResponseDto(
+                comment.getMember().getUsername(),
+                comment.getContent(),
+                comment.getCreatedAt(),
+                comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
+        );
     }
-
-//    public static CommentResponseDto toCommentDto() {
-//        return null;
-//    }
 }
