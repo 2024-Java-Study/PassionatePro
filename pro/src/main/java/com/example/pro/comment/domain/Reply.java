@@ -40,4 +40,8 @@ public class Reply extends BaseTimeEntity {
         this.comment = comment;
         this.content = Validator.validString(content);
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
