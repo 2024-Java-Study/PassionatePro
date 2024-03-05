@@ -2,6 +2,7 @@ package com.example.pro.common;
 
 import com.example.pro.auth.exception.AuthException;
 import com.example.pro.board.exception.BoardException;
+import com.example.pro.board.exception.BoardUnauthorizedException;
 import com.example.pro.comment.exception.CommentException;
 import com.example.pro.comment.exception.ReplyException;
 import com.example.pro.common.response.BasicResponse;
@@ -49,9 +50,16 @@ public class GlobalExceptionHandler {
 
     // board
     @ExceptionHandler(BoardException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST) // 상태 코드 204...?
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BasicResponse<ErrorEntity> boardException(BoardException e) {
         log.error("Board Exception({})={}", e.getCode(), e.getMessage());
+        return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
+    }
+
+    @ExceptionHandler(BoardUnauthorizedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public BasicResponse<ErrorEntity> boardUnauthorized (BoardUnauthorizedException e) {
+        log.error("Board Unauthorized Exception({})={}", e.getCode(), e.getMessage());
         return ResponseUtil.error(new ErrorEntity(e.getCode().toString(), e.getMessage()));
     }
 

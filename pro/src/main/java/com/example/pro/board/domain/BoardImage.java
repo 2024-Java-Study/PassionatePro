@@ -1,6 +1,5 @@
 package com.example.pro.board.domain;
 
-import com.example.pro.board.domain.Board;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

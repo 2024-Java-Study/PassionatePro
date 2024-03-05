@@ -8,12 +8,17 @@ import com.example.pro.board.dto.BoardUpdateDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.files.FileUploader;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +30,6 @@ import static org.mockito.Mockito.when;
 public class BoardServiceTest {
 
     @Mock BoardRepository boardRepository;
-    @Mock AuthService authService;
     @InjectMocks BoardService boardService;
 
     public BoardSaveDto boardSaveDto;
@@ -34,10 +38,18 @@ public class BoardServiceTest {
     public static Member member;
 
     public static Long boardId = 1L, memberId = 1L;
+    static MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
 
     @BeforeEach
     public void setUp() {
-        boardSaveDto = new BoardSaveDto("제목", "내용");
+        List<MultipartFile> fileList = new ArrayList<>();
+        fileList.add(file);
+
+        boardSaveDto = BoardSaveDto.builder()
+                .title("제목")
+                .content("내용")
+                .images(fileList)
+                .build();
 
         member = Member.builder()
                 .username("ajeong7038")

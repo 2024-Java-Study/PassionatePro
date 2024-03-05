@@ -1,7 +1,6 @@
 package com.example.pro.board.domain;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.auth.dto.BoardRequest;
 import com.example.pro.common.BaseTimeEntity;
 import com.example.pro.comment.domain.Comment;
 import jakarta.persistence.*;
@@ -27,8 +26,8 @@ public class Board extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @OneToMany(mappedBy = "board")
+    
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardImage> image = new ArrayList<>();
 
     @Column(length = 50, nullable = false)
@@ -47,15 +46,20 @@ public class Board extends BaseTimeEntity {
      */
     // 유저 추가
     @Builder
-    public Board (Long id, Member member, String title, String content) {
+    public Board (Long id, Member member, String title, String content, List<BoardImage> image) {
         this.id = id;
         this.member = member;
         this.title = title;
         this.content = content;
+        this.image = image;
     }
 
     public void updateBoard(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void uploadFile(List<BoardImage> images) {
+        this.image = images;
     }
 }

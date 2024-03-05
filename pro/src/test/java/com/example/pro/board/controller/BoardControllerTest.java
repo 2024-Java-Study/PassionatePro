@@ -4,19 +4,23 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardResponseDto;
-import com.example.pro.board.dto.BoardSaveDto;
-import com.example.pro.board.dto.BoardUpdateDto;
+import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.dto.*;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
+import com.example.pro.board.exception.BoardUnauthorizedException;
+import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.docs.ControllerTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,37 +41,71 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BoardControllerTest extends ControllerTest {
 
     private final BoardService boardService = mock(BoardService.class);
+    private final BoardImageService boardImageService = mock(BoardImageService.class);
     private final AuthService authService = mock(AuthService.class);
+
+    public static final String URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg";
+
+    static MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
     static Long boardId = 1L;
 
-    @Test
-    @DisplayName("[성공] 게시물 생성")
-    void create() throws Exception{
-        BoardSaveDto dto = BoardSaveDto.builder()
-                .title("제목")
-                .content("내용")
-                .build();
+    static Board board;
+    static Member member;
 
-        Member member = Member.builder()
+    @BeforeEach
+    void setUp() throws Exception {
+
+        member = Member.builder()
                 .username("ajeong7038")
                 .password("password1234")
                 .nickname("ajeong")
                 .email("ajung7038@gmail.com")
                 .build();
 
-        Board board = Board.builder()
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .image(null)
+                .build();
+    }
+
+    @Test
+    @DisplayName("[성공] 게시물 생성")
+    void create() throws Exception{
+
+        List<MultipartFile> fileList = new ArrayList<>();
+        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
+        fileList.add(image);
+
+        BoardSaveDto dto = BoardSaveDto.builder()
+                .title("제목")
+                .content("내용")
+                .images(fileList)
+                .build();
+
+        board = Board.builder()
                 .member(member)
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
 
+
         when(authService.loadUser()).thenReturn(member);
         when(boardService.createBoard(any(), any())).thenReturn(board);
-        String body = objectMapper.writeValueAsString(dto);
 
-        ResultActions perform = mockMvc.perform(post("/boards")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body));
+        MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
+
+        builder.with(request -> {
+            request.setMethod("POST");
+            return request;
+        });
+
+        ResultActions perform = mockMvc.perform(builder
+                .file(image)
+                .param("title", "제목")
+                .param("content", "내용")
+                .contentType(MediaType.APPLICATION_JSON));
 
         perform.andDo(print())
                 .andExpect(status().isOk())
@@ -75,10 +113,10 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response", containsString("게시물 생성에 성공하였습니다. 게시물id:")));
 
-        perform.andDo(document("board creation-success"
-        , preprocessRequest(prettyPrint())
-        , preprocessResponse(prettyPrint())
-        , resource(ResourceSnippetParameters.builder()
+        perform.andDo(document("board creation-success",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
                         .tag("API-Board") // 큰 태그
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
@@ -174,14 +212,34 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 조회")
     void findById() throws Exception{
-        BoardResponseDto dto = BoardResponseDto.builder()
+        List<String> urlList = new ArrayList<>();
+        urlList.add("https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg");
+
+        BoardImage boardImage = BoardImage.builder()
+                .board(board)
+                .url(urlList.get(0))
+                .build();
+
+        List<BoardImage> boardImages = new ArrayList<>();
+        boardImages.add(boardImage);
+
+        board = Board.builder()
+                .member(member)
+                .title("제목")
+                .content("내용")
+                .image(boardImages)
+                .build();
+
+        BoardImageResponseDto dto = BoardImageResponseDto.builder()
                 .username("ajeong7038")
                 .title("제목")
                 .content("내용")
+                .urlList(urlList)
                 .createdAt("2024-02-08 11:59:07")
                 .build();
 
-        when(boardService.findBoard(any())).thenReturn(dto);
+        when(boardService.findBoard(any())).thenReturn(board);
+        when(boardImageService.changeBoardImageToUrlList(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -194,8 +252,8 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.username").value(dto.getUsername()))
                 .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.content").value(dto.getContent()))
-                .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()));
-
+                .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()))
+                .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()));
         // 문서 자동화
         perform.andDo(document("board findById-success",
                 preprocessRequest(prettyPrint()),
@@ -207,6 +265,7 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.username").type(JsonFieldType.STRING).description("응답 메시지 - 유저 아이디"),
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
+                                fieldWithPath("response.urlList").type(JsonFieldType.ARRAY).description("응답 메시지 - url"),
                                 fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
                         ).build())
         ));
@@ -366,6 +425,46 @@ class BoardControllerTest extends ControllerTest {
     }
 
     @Test
+    @DisplayName("[실패] 게시물 수정 - 권한이 없는 경우")
+    void updateBoardNotValidation() throws Exception {
+        BoardUpdateDto dto = BoardUpdateDto.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        when(boardService.updateBoard(any(), any(), any())).thenThrow(new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD));
+        String body = objectMapper.writeValueAsString(dto);
+
+        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardUnauthorizedException.class))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("UNAUTHORIZED_BOARD"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물 권한이 없습니다."));
+
+        // 문서 자동화
+        perform.andDo(document("board update-unAuthorized board",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
+
+    @Test
     @DisplayName("[성공] 게시물 삭제")
     void deleteBoard() throws Exception{
 
@@ -393,7 +492,6 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 게시물 삭제 - 게시물을 찾을 수 없는 경우")
     void deleteWithBoardNull() throws Exception{
-//        when(boardService.deleteBoard(boardId)).thenThrow(new NoSearchBoardException(BoardErrorCode.BOARD_NOT_FOUND));
         doThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND))
                 .when(boardService)
                 .deleteBoard(any(), any());
@@ -424,8 +522,40 @@ class BoardControllerTest extends ControllerTest {
         ));
     }
 
+    @Test
+    @DisplayName("[실패] 게시물 삭제 - 권한이 없는 경우")
+    void deleteBoardNotValidation() throws Exception {
+        doThrow(new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD))
+                .when(boardService)
+                .deleteBoard(any(), any());
+        ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(BoardUnauthorizedException.class))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("UNAUTHORIZED_BOARD"))
+                .andExpect(jsonPath("$.response.errorMessage").value("게시물 권한이 없습니다."));
+        // 문서 자동화
+        perform.andDo(document("board delete- unauthorized board",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Board")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
+
     @Override
     protected Object injectController() {
-        return new BoardController(boardService, authService);
+        return new BoardController(boardService, boardImageService, authService);
     }
 }
