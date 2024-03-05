@@ -193,7 +193,7 @@ class CommentControllerTest extends ControllerTest {
         when(commentService.updateComment(any(), any(), any())).thenReturn(comment);
         String body = objectMapper.writeValueAsString(updateRequest);
 
-        ResultActions perform = mockMvc.perform(put("/comments/{id}", 1)
+        ResultActions perform = mockMvc.perform(put("/comments/{commentId}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .characterEncoding(StandardCharsets.UTF_8)
@@ -226,7 +226,7 @@ class CommentControllerTest extends ControllerTest {
 
         String body = objectMapper.writeValueAsString(updateRequest);
 
-        ResultActions perform = mockMvc.perform(put("/comments/{id}", 2)
+        ResultActions perform = mockMvc.perform(put("/comments/{commentId}", 2)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .characterEncoding(StandardCharsets.UTF_8)
@@ -263,7 +263,7 @@ class CommentControllerTest extends ControllerTest {
 
         String body = objectMapper.writeValueAsString(updateRequest);
 
-        ResultActions perform = mockMvc.perform(put("/comments/{id}", 1)
+        ResultActions perform = mockMvc.perform(put("/comments/{commentId}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .characterEncoding(StandardCharsets.UTF_8)
