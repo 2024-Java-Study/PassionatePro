@@ -1,9 +1,13 @@
 package com.example.pro.files;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 public interface FileUploader {
 
@@ -15,5 +19,13 @@ public interface FileUploader {
         objectMetadata.setContentType("image/png");
         objectMetadata.setContentLength(multipartFile.getSize());
         return objectMetadata;
+    }
+
+    default String generateKey(MultipartFile file, String path) {
+        if (file.getOriginalFilename() == null)
+            throw new S3IOException("파일 이름이 null입니다.");
+        String fileName = file.getOriginalFilename();
+        String ext = fileName.substring(fileName.lastIndexOf(".") + 1);
+        return path + UUID.randomUUID() + "." + ext;
     }
 }

@@ -27,9 +27,7 @@ public class S3FileUploader implements FileUploader {
     @Override
     public String uploadFile(MultipartFile multipartFile, String path) {
         ObjectMetadata objectMetadata = createObjectMetaData(multipartFile);
-        String originalFilename = multipartFile.getOriginalFilename();
-        String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        String key = path + UUID.randomUUID() + "." + ext;
+        String key = generateKey(multipartFile, path);
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetadata)
