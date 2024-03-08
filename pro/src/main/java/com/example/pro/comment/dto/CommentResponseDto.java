@@ -5,7 +5,7 @@ import com.example.pro.comment.domain.Comment;
 import java.util.ArrayList;
 import java.util.List;
 
-public record CommentResponseDto(String username, String content, String createdAt, List<ReplyResponseDto> replies) {
+public record CommentResponseDto(Long commentId, String username, String content, String createdAt, List<ReplyResponseDto> replies) {
 
     public static List<CommentResponseDto> makeDtoCollection(List<Comment> comments) {
         List<CommentResponseDto> responses = new ArrayList<>();
@@ -15,6 +15,7 @@ public record CommentResponseDto(String username, String content, String created
 
     private static CommentResponseDto toCommentDto(Comment comment) {
         return new CommentResponseDto(
+                comment.getId(),
                 comment.getMember().getUsername(),
                 comment.getContent(),
                 comment.getCreatedAt(),
