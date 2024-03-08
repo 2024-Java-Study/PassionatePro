@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TestFileUploader extends FileUploader{
+public class TestFileUploader implements FileUploader{
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -26,9 +26,7 @@ public class TestFileUploader extends FileUploader{
     @Override
     public String uploadFile(MultipartFile multipartFile, String path) {
         ObjectMetadata objectMetaData = createObjectMetaData(multipartFile);
-        String originalFilename = multipartFile.getOriginalFilename();
-        String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        String key = TEST_KEY + UUID.randomUUID() + "." + ext;
+        String key = generateKey(multipartFile, TEST_KEY);
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, key, inputStream, objectMetaData)
