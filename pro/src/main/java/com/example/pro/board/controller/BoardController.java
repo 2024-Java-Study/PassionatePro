@@ -39,7 +39,8 @@ public class BoardController {
     @GetMapping("{id}") // 게시물 조회
     public BasicResponse<BoardImageResponseDto> findById(@PathVariable Long id) {
         Board board = boardService.findBoard(id);
-    return ResponseUtil.success(boardImageService.changeBoardImageToUrlList(board));
+//        return ResponseUtil.success(boardImageService.changeBoardImageToUrlList(board));
+        return ResponseUtil.success(boardService.makeBoardResponse(board));
     }
 
     @PutMapping("/{id}") // 게시물 수정

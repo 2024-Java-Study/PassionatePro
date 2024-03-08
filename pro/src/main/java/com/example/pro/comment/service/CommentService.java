@@ -13,10 +13,12 @@ import com.example.pro.comment.exception.CommentException;
 import com.example.pro.comment.repository.CommentRepository;
 import com.example.pro.comment.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommentService {
@@ -30,6 +32,7 @@ public class CommentService {
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         Comment comment = commentRepository.save(saveRequest.toComment(board, writer));
         board.getComments().add(comment);
+        log.info("해당 게시글의 댓글 개수, {}", board.getComments().size());
         return comment;
     }
 
