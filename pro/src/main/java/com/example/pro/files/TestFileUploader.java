@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TestFileUploader extends FileUploader{
+public class TestFileUploader implements FileUploader{
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
