@@ -9,7 +9,9 @@ public record CommentResponseDto(Long commentId, String username, String content
 
     public static List<CommentResponseDto> makeDtoCollection(List<Comment> comments) {
         List<CommentResponseDto> responses = new ArrayList<>();
-        comments.forEach(comment -> responses.add(toCommentDto(comment)));
+        comments.forEach(comment ->
+            responses.add(comment.isDeleted() ? toDeletedCommentDto(comment) : toCommentDto(comment))
+        );
         return responses;
     }
 
@@ -18,6 +20,16 @@ public record CommentResponseDto(Long commentId, String username, String content
                 comment.getId(),
                 comment.getMember().getUsername(),
                 comment.getContent(),
+                comment.getCreatedAt(),
+                comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
+        );
+    }
+
+    private static CommentResponseDto toDeletedCommentDto(Comment comment) {
+        return new CommentResponseDto(
+                comment.getId(),
+                "(삭제)",
+                "삭제된 댓글입니다.",
                 comment.getCreatedAt(),
                 comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
         );
