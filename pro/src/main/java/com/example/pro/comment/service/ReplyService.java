@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReplyService {
 
@@ -36,9 +35,26 @@ public class ReplyService {
     public Reply updateReply(Member writer, Long replyId, ReplyUpdateRequestDto updateRequestDto) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
-        if (! writer.equals(reply.getMember()))
-            throw new ReplyException(ReplyErrorCode.REPLY_UPDATE_NOT_PERMITTED);
+        checkPermission(writer, reply);
         reply.updateContent(updateRequestDto.content());
         return reply;
+    }
+
+    @Transactional
+    public void deleteReply(Member sessionUser, Long replyId) {
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
+        checkPermission(sessionUser, reply);
+        reply.deleteReply();
+        if (reply.hasNoSibling()) {
+            Comment comment = reply.getComment();
+            // TODO: 현재 지울 답글이 마지막 답글일 경우 답글도 지우고 댓글도 지우고
+            replyRepository.delete(reply);
+        }
+    }
+
+    private void checkPermission(Member writer, Reply reply) {
+        if (! writer.equals(reply.getMember()))
+            throw new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED);
     }
 }

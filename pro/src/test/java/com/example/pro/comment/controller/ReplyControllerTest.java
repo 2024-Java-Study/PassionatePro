@@ -279,7 +279,7 @@ class ReplyControllerTest extends ControllerTest {
                 .build();
         when(authService.loadUser()).thenReturn(otherMember);
         when(replyService.updateReply(any(), anyLong(), any()))
-                .thenThrow(new ReplyException(ReplyErrorCode.REPLY_UPDATE_NOT_PERMITTED));
+                .thenThrow(new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED));
 
         String body = objectMapper.writeValueAsString(updateRequest);
 

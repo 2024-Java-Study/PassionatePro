@@ -5,6 +5,7 @@ import com.example.pro.common.BaseTimeEntity;
 import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class Reply extends BaseTimeEntity {
     @NotBlank
     private String content;
 
+    @NotNull
+    private boolean isDeleted;
+
     /**
      * 생성 메서드
      */
@@ -39,9 +43,16 @@ public class Reply extends BaseTimeEntity {
         this.member = member;
         this.comment = comment;
         this.content = Validator.validString(content);
+        this.isDeleted = false;
     }
 
     public void updateContent(String content) {
         this.content = content;
+    }
+    public void deleteReply() {
+        this.isDeleted = true;
+    }
+    public boolean hasNoSibling() {
+        return this.comment.countReplies() == 1;
     }
 }
