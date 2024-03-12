@@ -57,4 +57,11 @@ public class Comment extends BaseTimeEntity {
     public void updateContent(String content) {
         this.content = content;
     }
+
+    public void deleteComment() {
+        this.isDeleted = true;
+    }
+    public boolean hasNoReplies() {
+        return this.replies.size() == 0;
+    }
 }

@@ -11,7 +11,6 @@ import com.example.pro.comment.dto.CommentUpdateRequestDto;
 import com.example.pro.comment.exception.CommentErrorCode;
 import com.example.pro.comment.exception.CommentException;
 import com.example.pro.comment.repository.CommentRepository;
-import com.example.pro.comment.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CommentService {
 
     private final BoardRepository boardRepository;
@@ -44,5 +42,19 @@ public class CommentService {
             throw new CommentException(CommentErrorCode.COMMENT_UPDATE_NOT_PERMITTED);
         comment.updateContent(updateRequest.content());
         return comment;
+    }
+
+    @Transactional
+    public void deleteComment(Member sessionUser, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
+        if (! comment.getMember().equals(sessionUser))
+            throw new CommentException(CommentErrorCode.COMMENT_DELETE_NOT_PERMITTED);
+        comment.deleteComment();
+        if (comment.hasNoReplies()) {
+            Board board = comment.getBoard();
+            board.getComments().remove(comment);
+            commentRepository.delete(comment);
+        }
     }
 }

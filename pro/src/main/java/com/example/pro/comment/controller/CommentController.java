@@ -35,4 +35,11 @@ public class CommentController {
         Comment comment = commentService.updateComment(member, commentId, updateRequest);
         return ResponseUtil.success("댓글이 성공적으로 수정되었습니다. Comment Id: " + comment.getId());
     }
+
+    @DeleteMapping("/{commentId}")
+    public BasicResponse<String> deleteComment(@PathVariable Long commentId) {
+        Member member = authService.loadUser();
+        commentService.deleteComment(member, commentId);
+        return ResponseUtil.success("댓글이 성공적으로 삭제되었습니다.");
+    }
 }
