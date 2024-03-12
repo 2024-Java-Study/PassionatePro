@@ -5,7 +5,7 @@ import com.example.pro.comment.domain.Comment;
 import java.util.ArrayList;
 import java.util.List;
 
-public record CommentResponseDto(Long commentId, String username, String content, String createdAt, List<ReplyResponseDto> replies) {
+public record CommentResponseDto(Long commentId, String username, String content, String createdAt, Boolean isDeleted, List<ReplyResponseDto> replies) {
 
     public static List<CommentResponseDto> makeDtoCollection(List<Comment> comments) {
         List<CommentResponseDto> responses = new ArrayList<>();
@@ -21,6 +21,7 @@ public record CommentResponseDto(Long commentId, String username, String content
                 comment.getMember().getUsername(),
                 comment.getContent(),
                 comment.getCreatedAt(),
+                comment.isDeleted(),
                 comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
         );
     }
@@ -31,6 +32,7 @@ public record CommentResponseDto(Long commentId, String username, String content
                 "(삭제)",
                 "삭제된 댓글입니다.",
                 comment.getCreatedAt(),
+                comment.isDeleted(),
                 comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
         );
     }
