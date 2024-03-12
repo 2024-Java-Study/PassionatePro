@@ -3,8 +3,10 @@ package com.example.pro.comment.domain;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.common.BaseTimeEntity;
+import com.example.pro.common.BooleanTypeConverter;
 import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,6 +38,10 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
+    @NotNull
+    @Convert(converter = BooleanTypeConverter.class)
+    private boolean isDeleted;
+
     /**
      * 생성 메서드
      */
@@ -45,6 +51,7 @@ public class Comment extends BaseTimeEntity {
         this.member = member;
         this.board = board;
         this.content = Validator.validString(content);
+        this.isDeleted = false;
     }
 
     public void updateContent(String content) {
