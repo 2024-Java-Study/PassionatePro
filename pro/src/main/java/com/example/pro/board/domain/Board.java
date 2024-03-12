@@ -62,4 +62,8 @@ public class Board extends BaseTimeEntity {
     public void uploadFile(List<BoardImage> images) {
         this.image = images;
     }
+
+    public void removeComment(Comment comment) {
+        this.comments.remove(comment);
+    }
 }

@@ -38,23 +38,26 @@ public class CommentService {
     public Comment updateComment(Member sessionUser, Long commentId, CommentUpdateRequestDto updateRequest) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        if (! comment.getMember().equals(sessionUser))
-            throw new CommentException(CommentErrorCode.COMMENT_UPDATE_NOT_PERMITTED);
+        checkPermission(sessionUser, comment);
         comment.updateContent(updateRequest.content());
         return comment;
     }
-
     @Transactional
     public void deleteComment(Member sessionUser, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        if (! comment.getMember().equals(sessionUser))
-            throw new CommentException(CommentErrorCode.COMMENT_DELETE_NOT_PERMITTED);
+        checkPermission(sessionUser, comment);
         comment.deleteComment();
         if (comment.hasNoReplies()) {
             Board board = comment.getBoard();
-            board.getComments().remove(comment);
+            board.removeComment(comment);
             commentRepository.delete(comment);
         }
     }
+
+    private void checkPermission(Member sessionUser, Comment comment) {
+        if (! comment.getMember().equals(sessionUser))
+            throw new CommentException(CommentErrorCode.COMMENT_ACCESS_NOT_PERMITTED);
+    }
+
 }
