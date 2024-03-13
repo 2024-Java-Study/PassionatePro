@@ -1,7 +1,7 @@
 package com.example.pro.comment.domain;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.common.BaseTimeEntity;
+import com.example.pro.common.BooleanTypeConverter;
 import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -23,9 +23,8 @@ public class Reply extends BaseTimeEntity {
     @Column(name = "reply_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Embedded
+    private WriterInfo writer;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "comment_id", nullable = false)
@@ -35,15 +34,16 @@ public class Reply extends BaseTimeEntity {
     private String content;
 
     @NotNull
+    @Convert(converter = BooleanTypeConverter.class)
     private boolean isDeleted;
 
     /**
      * 생성 메서드
      */
     @Builder
-    public Reply(Long id, Member member, Comment comment, String content) {
+    public Reply(Long id, String username, Comment comment, String content) {
         this.id = id;
-        this.member = member;
+        this.writer = new WriterInfo(username, false);
         this.comment = comment;
         this.content = Validator.validString(content);
         this.isDeleted = false;

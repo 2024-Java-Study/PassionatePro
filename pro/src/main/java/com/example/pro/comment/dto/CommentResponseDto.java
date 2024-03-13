@@ -18,7 +18,7 @@ public record CommentResponseDto(Long commentId, String username, String content
     private static CommentResponseDto toCommentDto(Comment comment) {
         return new CommentResponseDto(
                 comment.getId(),
-                comment.getMember().getUsername(),
+                comment.getWriter().getUsername(),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 comment.isDeleted(),

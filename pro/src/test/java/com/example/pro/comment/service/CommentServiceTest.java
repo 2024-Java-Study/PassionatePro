@@ -59,7 +59,7 @@ class CommentServiceTest {
         comment = Comment.builder()
                 .id(1L)
                 .board(board)
-                .member(member)
+                .username(member.getUsername())
                 .content("댓글 내용 빈칸 아님")
                 .build();
     }
@@ -70,7 +70,7 @@ class CommentServiceTest {
         saveRequest = new CommentSaveRequestDto(1L, "댓글 내용");
 
         when(boardRepository.findById(1L)).thenReturn(Optional.ofNullable(board));
-        when(commentRepository.save(any())).thenReturn(saveRequest.toComment(board, member));
+        when(commentRepository.save(any())).thenReturn(saveRequest.toComment(board, member.getUsername()));
 
         Comment comment = commentService.saveComment(member, saveRequest);
         assertThat(comment.getContent()).isEqualTo("댓글 내용");

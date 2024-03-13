@@ -18,7 +18,7 @@ public record ReplyResponseDto(Long replyId, String username, String content, St
     private static ReplyResponseDto toReplyResponseDto(Reply reply) {
         return new ReplyResponseDto(
                 reply.getId(),
-                reply.getMember().getUsername(),
+                reply.getWriter().getUsername(),
                 reply.getContent(),
                 reply.getCreatedAt(),
                 reply.isDeleted()

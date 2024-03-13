@@ -1,6 +1,5 @@
 package com.example.pro.comment.dto;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
 import com.example.pro.comment.exception.ReplyErrorCode;
@@ -17,12 +16,12 @@ public record ReplySaveRequestDto(@NotNull Long commentId, @NotBlank String cont
         this.content = content;
     }
 
-    public Reply toReply(Member member, Comment comment) {
+    public Reply toReply(String username, Comment comment) {
         if (!Objects.equals(commentId, comment.getId()))
             throw new ReplyException(ReplyErrorCode.REPLY_ID_NOT_MATCH);
 
         return Reply.builder()
-                .member(member)
+                .username(username)
                 .comment(comment)
                 .content(content)
                 .build();

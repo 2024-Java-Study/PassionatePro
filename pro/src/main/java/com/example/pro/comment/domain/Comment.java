@@ -1,6 +1,5 @@
 package com.example.pro.comment.domain;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.common.BaseTimeEntity;
 import com.example.pro.common.BooleanTypeConverter;
@@ -24,9 +23,8 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Embedded
+    private WriterInfo writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
@@ -46,9 +44,9 @@ public class Comment extends BaseTimeEntity {
      * 생성 메서드
      */
     @Builder
-    public Comment(Long id, Member member, Board board, String content) {
+    public Comment(Long id, String username, Board board, String content) {
         this.id = id;
-        this.member = member;
+        this.writer = new WriterInfo(username, false);
         this.board = board;
         this.content = Validator.validString(content);
         this.isDeleted = false;

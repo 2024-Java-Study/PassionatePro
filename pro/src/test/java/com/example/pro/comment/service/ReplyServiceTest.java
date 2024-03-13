@@ -60,14 +60,14 @@ class ReplyServiceTest {
 
         comment = Comment.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .board(board)
                 .content("댓글 빈킨 아님")
                 .build();
 
         reply = Reply.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .comment(comment)
                 .content("댓글에 대한 답글 빈칸 아님")
                 .build();
@@ -80,7 +80,7 @@ class ReplyServiceTest {
     @DisplayName("[성공] 대댓글 작성")
     void saveReply() {
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
-        when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member, comment));
+        when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member.getUsername(), comment));
         Reply reply = replyService.saveReply(member, saveRequest);
 
         assertThat(reply.getContent()).isEqualTo("대댓글 내용");

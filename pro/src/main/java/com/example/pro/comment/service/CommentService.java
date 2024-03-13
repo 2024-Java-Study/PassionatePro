@@ -28,7 +28,7 @@ public class CommentService {
     public Comment saveComment(Member writer, CommentSaveRequestDto saveRequest) {
         Board board = boardRepository.findById(saveRequest.boardId())
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        Comment comment = commentRepository.save(saveRequest.toComment(board, writer));
+        Comment comment = commentRepository.save(saveRequest.toComment(board, writer.getUsername()));
         board.getComments().add(comment);
         log.info("해당 게시글의 댓글 개수, {}", board.getComments().size());
         return comment;
@@ -56,7 +56,7 @@ public class CommentService {
     }
 
     private void checkPermission(Member sessionUser, Comment comment) {
-        if (! comment.getMember().equals(sessionUser))
+        if (! comment.getWriter().getUsername().equals(sessionUser.getUsername()))
             throw new CommentException(CommentErrorCode.COMMENT_ACCESS_NOT_PERMITTED);
     }
 
