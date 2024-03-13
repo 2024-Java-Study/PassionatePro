@@ -48,6 +48,10 @@ public class CommentService {
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
         checkPermission(sessionUser, comment);
         comment.deleteComment();
+        deleteCommentFromDB(comment);
+    }
+
+    private void deleteCommentFromDB(Comment comment) {
         if (comment.hasNoReplies()) {
             Board board = comment.getBoard();
             board.removeComment(comment);
