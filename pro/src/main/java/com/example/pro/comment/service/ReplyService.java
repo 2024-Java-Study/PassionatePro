@@ -41,20 +41,31 @@ public class ReplyService {
     }
 
     @Transactional
-    public void deleteReply(Member sessionUser, Long replyId) {
+    public void deleteReplyFromDB(Member sessionUser, Long replyId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
         checkPermission(sessionUser, reply);
         reply.deleteReply();
-        if (reply.hasNoSibling()) {
-            Comment comment = reply.getComment();
-            // TODO: 현재 지울 답글이 마지막 답글일 경우 답글도 지우고 댓글도 지우고
+        deleteReplyFromDB(reply);
+        deleteParentWithSiblings(reply.getComment());
+    }
+
+    private void deleteParentWithSiblings(Comment parent) {
+        if (parent.countExistingReplies() == 0) {
+            replyRepository.deleteAll(parent.getReplies());
+            commentRepository.delete(parent);
+        }
+    }
+
+    private void deleteReplyFromDB(Reply reply) {
+        if (reply.isTheYoungest()) {
             replyRepository.delete(reply);
         }
     }
 
     private void checkPermission(Member writer, Reply reply) {
-        if (! writer.equals(reply.getMember()))
+        if (! writer.equals(reply.getMember())) {
             throw new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED);
+        }
     }
 }

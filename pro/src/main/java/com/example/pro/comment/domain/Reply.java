@@ -11,6 +11,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.LongStream;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,10 +52,13 @@ public class Reply extends BaseTimeEntity {
     public void updateContent(String content) {
         this.content = content;
     }
+
     public void deleteReply() {
         this.isDeleted = true;
     }
-    public boolean hasNoSibling() {
-        return this.comment.countReplies() == 1;
+    public boolean isTheYoungest() {
+        List<Reply> replies = this.comment.getReplies();
+        long idx = replies.indexOf(this);
+        return LongStream.range(idx + 1, replies.size()).allMatch(i -> replies.get((int) i).isDeleted);
     }
 }

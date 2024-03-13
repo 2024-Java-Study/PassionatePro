@@ -63,10 +63,10 @@ public class Comment extends BaseTimeEntity {
     }
 
     public boolean hasNoReplies() {
-        return this.countReplies() == 0;
+        return this.replies.size() == 0;
     }
 
-    public Long countReplies() {
+    public Long countExistingReplies() {
         return this.replies.stream().filter(reply -> !reply.isDeleted()).count();
     }
 }

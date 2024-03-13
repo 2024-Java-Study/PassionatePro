@@ -1,6 +1,7 @@
 package com.example.pro.comment.dto;
 
 import com.example.pro.comment.domain.Comment;
+import com.example.pro.comment.domain.Reply;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public record CommentResponseDto(Long commentId, String username, String content
                 comment.getContent(),
                 comment.getCreatedAt(),
                 comment.isDeleted(),
-                comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
+                ReplyResponseDto.makeRepliesResponse(comment.getReplies())
         );
     }
 
@@ -33,7 +34,7 @@ public record CommentResponseDto(Long commentId, String username, String content
                 "삭제된 댓글입니다.",
                 comment.getCreatedAt(),
                 comment.isDeleted(),
-                comment.getReplies().stream().map(ReplyResponseDto::toReplyResponse).toList()
+                ReplyResponseDto.makeRepliesResponse(comment.getReplies())
         );
     }
 }

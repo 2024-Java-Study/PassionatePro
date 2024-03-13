@@ -32,4 +32,11 @@ public class ReplyController {
         Reply reply = replyService.updateReply(member, replyId, updateRequest);
         return ResponseUtil.success("답글이 성공적으로 수정되었습니다. Reply Id: " + reply.getId());
     }
+
+    @DeleteMapping("/{replyId}")
+    public BasicResponse<String> deleteReply(@PathVariable Long replyId) {
+        Member member = authService.loadUser();
+        replyService.deleteReplyFromDB(member, replyId);
+        return ResponseUtil.success("답글이 성공적으로 삭제되었습니다.");
+    }
 }
