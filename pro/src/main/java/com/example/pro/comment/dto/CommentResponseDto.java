@@ -1,7 +1,6 @@
 package com.example.pro.comment.dto;
 
 import com.example.pro.comment.domain.Comment;
-import com.example.pro.comment.domain.Reply;
 
 import java.util.ArrayList;
 import java.util.List;

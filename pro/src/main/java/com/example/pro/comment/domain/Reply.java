@@ -56,6 +56,7 @@ public class Reply extends BaseTimeEntity {
     public void deleteReply() {
         this.isDeleted = true;
     }
+
     public boolean isTheYoungest() {
         List<Reply> replies = this.comment.getReplies();
         long idx = replies.indexOf(this);
