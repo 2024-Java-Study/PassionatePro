@@ -30,7 +30,6 @@ public class CommentService {
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         Comment comment = commentRepository.save(saveRequest.toComment(board, writer.getUsername()));
         board.getComments().add(comment);
-        log.info("해당 게시글의 댓글 개수, {}", board.getComments().size());
         return comment;
     }
 
