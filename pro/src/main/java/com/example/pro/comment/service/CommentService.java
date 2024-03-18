@@ -1,6 +1,5 @@
 package com.example.pro.comment.service;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
