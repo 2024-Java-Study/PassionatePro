@@ -81,7 +81,7 @@ class ReplyServiceTest {
     void saveReply() {
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
         when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member.getUsername(), comment));
-        Reply reply = replyService.saveReply(member, saveRequest);
+        Reply reply = replyService.saveReply(member.getUsername(), saveRequest);
 
         assertThat(reply.getContent()).isEqualTo("대댓글 내용");
         assertThat(comment.getReplies().size()).isEqualTo(1);
@@ -93,7 +93,7 @@ class ReplyServiceTest {
         when(commentRepository.findById(any()))
                 .thenThrow(new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
 
-        assertThatThrownBy(() -> replyService.saveReply(member, saveRequest))
+        assertThatThrownBy(() -> replyService.saveReply(member.getUsername(), saveRequest))
                 .isInstanceOf(CommentException.class)
                 .hasMessageContaining("해당 댓글을 찾을 수 없습니다.");
     }
@@ -102,7 +102,7 @@ class ReplyServiceTest {
     @DisplayName("[성공] 대댓글 수정")
     void updateReply() {
         when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
-        Reply updated = replyService.updateReply(member, 1L, updateRequest);
+        Reply updated = replyService.updateReply(member.getUsername(), 1L, updateRequest);
         assertThat(updated.getContent()).isEqualTo("수정된 내용의 답글");
     }
 
@@ -112,7 +112,7 @@ class ReplyServiceTest {
         when(replyRepository.findById(any()))
                 .thenThrow(new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
 
-        assertThatThrownBy(() -> replyService.updateReply(member, 2L, updateRequest))
+        assertThatThrownBy(() -> replyService.updateReply(member.getUsername(), 2L, updateRequest))
                 .isInstanceOf(ReplyException.class)
                 .hasMessageContaining("해당 id의 답글을 찾을 수 없습니다.");
     }
@@ -128,7 +128,7 @@ class ReplyServiceTest {
                 .build();
 
         when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
-        assertThatThrownBy(() -> replyService.updateReply(otherMember, 1L, updateRequest))
+        assertThatThrownBy(() -> replyService.updateReply(otherMember.getUsername(), 1L, updateRequest))
                 .isInstanceOf(ReplyException.class)
                 .hasMessageContaining("해당 답글에 접근할 권한이 없습니다.");
     }

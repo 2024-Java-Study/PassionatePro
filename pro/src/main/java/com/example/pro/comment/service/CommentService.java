@@ -25,27 +25,28 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Comment saveComment(Member writer, CommentSaveRequestDto saveRequest) {
+    public Comment saveComment(String writerName, CommentSaveRequestDto saveRequest) {
         Board board = boardRepository.findById(saveRequest.boardId())
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        Comment comment = commentRepository.save(saveRequest.toComment(board, writer.getUsername()));
+        Comment comment = commentRepository.save(saveRequest.toComment(board, writerName));
         board.getComments().add(comment);
         return comment;
     }
 
     @Transactional
-    public Comment updateComment(Member sessionUser, Long commentId, CommentUpdateRequestDto updateRequest) {
+    public Comment updateComment(String sessionUsername, Long commentId, CommentUpdateRequestDto updateRequest) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        checkPermission(sessionUser, comment);
+        checkPermission(sessionUsername, comment);
         comment.updateContent(updateRequest.content());
         return comment;
     }
+
     @Transactional
-    public void deleteComment(Member sessionUser, Long commentId) {
+    public void deleteComment(String sessionUsername, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        checkPermission(sessionUser, comment);
+        checkPermission(sessionUsername, comment);
         comment.deleteComment();
         deleteCommentFromDB(comment);
     }
@@ -58,8 +59,8 @@ public class CommentService {
         }
     }
 
-    private void checkPermission(Member sessionUser, Comment comment) {
-        if (! comment.getWriter().getUsername().equals(sessionUser.getUsername()))
+    private void checkPermission(String sessionUsername, Comment comment) {
+        if (! comment.getWriter().getUsername().equals(sessionUsername))
             throw new CommentException(CommentErrorCode.COMMENT_ACCESS_NOT_PERMITTED);
     }
 

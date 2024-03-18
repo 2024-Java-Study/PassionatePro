@@ -23,28 +23,28 @@ public class ReplyService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Reply saveReply(Member writer, ReplySaveRequestDto saveRequestDto) {
+    public Reply saveReply(String writerName, ReplySaveRequestDto saveRequestDto) {
         Comment comment = commentRepository.findById(saveRequestDto.commentId())
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        Reply reply = replyRepository.save(saveRequestDto.toReply(writer.getUsername(), comment));
+        Reply reply = replyRepository.save(saveRequestDto.toReply(writerName, comment));
         comment.getReplies().add(reply);
         return reply;
     }
 
     @Transactional
-    public Reply updateReply(Member writer, Long replyId, ReplyUpdateRequestDto updateRequestDto) {
+    public Reply updateReply(String sessionUsername, Long replyId, ReplyUpdateRequestDto updateRequestDto) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
-        checkPermission(writer, reply);
+        checkPermission(sessionUsername, reply);
         reply.updateContent(updateRequestDto.content());
         return reply;
     }
 
     @Transactional
-    public void deleteReplyFromDB(Member sessionUser, Long replyId) {
+    public void deleteReplyFromDB(String sessionUsername, Long replyId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
-        checkPermission(sessionUser, reply);
+        checkPermission(sessionUsername, reply);
         reply.deleteReply();
         deleteReplyFromDB(reply);
         deleteParentWithSiblings(reply.getComment());
@@ -63,8 +63,8 @@ public class ReplyService {
         }
     }
 
-    private void checkPermission(Member writer, Reply reply) {
-        if (! writer.getUsername().equals(reply.getWriter().getUsername())) {
+    private void checkPermission(String sessionUsername, Reply reply) {
+        if (! sessionUsername.equals(reply.getWriter().getUsername())) {
             throw new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED);
         }
     }

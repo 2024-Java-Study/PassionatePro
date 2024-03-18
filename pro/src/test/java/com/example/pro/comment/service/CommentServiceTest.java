@@ -72,7 +72,7 @@ class CommentServiceTest {
         when(boardRepository.findById(1L)).thenReturn(Optional.ofNullable(board));
         when(commentRepository.save(any())).thenReturn(saveRequest.toComment(board, member.getUsername()));
 
-        Comment comment = commentService.saveComment(member, saveRequest);
+        Comment comment = commentService.saveComment(member.getUsername(), saveRequest);
         assertThat(comment.getContent()).isEqualTo("댓글 내용");
         assertThat(board.getComments().size()).isEqualTo(1);
     }
@@ -83,7 +83,7 @@ class CommentServiceTest {
         saveRequest = new CommentSaveRequestDto(1L, "댓글 내용");
 
         when(boardRepository.findById(1L)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        assertThatThrownBy(() -> commentService.saveComment(member, saveRequest))
+        assertThatThrownBy(() -> commentService.saveComment(member.getUsername(), saveRequest))
                 .isInstanceOf(BoardException.class)
                 .hasMessageContaining("게시물을 찾을 수 없습니다.");
     }
@@ -93,7 +93,7 @@ class CommentServiceTest {
     void updateComment() {
         updateRequest = new CommentUpdateRequestDto("수정된 댓글 내용. 빈 값 아님");
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
-        Comment updated = commentService.updateComment(member, 1L, updateRequest);
+        Comment updated = commentService.updateComment(member.getUsername(), 1L, updateRequest);
         assertThat(updated.getContent()).isEqualTo("수정된 댓글 내용. 빈 값 아님");
     }
 
@@ -103,7 +103,7 @@ class CommentServiceTest {
         updateRequest = new CommentUpdateRequestDto("수정된 댓글 내용. 빈 값 아님");
         when(commentRepository.findById(any()))
                 .thenThrow(new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        assertThatThrownBy(() -> commentService.updateComment(member, 1L, updateRequest));
+        assertThatThrownBy(() -> commentService.updateComment(member.getUsername(), 1L, updateRequest));
     }
 
     @Test
@@ -118,7 +118,7 @@ class CommentServiceTest {
         updateRequest = new CommentUpdateRequestDto("수정된 댓글 내용. 빈 값 아님");
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
 
-        assertThatThrownBy(() -> commentService.updateComment(otherMember, 1L, updateRequest))
+        assertThatThrownBy(() -> commentService.updateComment(otherMember.getUsername(), 1L, updateRequest))
                 .isInstanceOf(CommentException.class)
                 .hasMessageContaining("해당 댓글에 접근할 권한이 없습니다.");
     }

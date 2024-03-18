@@ -23,7 +23,7 @@ public class CommentController {
     @PostMapping
     public BasicResponse<String> saveComment(@Valid @RequestBody CommentSaveRequestDto saveRequest) {
         Member member = authService.loadUser();
-        Comment comment = commentService.saveComment(member, saveRequest);
+        Comment comment = commentService.saveComment(member.getUsername(), saveRequest);
         return ResponseUtil.success("댓글이 성공적으로 등록되었습니다. Comment Id: " + comment.getId());
     }
 
@@ -32,14 +32,14 @@ public class CommentController {
             @PathVariable Long commentId,
             @Valid @RequestBody CommentUpdateRequestDto updateRequest) {
         Member member = authService.loadUser();
-        Comment comment = commentService.updateComment(member, commentId, updateRequest);
+        Comment comment = commentService.updateComment(member.getUsername(), commentId, updateRequest);
         return ResponseUtil.success("댓글이 성공적으로 수정되었습니다. Comment Id: " + comment.getId());
     }
 
     @DeleteMapping("/{commentId}")
     public BasicResponse<String> deleteComment(@PathVariable Long commentId) {
         Member member = authService.loadUser();
-        commentService.deleteComment(member, commentId);
+        commentService.deleteComment(member.getUsername(), commentId);
         return ResponseUtil.success("댓글이 성공적으로 삭제되었습니다.");
     }
 }
