@@ -6,6 +6,7 @@ import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.comment.domain.Comment;
+import com.example.pro.comment.domain.Reply;
 import com.example.pro.comment.dto.CommentSaveRequestDto;
 import com.example.pro.comment.dto.CommentUpdateRequestDto;
 import com.example.pro.comment.exception.CommentErrorCode;
@@ -107,19 +108,62 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[실패] 댓글 수정-존재하지 않는 댓글id")
+    @DisplayName("[실패] 댓글 수정-수정 권한 없음")
     void updateCommentNotAuthorized() {
-        Member otherMember =  Member.builder()
-                .username("comment-reader")
-                .password("password4321")
-                .nickname("nickname22")
-                .email("hellojava@gmail.com")
-                .build();
         updateRequest = new CommentUpdateRequestDto("수정된 댓글 내용. 빈 값 아님");
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
 
-        assertThatThrownBy(() -> commentService.updateComment(otherMember.getUsername(), 1L, updateRequest))
+        assertThatThrownBy(() -> commentService.updateComment("comment-reader", 1L, updateRequest))
                 .isInstanceOf(CommentException.class)
                 .hasMessageContaining("해당 댓글에 접근할 권한이 없습니다.");
     }
+
+    @Test
+    @DisplayName("[성공] 댓글 삭제-하위 답글 없을 경우 완전히 삭제")
+    void hardDeleteComment() {
+        board.getComments().add(comment);
+        when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
+        assertThat(board.getComments().size()).isNotZero();
+        commentService.deleteComment(member.getUsername(), 1L);
+        assertThat(board.getComments().size()).isZero();
+    }
+
+    @Test
+    @DisplayName("[성공] 댓글 삭제-하위 답글 있을 경우 soft delete")
+    void softDeleteComment() {
+        board.getComments().add(comment);
+        Reply reply = Reply.builder()
+                .id(1L)
+                .username(member.getUsername())
+                .comment(comment)
+                .content("댓글에 대한 답글 빈칸 아님")
+                .build();
+        comment.getReplies().add(reply);
+        when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
+        commentService.deleteComment(member.getUsername(), 1L);
+        assertThat(board.getComments().size()).isNotZero();
+        // todo: soft delete이므로 내부 로직에서는 삭제된 댓글까지 보여짐
+    }
+
+    @Test
+    @DisplayName("[실패] 댓글 삭제-삭제 권한 없음")
+    void deleteCommentNotPermitted() {
+        board.getComments().add(comment);
+        when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
+        assertThatThrownBy(() -> commentService.deleteComment("comment-reader", 1L))
+                .isInstanceOf(CommentException.class)
+                .hasMessageContaining("해당 댓글에 접근할 권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("[실패] 댓글 삭제-존재하지 않는 댓글id")
+    void deleteCommentNotFound() {
+        board.getComments().add(comment);
+        when(commentRepository.findById(any()))
+                .thenThrow(new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
+        assertThatThrownBy(() -> commentService.deleteComment("comment-writer", 1L))
+                .isInstanceOf(CommentException.class)
+                .hasMessageContaining("해당 댓글을 찾을 수 없습니다.");
+    }
+
 }
