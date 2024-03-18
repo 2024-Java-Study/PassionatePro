@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ReplyTest {
-
     Board board;
     Comment comment;
     Reply reply1;
@@ -24,7 +23,7 @@ class ReplyTest {
                 .build();
 
         comment = Comment.builder()
-                .id(2L)
+                .id(1L)
                 .username("comment-writer")
                 .board(board)
                 .content("댓글 내용 빈칸 아님")
@@ -40,7 +39,7 @@ class ReplyTest {
                 .build();
 
         reply2 = Reply.builder()
-                .id(1L)
+                .id(2L)
                 .username("comment-writer")
                 .comment(comment)
                 .content("대댓글 내용2 빈칸 아님")
