@@ -1,7 +1,6 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
