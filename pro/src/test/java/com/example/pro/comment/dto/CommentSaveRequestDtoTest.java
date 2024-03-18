@@ -19,18 +19,18 @@ class CommentSaveRequestDtoTest {
     void init() {
         request = new CommentSaveRequestDto(1L, "댓글 내용");
 
-        board = Board.builder()
-                .id(2L)
-                .member(member)
-                .title("게시글 제목")
-                .content("게시글 내용")
-                .build();
-
         member = Member.builder()
                 .username("comment-writer")
                 .password("password1234")
                 .nickname("nickname")
                 .email("helloworld@gmail.com")
+                .build();
+
+        board = Board.builder()
+                .id(2L)
+                .username(member.getUsername())
+                .title("게시글 제목")
+                .content("게시글 내용")
                 .build();
     }
 

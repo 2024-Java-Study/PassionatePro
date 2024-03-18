@@ -42,18 +42,18 @@ class CommentServiceTest {
 
     @BeforeEach
     void init() {
-        board = Board.builder()
-                .id(1L)
-                .member(member)
-                .title("게시글 제목")
-                .content("게시글 내용")
-                .build();
-
         member = Member.builder()
                 .username("comment-writer")
                 .password("password1234")
                 .nickname("nickname")
                 .email("helloworld@gmail.com")
+                .build();
+
+        board = Board.builder()
+                .id(1L)
+                .username(member.getUsername())
+                .title("게시글 제목")
+                .content("게시글 내용")
                 .build();
 
         comment = Comment.builder()
@@ -120,6 +120,6 @@ class CommentServiceTest {
 
         assertThatThrownBy(() -> commentService.updateComment(otherMember, 1L, updateRequest))
                 .isInstanceOf(CommentException.class)
-                .hasMessageContaining("해당 댓글을 수정할 권한이 없습니다.");
+                .hasMessageContaining("해당 댓글에 접근할 권한이 없습니다.");
     }
 }

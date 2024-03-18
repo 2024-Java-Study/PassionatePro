@@ -72,7 +72,7 @@ public class BoardImageService {
         return BoardImageResponseDto.builder()
                 .title(board.getTitle())
                 .content(board.getContent())
-                .username(board.getMember().getUsername())
+                .username(board.getWriterInfo().getUsername())
                 .createdAt(board.getCreatedAt())
                 .urlList(urlList)
                 .build();

@@ -58,13 +58,6 @@ class CommentControllerTest extends ControllerTest {
         saveRequest = new CommentSaveRequestDto(1L, "댓글 내용 빈칸 아님");
         updateRequest = new CommentUpdateRequestDto("수정된 댓글 내용.");
 
-        board = Board.builder()
-                .id(1L)
-                .member(member)
-                .title("게시글 제목")
-                .content("게시글 내용")
-                .build();
-
         member = Member.builder()
                 .username("comment-writer")
                 .password("password1234")
@@ -72,10 +65,17 @@ class CommentControllerTest extends ControllerTest {
                 .email("helloworld@gmail.com")
                 .build();
 
+        board = Board.builder()
+                .id(1L)
+                .username(member.getUsername())
+                .title("게시글 제목")
+                .content("게시글 내용")
+                .build();
+
         comment = Comment.builder()
                 .id(1L)
                 .board(board)
-                .member(member)
+                .username(member.getUsername())
                 .content("댓글 내용 빈칸 아님")
                 .build();
     }
@@ -259,7 +259,7 @@ class CommentControllerTest extends ControllerTest {
     void updateCommentNotPermitted() throws Exception {
         when(authService.loadUser()).thenReturn(member);
         when(commentService.updateComment(any(), any(), any()))
-                .thenThrow(new CommentException(CommentErrorCode.COMMENT_UPDATE_NOT_PERMITTED));
+                .thenThrow(new CommentException(CommentErrorCode.COMMENT_ACCESS_NOT_PERMITTED));
 
         String body = objectMapper.writeValueAsString(updateRequest);
 
@@ -274,8 +274,8 @@ class CommentControllerTest extends ControllerTest {
                 .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(CommentException.class))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.response.errorCode").value("COMMENT_UPDATE_NOT_PERMITTED"))
-                .andExpect(jsonPath("$.response.errorMessage").value("해당 댓글을 수정할 권한이 없습니다."));
+                .andExpect(jsonPath("$.response.errorCode").value("COMMENT_ACCESS_NOT_PERMITTED"))
+                .andExpect(jsonPath("$.response.errorMessage").value("해당 댓글에 접근할 권한이 없습니다."));
 
         perform.andDo(document("comment update-not permitted",
                 preprocessRequest(prettyPrint()),

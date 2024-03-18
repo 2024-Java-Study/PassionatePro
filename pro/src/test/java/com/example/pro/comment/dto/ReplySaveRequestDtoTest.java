@@ -27,7 +27,7 @@ class ReplySaveRequestDtoTest {
 
         board = Board.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();

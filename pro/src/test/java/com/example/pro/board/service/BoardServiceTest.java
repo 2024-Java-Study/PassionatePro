@@ -59,7 +59,7 @@ public class BoardServiceTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
                 .build();

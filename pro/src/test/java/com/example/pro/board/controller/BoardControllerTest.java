@@ -63,7 +63,7 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .image(null)
@@ -85,7 +85,7 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
@@ -224,7 +224,7 @@ class BoardControllerTest extends ControllerTest {
         boardImages.add(boardImage);
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .image(boardImages)

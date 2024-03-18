@@ -52,7 +52,7 @@ public class BoardUploadControllerTest extends ControllerTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .build();

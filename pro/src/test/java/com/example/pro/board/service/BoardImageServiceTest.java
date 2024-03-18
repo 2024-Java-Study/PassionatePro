@@ -53,7 +53,7 @@ class BoardImageServiceTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .image(null)

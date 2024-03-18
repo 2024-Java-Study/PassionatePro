@@ -66,7 +66,7 @@ class ReplyControllerTest extends ControllerTest {
 
         board = Board.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -74,13 +74,13 @@ class ReplyControllerTest extends ControllerTest {
         comment = Comment.builder()
                 .id(1L)
                 .board(board)
-                .member(member)
+                .username(member.getUsername())
                 .content("댓글 내용 빈칸 아님")
                 .build();
 
         reply = Reply.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .comment(comment)
                 .content("대딧글 내용")
                 .build();
@@ -294,8 +294,8 @@ class ReplyControllerTest extends ControllerTest {
                 .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(ReplyException.class))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.response.errorCode").value("REPLY_UPDATE_NOT_PERMITTED"))
-                .andExpect(jsonPath("$.response.errorMessage").value("해당 답글을 수정할 권한이 없습니다."));
+                .andExpect(jsonPath("$.response.errorCode").value("REPLY_ACCESS_NOT_PERMITTED"))
+                .andExpect(jsonPath("$.response.errorMessage").value("해당 답글에 접근할 권한이 없습니다."));
 
         perform.andDo(document("reply update-update not permitted",
                 preprocessRequest(prettyPrint()),

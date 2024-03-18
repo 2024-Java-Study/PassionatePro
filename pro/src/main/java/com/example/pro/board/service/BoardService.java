@@ -31,9 +31,9 @@ public class BoardService {
     private final BoardImageService boardImageService;
 
     @Transactional
-    public Board createBoard(BoardSaveDto boardDto, Member member) {
+    public Board createBoard(BoardSaveDto boardDto, String username) {
         Board board = Board.builder()
-                .member(member)
+                .username(username)
                 .title(boardDto.getTitle())
                 .content(boardDto.getContent())
                 .build();
@@ -52,7 +52,7 @@ public class BoardService {
         return BoardImageResponseDto.builder()
                 .title(board.getTitle())
                 .content(board.getContent())
-                .username(board.getMember().getUsername())
+                .username(board.getWriterInfo().getUsername())
                 .createdAt(board.getCreatedAt())
                 .urlList(urls)
                 .comments(dtoCollection)
@@ -93,7 +93,7 @@ public class BoardService {
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // 권한 확인 로직
-        if (!member.getUsername().equals(board.getMember().getUsername())) {
+        if (!member.getUsername().equals(board.getWriterInfo().getUsername())) {
             throw new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD);
         }
 
@@ -107,7 +107,7 @@ public class BoardService {
                 .orElseThrow(
                         () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         // 권한 확인 로직
-        if (!member.getUsername().equals(board.getMember().getUsername())) {
+        if (!member.getUsername().equals(board.getWriterInfo().getUsername())) {
             throw new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD);
         }
 
