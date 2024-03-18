@@ -1,6 +1,5 @@
 package com.example.pro.comment.service;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
 import com.example.pro.comment.dto.ReplySaveRequestDto;
@@ -41,7 +40,7 @@ public class ReplyService {
     }
 
     @Transactional
-    public void deleteReplyFromDB(String sessionUsername, Long replyId) {
+    public void deleteReply(String sessionUsername, Long replyId) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
         checkPermission(sessionUsername, reply);
@@ -59,6 +58,8 @@ public class ReplyService {
 
     private void deleteReplyFromDB(Reply reply) {
         if (reply.isTheYoungest()) {
+            Comment comment = reply.getComment();
+            comment.getReplies().remove(reply);
             replyRepository.delete(reply);
         }
     }

@@ -119,7 +119,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 댓글 삭제-하위 답글 없을 경우 완전히 삭제")
+    @DisplayName("[성공] 댓글 삭제-하위 답글 없을 경우 hard delete")
     void hardDeleteComment() {
         board.getComments().add(comment);
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));

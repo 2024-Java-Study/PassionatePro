@@ -45,7 +45,7 @@ class ReplyServiceTest {
     @BeforeEach
     void init() {
         member = Member.builder()
-                .username("comment-writer")
+                .username("reply-writer")
                 .password("password1234")
                 .nickname("nickname")
                 .email("helloworld@gmail.com")
@@ -131,5 +131,62 @@ class ReplyServiceTest {
         assertThatThrownBy(() -> replyService.updateReply(otherMember.getUsername(), 1L, updateRequest))
                 .isInstanceOf(ReplyException.class)
                 .hasMessageContaining("해당 답글에 접근할 권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("[성공] 대댓글 삭제-하위 답글 없을 경우 hard delete")
+    void hardDeleteReply() {
+        Reply reply2 = Reply.builder()
+                .id(2L)
+                .username("other-reply-writer")
+                .comment(comment)
+                .content("댓글에 대한 답글2 빈칸 아님")
+                .build();
+        board.getComments().add(comment);
+        comment.getReplies().add(reply);
+        comment.getReplies().add(reply2);
+
+        when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply2));
+        assertThat(comment.getReplies().size()).isEqualTo(2);
+        replyService.deleteReply("other-reply-writer", 2L);
+        assertThat(comment.getReplies().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("[성공] 대댓글 삭제-하위 답글 있을 경우 soft delete")
+    void softDeleteReply() {
+        Reply reply2 = Reply.builder()
+                .id(2L)
+                .username("other-reply-writer")
+                .comment(comment)
+                .content("댓글에 대한 답글2 빈칸 아님")
+                .build();
+        board.getComments().add(comment);
+        comment.getReplies().add(reply);
+        comment.getReplies().add(reply2);
+
+        when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
+        assertThat(comment.getReplies().size()).isEqualTo(2);
+        replyService.deleteReply("reply-writer", 1L);
+        assertThat(comment.getReplies().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("[실패] 대댓글 삭제-권한 없음")
+    void deleteReplyNotPermitted() {
+        when(replyRepository.findById(any())).thenReturn(Optional.ofNullable(reply));
+        assertThatThrownBy(() -> replyService.deleteReply("other-reply-writer", 1L))
+                .isInstanceOf(ReplyException.class)
+                .hasMessageContaining("해당 답글에 접근할 권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("[실패] 대댓글 삭제-권한 없음")
+    void deleteReplyNotFound() {
+        when(replyRepository.findById(any()))
+                .thenThrow(new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
+        assertThatThrownBy(() -> replyService.deleteReply("reply-writer", 1L))
+                .isInstanceOf(ReplyException.class)
+                .hasMessageContaining("해당 id의 답글을 찾을 수 없습니다.");
     }
 }

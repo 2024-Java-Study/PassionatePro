@@ -36,7 +36,7 @@ public class ReplyController {
     @DeleteMapping("/{replyId}")
     public BasicResponse<String> deleteReply(@PathVariable Long replyId) {
         Member member = authService.loadUser();
-        replyService.deleteReplyFromDB(member.getUsername(), replyId);
+        replyService.deleteReply(member.getUsername(), replyId);
         return ResponseUtil.success("답글이 성공적으로 삭제되었습니다.");
     }
 }
