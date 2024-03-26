@@ -15,14 +15,16 @@ public class BoardListResponseDto {
     @NotNull
     public Long id;
     public String username;
+    public Boolean isWriterQuit;
     @NotBlank
     public String title;
     public String createdAt; // 날짜
 
     @Builder
-    public BoardListResponseDto(Long id, String username, String title, String createdAt) {
+    private BoardListResponseDto(Long id, String username, boolean isWriterQuit, String title, String createdAt) {
         this.id = id;
         this.username = username;
+        this.isWriterQuit = isWriterQuit;
         this.title = title;
         this.createdAt = createdAt;
     }
@@ -31,6 +33,7 @@ public class BoardListResponseDto {
         return BoardListResponseDto.builder()
                 .id(board.getId())
                 .username(board.getWriterInfo().getUsername())
+                .isWriterQuit(board.getWriterInfo().isMemberQuit())
                 .title(board.getTitle())
                 .createdAt(String.valueOf(board.getCreatedAt()))
                 .build();

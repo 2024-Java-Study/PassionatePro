@@ -18,6 +18,7 @@ public class BoardResponseDto {
     private String content;
     @NotBlank
     private String username;
+    private Boolean isWriterQuit;
     private String createdAt;
     private List<String> urlList;
     private List<CommentResponseDto> comments;
@@ -26,6 +27,7 @@ public class BoardResponseDto {
         return new BoardResponseDto(board.getTitle(),
                 board.getContent(),
                 board.getWriterInfo().getUsername(),
+                board.getWriterInfo().isMemberQuit(),
                 board.getCreatedAt(),
                 urlList,
                 CommentResponseDto.makeDtoCollection(board.getComments())

@@ -52,6 +52,9 @@ public class Reply extends BaseTimeEntity {
     public void updateContent(String content) {
         this.content = content;
     }
+    public void removeWriterInfo() {
+        this.writer = new WriterInfo("탈퇴한 사용자", true);
+    }
 
     public void deleteReply() {
         this.isDeleted = true;

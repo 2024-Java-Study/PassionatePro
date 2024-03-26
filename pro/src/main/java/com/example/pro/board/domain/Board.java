@@ -56,6 +56,10 @@ public class Board extends BaseTimeEntity {
         this.content = content;
     }
 
+    public void removeWriterInfo() {
+        this.writerInfo = new WriterInfo("탈퇴한 사용자", true);
+    }
+
     public void uploadFile(List<BoardImage> images) {
         this.image = images;
     }
