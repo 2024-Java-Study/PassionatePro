@@ -1,6 +1,5 @@
 package com.example.pro.auth.controller;
 
-
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.dto.LoginRequest;
 import com.example.pro.auth.dto.ProfileUpdateRequest;
@@ -14,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import static com.example.pro.auth.domain.UserSession.SESSION_KEY;
 
@@ -43,6 +41,12 @@ public class MemberController {
         Member member = authService.loadUser();
         member = memberService.updateProfile(request.getImage(), member);
         return ResponseUtil.success(member.getUsername() + "님의 프로필 이미지가 변경되었습니다.");
+    }
+
+    @DeleteMapping
+    public BasicResponse<String> quitMember() {
+        authService.quit();
+        return ResponseUtil.success("탈퇴되었습니다.");
     }
 
     @GetMapping("/me")

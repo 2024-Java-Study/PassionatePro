@@ -56,6 +56,10 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
     }
 
+    public void removeWriterInfo() {
+        this.writer = new WriterInfo("탈퇴한 사용자", true);
+    }
+
     public void deleteComment() {
         this.isDeleted = true;
     }

@@ -1,6 +1,5 @@
 package com.example.pro.auth.service;
 
-import com.example.pro.auth.dto.BoardRequest;
 import com.example.pro.auth.repository.MemberRepository;
 import com.example.pro.auth.repository.UserSessionRepository;
 import com.example.pro.auth.dto.LoginRequest;
@@ -26,6 +25,7 @@ import java.time.Clock;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService {
+    private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final UserSessionRepository sessionRepository;
     private final AuthenticationManager authenticationManager;
@@ -48,6 +48,16 @@ public class AuthService {
         );
         sessionRepository.save(UserSession.create(sessionId, form.getUsername(), clock));
         return form.getUsername();
+    }
+
+    @Transactional
+    public void quit() {
+        Member member = loadUser();
+        memberService.markQuitInWriterInfo(member);
+        UserSession session = sessionRepository.findByUsername(member.getUsername())
+                .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED_USER));
+        sessionRepository.delete(session);
+        memberRepository.delete(member);
     }
 
     public Member loadUser() {

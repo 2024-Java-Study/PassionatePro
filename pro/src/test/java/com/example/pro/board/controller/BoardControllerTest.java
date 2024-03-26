@@ -200,6 +200,7 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.total").value(boards.size()))
                 .andExpect(jsonPath("$.response.boards[0].id").value(dto.getId()))
                 .andExpect(jsonPath("$.response.boards[0].username").value(dto.getUsername()))
+                .andExpect(jsonPath("$.response.boards[0].isWriterQuit").value(false))
                 .andExpect(jsonPath("$.response.boards[0].title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.boards[0].createdAt").value(dto.getCreatedAt()));
 
@@ -214,6 +215,7 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.total").type(JsonFieldType.NUMBER).description("응답 메시지 - 댓글 총 개수"),
                                 fieldWithPath("response.boards[].id").type(JsonFieldType.NUMBER).description("응답 메시지 - 아이디"),
                                 fieldWithPath("response.boards[].username").type(JsonFieldType.STRING).description("응답 메시지 - 유저명"),
+                                fieldWithPath("response.boards[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 작성자 탈퇴 여부"),
                                 fieldWithPath("response.boards[].title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.boards[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
                         ).build())
@@ -271,17 +273,20 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response.username").value(dto.getUsername()))
+                .andExpect(jsonPath("$.response.isWriterQuit").value(false))
                 .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.content").value(dto.getContent()))
                 .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()))
                 .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()))
                 .andExpect(jsonPath("$.response.comments[0].commentId").value(comment.getId()))
                 .andExpect(jsonPath("$.response.comments[0].username").value(comment.getWriter().getUsername()))
+                .andExpect(jsonPath("$.response.comments[0].isWriterQuit").value(comment.getWriter().isMemberQuit()))
                 .andExpect(jsonPath("$.response.comments[0].content").value(comment.getContent()))
                 .andExpect(jsonPath("$.response.comments[0].createdAt").value(comment.getCreatedAt()))
                 .andExpect(jsonPath("$.response.comments[0].isDeleted").value(false))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].replyId").value(reply.getId()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].username").value(reply.getWriter().getUsername()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].isWriterQuit").value(reply.getWriter().isMemberQuit()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].content").value(reply.getContent()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].createdAt").value(reply.getCreatedAt()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].isDeleted").value(false));
@@ -295,17 +300,20 @@ class BoardControllerTest extends ControllerTest {
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
                                 fieldWithPath("response.username").type(JsonFieldType.STRING).description("응답 메시지 - 유저 아이디"),
+                                fieldWithPath("response.isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 작성자 탈퇴 여부"),
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
                                 fieldWithPath("response.urlList").type(JsonFieldType.ARRAY).description("응답 메시지 - url"),
                                 fieldWithPath("response.createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 생성 날짜"),
                                 fieldWithPath("response.comments[].commentId").type(JsonFieldType.NUMBER).description("응답 메시지 - 댓글 아이디"),
                                 fieldWithPath("response.comments[].username").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 작성자 아이디"),
+                                fieldWithPath("response.comments[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 작성자 탈퇴 여부"),
                                 fieldWithPath("response.comments[].content").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 내용"),
                                 fieldWithPath("response.comments[].createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 댓글 작성일자"),
                                 fieldWithPath("response.comments[].isDeleted").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 삭제 여부"),
                                 fieldWithPath("response.comments[].replies[].replyId").type(JsonFieldType.NUMBER).description("응답 메시지 - 답글 아이디"),
                                 fieldWithPath("response.comments[].replies[].username").type(JsonFieldType.STRING).description("응답 메시지 - 답글 작성자 아이디"),
+                                fieldWithPath("response.comments[].replies[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 작성자 탈퇴 여부"),
                                 fieldWithPath("response.comments[].replies[].content").type(JsonFieldType.STRING).description("응답 메시지 - 답글 내용"),
                                 fieldWithPath("response.comments[].replies[].createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 답글 작성일자"),
                                 fieldWithPath("response.comments[].replies[].isDeleted").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 답글 삭제 여부")
@@ -507,7 +515,6 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 삭제")
     void deleteBoard() throws Exception{
-
 
         ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON));
