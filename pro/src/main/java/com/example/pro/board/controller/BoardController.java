@@ -12,8 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/boards")
 @RequiredArgsConstructor
@@ -26,20 +24,19 @@ public class BoardController {
     @PostMapping
     public BasicResponse<String> create(@ModelAttribute @Valid BoardSaveDto boardDto) {
         Member member = authService.loadUser();
-        Board board = boardService.createBoard(boardDto, member);
+        Board board = boardService.createBoard(boardDto, member.getUsername());
         boardImageService.uploadBoardImage(boardDto.getImages(), board);
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }
 
-    @GetMapping("") // 전체 게시물 조회
-    public BasicResponse<List<BoardListResponseDto>> findAll() {
+    @GetMapping // 전체 게시물 조회
+    public BasicResponse<BoardCountResponseDto> findAll() {
         return ResponseUtil.success(boardService.findAllBoards());
     }
 
     @GetMapping("{id}") // 게시물 조회
-    public BasicResponse<BoardImageResponseDto> findById(@PathVariable Long id) {
-        Board board = boardService.findBoard(id);
-    return ResponseUtil.success(boardImageService.changeBoardImageToUrlList(board));
+    public BasicResponse<BoardResponseDto> findById(@PathVariable Long id) {
+        return ResponseUtil.success(boardService.makeBoardResponse(id));
     }
 
     @PutMapping("/{id}") // 게시물 수정

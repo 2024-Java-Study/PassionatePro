@@ -1,9 +1,8 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
+import com.example.pro.board.dto.BoardCountResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
@@ -61,7 +60,7 @@ public class BoardServiceSearchTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
                 .image(null)
@@ -79,8 +78,8 @@ public class BoardServiceSearchTest {
 
 
         // then
-        assertThat(boardService.createBoard(boardSaveDto, member).getTitle()).isEqualTo("제목");
-        assertThat(boardService.createBoard(boardSaveDto, member).getMember().getNickname()).isEqualTo("ajeong");
+        assertThat(boardService.createBoard(boardSaveDto, member.getUsername()).getTitle()).isEqualTo("제목");
+        assertThat(boardService.createBoard(boardSaveDto, member.getUsername()).getWriterInfo().getUsername()).isEqualTo("ajeong7038");
     }
     
     @Test
@@ -93,10 +92,11 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.findAll()).thenReturn(boardList);
-        List<BoardListResponseDto> allBoards = boardService.findAllBoards(); // 모든 보드를 찾아 Dto로 바꿔주기
+        when(boardRepository.count()).thenReturn((long) boardList.size());
+        BoardCountResponseDto allBoards = boardService.findAllBoards(); // 모든 보드를 찾아 Dto로 바꿔주기
 
         // then
-        assertThat(allBoards.size()).isEqualTo(1); // 전부 다 찾았는지 확인
+        assertThat(allBoards.getTotal()).isEqualTo(1); // 전부 다 찾았는지 확인
     }
     
     @Test
@@ -111,7 +111,7 @@ public class BoardServiceSearchTest {
 
         // then
         assertThat(findBoard.getTitle()).isEqualTo("제목");
-        assertThat(findBoard.getMember().getUsername()).isEqualTo("ajeong7038");
+        assertThat(findBoard.getWriterInfo().getUsername()).isEqualTo("ajeong7038");
     }
 
     

@@ -32,9 +32,9 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -66,7 +66,7 @@ class ReplyControllerTest extends ControllerTest {
 
         board = Board.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -74,13 +74,13 @@ class ReplyControllerTest extends ControllerTest {
         comment = Comment.builder()
                 .id(1L)
                 .board(board)
-                .member(member)
+                .username(member.getUsername())
                 .content("댓글 내용 빈칸 아님")
                 .build();
 
         reply = Reply.builder()
                 .id(1L)
-                .member(member)
+                .username(member.getUsername())
                 .comment(comment)
                 .content("대딧글 내용")
                 .build();
@@ -232,7 +232,7 @@ class ReplyControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("[실패] 대댓글 수정-잘못된 답글 id")
+    @DisplayName("[실패] 대댓글 수정-존재하지 않는 답글 id")
     void updateReplyNotFound() throws Exception {
         when(authService.loadUser()).thenReturn(member);
         when(replyService.updateReply(any(), anyLong(), any()))
@@ -279,7 +279,7 @@ class ReplyControllerTest extends ControllerTest {
                 .build();
         when(authService.loadUser()).thenReturn(otherMember);
         when(replyService.updateReply(any(), anyLong(), any()))
-                .thenThrow(new ReplyException(ReplyErrorCode.REPLY_UPDATE_NOT_PERMITTED));
+                .thenThrow(new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED));
 
         String body = objectMapper.writeValueAsString(updateRequest);
 
@@ -294,8 +294,8 @@ class ReplyControllerTest extends ControllerTest {
                 .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(ReplyException.class))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.response.errorCode").value("REPLY_UPDATE_NOT_PERMITTED"))
-                .andExpect(jsonPath("$.response.errorMessage").value("해당 답글을 수정할 권한이 없습니다."));
+                .andExpect(jsonPath("$.response.errorCode").value("REPLY_ACCESS_NOT_PERMITTED"))
+                .andExpect(jsonPath("$.response.errorMessage").value("해당 답글에 접근할 권한이 없습니다."));
 
         perform.andDo(document("reply update-update not permitted",
                 preprocessRequest(prettyPrint()),
@@ -344,6 +344,105 @@ class ReplyControllerTest extends ControllerTest {
                                 fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
                                 fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
                                 fieldWithPath("response.errors.content").type(JsonFieldType.STRING).description("답글 내용 공백 검사")
+                        ).build())
+        ));
+    }
+
+    @Test
+    @DisplayName("[성공] 대댓글 삭제")
+    void deleteReply() throws Exception {
+        when(authService.loadUser()).thenReturn(member);
+
+        ResultActions perform = mockMvc.perform(delete("/replies/{replyId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(Locale.KOREAN)
+                .characterEncoding(StandardCharsets.UTF_8)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("답글이 성공적으로 삭제되었습니다."));
+
+        perform.andDo(document("reply delete-success",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Reply")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response").type(JsonFieldType.STRING).description("응답 메시지")
+                        ).build())
+        ));
+    }
+
+    @Test
+    @DisplayName("[실패] 대댓글 삭제-존재하지 않는 대댓글id")
+    void deleteReplyNotFound() throws Exception {
+        when(authService.loadUser()).thenReturn(member);
+        doThrow(new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND))
+                .when(replyService).deleteReply(any(), any());
+
+        ResultActions perform = mockMvc.perform(delete("/replies/{replyId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(Locale.KOREAN)
+                .characterEncoding(StandardCharsets.UTF_8)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(ReplyException.class))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("REPLY_NOT_FOUND"))
+                .andExpect(jsonPath("$.response.errorMessage").value("해당 id의 답글을 찾을 수 없습니다."));
+
+        perform.andDo(document("reply delete-reply not found",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Reply")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
+                        ).build())
+        ));
+    }
+
+    @Test
+    @DisplayName("[실패] 대댓글 삭제-삭제권한 없음")
+    void deleteReplyNotPermitted() throws Exception {
+        when(authService.loadUser()).thenReturn(member);
+        doThrow(new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED))
+                .when(replyService).deleteReply(any(), any());
+
+        ResultActions perform = mockMvc.perform(delete("/replies/{replyId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(Locale.KOREAN)
+                .characterEncoding(StandardCharsets.UTF_8)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertThat(result.getResolvedException()).isInstanceOf(ReplyException.class))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.response.errorCode").value("REPLY_ACCESS_NOT_PERMITTED"))
+                .andExpect(jsonPath("$.response.errorMessage").value("해당 답글에 접근할 권한이 없습니다."));
+
+        perform.andDo(document("reply delete-not permitted",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Reply")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response.errorCode").type(JsonFieldType.STRING).description("예외 코드"),
+                                fieldWithPath("response.errorMessage").type(JsonFieldType.STRING).description("예외 메시지"),
+                                fieldWithPath("response.errors").type(JsonFieldType.OBJECT).description("필드 유효성 검사 내용")
                         ).build())
         ));
     }

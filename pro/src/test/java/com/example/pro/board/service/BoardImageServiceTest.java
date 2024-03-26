@@ -24,7 +24,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +52,7 @@ class BoardImageServiceTest {
                 .build();
 
         board = Board.builder()
-                .member(member)
+                .username(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .image(null)

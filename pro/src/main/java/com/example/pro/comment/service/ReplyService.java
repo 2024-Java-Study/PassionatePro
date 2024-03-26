@@ -1,6 +1,5 @@
 package com.example.pro.comment.service;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
 import com.example.pro.comment.dto.ReplySaveRequestDto;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReplyService {
 
@@ -24,21 +22,51 @@ public class ReplyService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Reply saveReply(Member writer, ReplySaveRequestDto saveRequestDto) {
+    public Reply saveReply(String writerName, ReplySaveRequestDto saveRequestDto) {
         Comment comment = commentRepository.findById(saveRequestDto.commentId())
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        Reply reply = replyRepository.save(saveRequestDto.toReply(writer, comment));
+        Reply reply = replyRepository.save(saveRequestDto.toReply(writerName, comment));
         comment.getReplies().add(reply);
         return reply;
     }
 
     @Transactional
-    public Reply updateReply(Member writer, Long replyId, ReplyUpdateRequestDto updateRequestDto) {
+    public Reply updateReply(String sessionUsername, Long replyId, ReplyUpdateRequestDto updateRequestDto) {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
-        if (! writer.equals(reply.getMember()))
-            throw new ReplyException(ReplyErrorCode.REPLY_UPDATE_NOT_PERMITTED);
+        checkPermission(sessionUsername, reply);
         reply.updateContent(updateRequestDto.content());
         return reply;
+    }
+
+    @Transactional
+    public void deleteReply(String sessionUsername, Long replyId) {
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyException(ReplyErrorCode.REPLY_NOT_FOUND));
+        checkPermission(sessionUsername, reply);
+        reply.deleteReply();
+        deleteReplyFromDB(reply);
+        deleteParentWithSiblings(reply.getComment());
+    }
+
+    private void deleteParentWithSiblings(Comment parent) {
+        if (parent.countExistingReplies() == 0) {
+            replyRepository.deleteAll(parent.getReplies());
+            commentRepository.delete(parent);
+        }
+    }
+
+    private void deleteReplyFromDB(Reply reply) {
+        if (reply.isTheYoungest()) {
+            Comment comment = reply.getComment();
+            comment.getReplies().remove(reply);
+            replyRepository.delete(reply);
+        }
+    }
+
+    private void checkPermission(String sessionUsername, Reply reply) {
+        if (! sessionUsername.equals(reply.getWriter().getUsername())) {
+            throw new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED);
+        }
     }
 }

@@ -1,14 +1,12 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
+import com.example.pro.board.dto.*;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.exception.BoardUnauthorizedException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardSaveDto;
-import com.example.pro.board.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,30 +20,39 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardImageService boardImageService;
 
     @Transactional
-    public Board createBoard(BoardSaveDto boardDto, Member member) {
+    public Board createBoard(BoardSaveDto boardDto, String username) {
         Board board = Board.builder()
-                .member(member)
+                .username(username)
                 .title(boardDto.getTitle())
                 .content(boardDto.getContent())
                 .build();
         return boardRepository.save(board);
     }
 
+    public BoardResponseDto makeBoardResponse(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        List<String> urls = boardImageService.getImageUrls(board);
+        return BoardResponseDto.toBoardResponse(board, urls);
+    }
 
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 
-    public List<BoardListResponseDto> findAllBoards() {
+    public BoardCountResponseDto findAllBoards() {
         List<Board> boards = boardRepository.findAll();
 
         // 엔티티를 Dto로 변환하는 로직
-        return boards.stream()
+        List<BoardListResponseDto> responses = boards.stream()
                 .map(BoardListResponseDto::toBoardListDto)
                 .collect(Collectors.toList());
+        long count = boardRepository.count();
+        return new BoardCountResponseDto(responses, count);
     }
 
     public List<Board> searchTitle(String title) {
@@ -60,7 +67,7 @@ public class BoardService {
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // 권한 확인 로직
-        if (!member.getUsername().equals(board.getMember().getUsername())) {
+        if (!member.getUsername().equals(board.getWriterInfo().getUsername())) {
             throw new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD);
         }
 
@@ -74,7 +81,7 @@ public class BoardService {
                 .orElseThrow(
                         () -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         // 권한 확인 로직
-        if (!member.getUsername().equals(board.getMember().getUsername())) {
+        if (!member.getUsername().equals(board.getWriterInfo().getUsername())) {
             throw new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD);
         }
 

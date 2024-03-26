@@ -2,7 +2,6 @@ package com.example.pro.board.service;
 
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.domain.BoardImage;
-import com.example.pro.board.dto.BoardImageResponseDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardImageRepository;
@@ -58,24 +57,13 @@ public class BoardImageService {
         else board.uploadFile(boardImages);
     }
 
-    @Transactional
-    public BoardImageResponseDto changeBoardImageToUrlList(Board board) {
+    public List<String> getImageUrls(Board board) {
         List<BoardImage> boardImages = findBoardImages(board);
-        List<String> urlList = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
 
         // List<BoardImage> -> List<String>
-        for (BoardImage image : boardImages) {
-            urlList.add(image.getUrl());
-        }
-
-        // dto 생성
-        return BoardImageResponseDto.builder()
-                .title(board.getTitle())
-                .content(board.getContent())
-                .username(board.getMember().getUsername())
-                .createdAt(board.getCreatedAt())
-                .urlList(urlList)
-                .build();
+        boardImages.forEach(boardImage -> urls.add(boardImage.getUrl()));
+        return urls;
     }
 
     public List<BoardImage> findBoardImages (Board board) {
@@ -84,7 +72,7 @@ public class BoardImageService {
 
     @Transactional
     public void deleteBoardImage (Board board) {
-        List<String> urlList = changeBoardImageToUrlList(board).getUrlList();
+        List<String> urlList = getImageUrls(board);
         for (String url : urlList) {
             fileUploader.deleteFile(url);
         }

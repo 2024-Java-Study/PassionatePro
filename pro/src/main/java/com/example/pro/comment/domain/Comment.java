@@ -1,10 +1,11 @@
 package com.example.pro.comment.domain;
 
-import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.common.BaseTimeEntity;
+import com.example.pro.common.BooleanTypeConverter;
 import com.example.pro.common.exception.Validator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,9 +23,8 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Embedded
+    private WriterInfo writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
@@ -36,18 +36,35 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
+    @NotNull
+    @Convert(converter = BooleanTypeConverter.class)
+    private boolean isDeleted;
+
     /**
      * 생성 메서드
      */
     @Builder
-    public Comment(Long id, Member member, Board board, String content) {
+    public Comment(Long id, String username, Board board, String content) {
         this.id = id;
-        this.member = member;
+        this.writer = new WriterInfo(username, false);
         this.board = board;
         this.content = Validator.validString(content);
+        this.isDeleted = false;
     }
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void deleteComment() {
+        this.isDeleted = true;
+    }
+
+    public boolean hasNoReplies() {
+        return this.replies.size() == 0;
+    }
+
+    public Long countExistingReplies() {
+        return this.replies.stream().filter(reply -> !reply.isDeleted()).count();
     }
 }
