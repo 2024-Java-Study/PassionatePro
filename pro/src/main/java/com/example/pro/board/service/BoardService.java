@@ -1,8 +1,7 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.board.domain.BoardImage;
-import com.example.pro.board.dto.BoardImageResponseDto;
+import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.exception.BoardUnauthorizedException;
@@ -11,14 +10,10 @@ import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardListResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
-import com.example.pro.comment.domain.Comment;
-import com.example.pro.comment.dto.CommentResponseDto;
-import com.example.pro.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,31 +35,11 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
-    /**
-     * BoardImageService.class
-     * changeBoardImageToUrlList()와 동일 기능을 하는 메서드.
-     * */
-    public BoardImageResponseDto makeBoardResponse(Board board) {
-        List<BoardImage> boardImages = boardImageService.findBoardImages(board);
-        List<String> urls = changeBoardImagesToUrls(boardImages);
-        List<CommentResponseDto> dtoCollection = CommentResponseDto.makeDtoCollection(board.getComments());
-
-        return BoardImageResponseDto.builder()
-                .title(board.getTitle())
-                .content(board.getContent())
-                .username(board.getWriterInfo().getUsername())
-                .createdAt(board.getCreatedAt())
-                .urlList(urls)
-                .comments(dtoCollection)
-                .build();
-    }
-
-    private List<String> changeBoardImagesToUrls(List<BoardImage> boardImages) {
-        List<String> urlList = new ArrayList<>();
-        for (BoardImage image : boardImages) {
-            urlList.add(image.getUrl());
-        }
-        return urlList;
+    public BoardResponseDto makeBoardResponse(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        List<String> urls = boardImageService.getImageUrls(board);
+        return BoardResponseDto.toBoardResponse(board, urls);
     }
 
     public Board findBoard(Long boardId) {

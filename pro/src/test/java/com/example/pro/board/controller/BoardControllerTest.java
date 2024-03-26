@@ -11,10 +11,16 @@ import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.exception.BoardUnauthorizedException;
 import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
+import com.example.pro.comment.domain.Comment;
+import com.example.pro.comment.domain.Reply;
+import com.example.pro.comment.dto.CommentResponseDto;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -38,11 +44,14 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ExtendWith(MockitoExtension.class)
 class BoardControllerTest extends ControllerTest {
-
-    private final BoardService boardService = mock(BoardService.class);
-    private final BoardImageService boardImageService = mock(BoardImageService.class);
-    private final AuthService authService = mock(AuthService.class);
+    @Mock
+    private BoardService boardService;
+    @Mock
+    private BoardImageService boardImageService;
+    @Mock
+    private AuthService authService;
 
     public static final String URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg";
 
@@ -230,16 +239,26 @@ class BoardControllerTest extends ControllerTest {
                 .image(boardImages)
                 .build();
 
-        BoardImageResponseDto dto = BoardImageResponseDto.builder()
-                .username("ajeong7038")
-                .title("제목")
-                .content("내용")
-                .urlList(urlList)
-                .createdAt("2024-02-08 11:59:07")
+        Comment comment = Comment.builder()
+                .username("comment-writer")
+                .id(1L)
+                .board(board)
+                .content("댓글1 빈칸 아님")
                 .build();
 
-        when(boardService.findBoard(any())).thenReturn(board);
-        when(boardImageService.changeBoardImageToUrlList(any())).thenReturn(dto);
+        Reply reply = Reply.builder()
+                .id(1L)
+                .username("reply-writer")
+                .content("답글 내용 빈칸 아님")
+                .comment(comment)
+                .build();
+
+        board.getComments().add(comment);
+        comment.getReplies().add(reply);
+
+        BoardResponseDto dto = BoardResponseDto.toBoardResponse(board, urlList);
+
+        when(boardService.makeBoardResponse(any())).thenReturn(dto);
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -253,7 +272,18 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.content").value(dto.getContent()))
                 .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()))
-                .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()));
+                .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()))
+                .andExpect(jsonPath("$.response.comments[0].commentId").value(comment.getId()))
+                .andExpect(jsonPath("$.response.comments[0].username").value(comment.getWriter().getUsername()))
+                .andExpect(jsonPath("$.response.comments[0].content").value(comment.getContent()))
+                .andExpect(jsonPath("$.response.comments[0].createdAt").value(comment.getCreatedAt()))
+                .andExpect(jsonPath("$.response.comments[0].isDeleted").value(false))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].replyId").value(reply.getId()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].username").value(reply.getWriter().getUsername()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].content").value(reply.getContent()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].createdAt").value(reply.getCreatedAt()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].isDeleted").value(false));
+
         // 문서 자동화
         perform.andDo(document("board findById-success",
                 preprocessRequest(prettyPrint()),
@@ -266,7 +296,18 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
                                 fieldWithPath("response.urlList").type(JsonFieldType.ARRAY).description("응답 메시지 - url"),
-                                fieldWithPath("response.createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
+                                fieldWithPath("response.createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 생성 날짜"),
+                                fieldWithPath("response.comments[].commentId").type(JsonFieldType.NUMBER).description("응답 메시지 - 댓글 아이디"),
+                                fieldWithPath("response.comments[].username").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 작성자 아이디"),
+                                fieldWithPath("response.comments[].content").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 내용"),
+                                fieldWithPath("response.comments[].createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 댓글 작성일자"),
+                                fieldWithPath("response.comments[].isDeleted").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 삭제 여부"),
+                                fieldWithPath("response.comments[].replies[].replyId").type(JsonFieldType.NUMBER).description("응답 메시지 - 답글 아이디"),
+                                fieldWithPath("response.comments[].replies[].username").type(JsonFieldType.STRING).description("응답 메시지 - 답글 작성자 아이디"),
+                                fieldWithPath("response.comments[].replies[].content").type(JsonFieldType.STRING).description("응답 메시지 - 답글 내용"),
+                                fieldWithPath("response.comments[].replies[].createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 답글 작성일자"),
+                                fieldWithPath("response.comments[].replies[].isDeleted").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 답글 삭제 여부")
+
                         ).build())
         ));
     }
@@ -274,9 +315,7 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 게시물 조회 - 게시물을 찾을 수 없는 경우")
     void findByIdWithBoardNull() throws Exception{
-        Long boardId = 1L;
-
-        when(boardService.findBoard(boardId)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardService.makeBoardResponse(any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         ResultActions perform = mockMvc.perform(get("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -347,10 +386,9 @@ class BoardControllerTest extends ControllerTest {
     void updateWithTitleAndContentNull() throws Exception{
         BoardUpdateDto dto = BoardUpdateDto.builder()
                 .title(null)
-                .content(null)
+                .content("  ")
                 .build();
 
-        when(boardService.updateBoard(any(), any(), any())).thenReturn(dto);
         String body = objectMapper.writeValueAsString(dto);
 
         ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
