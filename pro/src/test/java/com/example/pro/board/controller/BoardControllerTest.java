@@ -516,7 +516,6 @@ class BoardControllerTest extends ControllerTest {
     @DisplayName("[성공] 게시물 삭제")
     void deleteBoard() throws Exception{
 
-
         ResultActions perform = mockMvc.perform(delete("/boards/{id}", boardId)
                 .contentType(MediaType.APPLICATION_JSON));
 

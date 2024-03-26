@@ -88,7 +88,7 @@ class MemberServiceTest {
                 .id(1L)
                 .username(member.getUsername())
                 .comment(comment)
-                .content("대딧글 내용")
+                .content("대댓글 내용")
                 .build();
 
         board.getComments().add(comment);

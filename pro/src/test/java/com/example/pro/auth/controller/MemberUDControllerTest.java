@@ -8,11 +8,17 @@ import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -30,10 +36,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+@ExtendWith(MockitoExtension.class)
 public class MemberUDControllerTest extends ControllerTest {
 
-    private final AuthService authService = mock(AuthService.class);
-    private final MemberService memberService = mock(MemberService.class);
+    @Mock
+    private AuthService authService;
+    @Mock
+    private MemberService memberService;
     private Member member;
     private static final String SAMPLE_URL = "https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/e0aa3d71-b098-4926-a0da-2b14d64546fe.png";
 
@@ -72,6 +81,33 @@ public class MemberUDControllerTest extends ControllerTest {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                // requestPartFields("image", fieldWithPath("image").description("변경할 이미지 파일")),
+                resource(ResourceSnippetParameters.builder()
+                        .tag("API-Member")
+                        .responseFields(
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
+                                fieldWithPath("response").type(JsonFieldType.STRING).description("응답 메시지")
+                        ).build())
+        ));
+    }
+
+    @Test
+    @DisplayName("[성공] 회원 탈퇴")
+    void quitMember() throws Exception {
+        ResultActions perform = mockMvc.perform(delete("/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .locale(Locale.KOREAN)
+                .characterEncoding(StandardCharsets.UTF_8)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.response").value("탈퇴되었습니다."));
+
+        perform.andDo(document("Member delete-success",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
                 resource(ResourceSnippetParameters.builder()
                         .tag("API-Member")
                         .responseFields(
