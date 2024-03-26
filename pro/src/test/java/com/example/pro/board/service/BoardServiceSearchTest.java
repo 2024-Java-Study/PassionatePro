@@ -2,7 +2,7 @@ package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
+import com.example.pro.board.dto.BoardCountResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
@@ -92,10 +92,11 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.findAll()).thenReturn(boardList);
-        List<BoardListResponseDto> allBoards = boardService.findAllBoards(); // 모든 보드를 찾아 Dto로 바꿔주기
+        when(boardRepository.count()).thenReturn((long) boardList.size());
+        BoardCountResponseDto allBoards = boardService.findAllBoards(); // 모든 보드를 찾아 Dto로 바꿔주기
 
         // then
-        assertThat(allBoards.size()).isEqualTo(1); // 전부 다 찾았는지 확인
+        assertThat(allBoards.getTotal()).isEqualTo(1); // 전부 다 찾았는지 확인
     }
     
     @Test

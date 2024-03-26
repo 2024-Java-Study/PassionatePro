@@ -13,7 +13,6 @@ import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
-import com.example.pro.comment.dto.CommentResponseDto;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -186,8 +185,9 @@ class BoardControllerTest extends ControllerTest {
                 .createdAt("2024-02-07 18:32:25")
                 .build();
         boards.add(dto);
+        BoardCountResponseDto response = new BoardCountResponseDto(boards, 1L);
 
-        when(boardService.findAllBoards()).thenReturn(boards);
+        when(boardService.findAllBoards()).thenReturn(response);
 
         ResultActions perform = mockMvc.perform(get("/boards")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -197,10 +197,11 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response[0].id").value(dto.getId()))
-                .andExpect(jsonPath("$.response[0].username").value(dto.getUsername()))
-                .andExpect(jsonPath("$.response[0].title").value(dto.getTitle()))
-                .andExpect(jsonPath("$.response[0].createdAt").value(dto.getCreatedAt()));
+                .andExpect(jsonPath("$.response.total").value(boards.size()))
+                .andExpect(jsonPath("$.response.boards[0].id").value(dto.getId()))
+                .andExpect(jsonPath("$.response.boards[0].username").value(dto.getUsername()))
+                .andExpect(jsonPath("$.response.boards[0].title").value(dto.getTitle()))
+                .andExpect(jsonPath("$.response.boards[0].createdAt").value(dto.getCreatedAt()));
 
         // 문서 자동화
         perform.andDo(document("board findAll-success",
@@ -210,10 +211,11 @@ class BoardControllerTest extends ControllerTest {
                         .tag("API-Board")
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
-                                fieldWithPath("response[].id").type(JsonFieldType.NUMBER).description("응답 메시지 - 아이디"),
-                                fieldWithPath("response[].username").type(JsonFieldType.STRING).description("응답 메시지 - 유저명"),
-                                fieldWithPath("response[].title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
-                                fieldWithPath("response[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
+                                fieldWithPath("response.total").type(JsonFieldType.NUMBER).description("응답 메시지 - 댓글 총 개수"),
+                                fieldWithPath("response.boards[].id").type(JsonFieldType.NUMBER).description("응답 메시지 - 아이디"),
+                                fieldWithPath("response.boards[].username").type(JsonFieldType.STRING).description("응답 메시지 - 유저명"),
+                                fieldWithPath("response.boards[].title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
+                                fieldWithPath("response.boards[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
                         ).build())
         ));
     }

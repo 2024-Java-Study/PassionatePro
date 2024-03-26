@@ -12,8 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/boards")
 @RequiredArgsConstructor
@@ -31,8 +29,8 @@ public class BoardController {
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }
 
-    @GetMapping("") // 전체 게시물 조회
-    public BasicResponse<List<BoardListResponseDto>> findAll() {
+    @GetMapping // 전체 게시물 조회
+    public BasicResponse<BoardCountResponseDto> findAll() {
         return ResponseUtil.success(boardService.findAllBoards());
     }
 

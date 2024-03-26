@@ -1,15 +1,12 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.board.dto.BoardResponseDto;
+import com.example.pro.board.dto.*;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.exception.BoardUnauthorizedException;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardListResponseDto;
-import com.example.pro.board.dto.BoardSaveDto;
-import com.example.pro.board.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,13 +44,15 @@ public class BoardService {
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 
-    public List<BoardListResponseDto> findAllBoards() {
+    public BoardCountResponseDto findAllBoards() {
         List<Board> boards = boardRepository.findAll();
 
         // 엔티티를 Dto로 변환하는 로직
-        return boards.stream()
+        List<BoardListResponseDto> responses = boards.stream()
                 .map(BoardListResponseDto::toBoardListDto)
                 .collect(Collectors.toList());
+        long count = boardRepository.count();
+        return new BoardCountResponseDto(responses, count);
     }
 
     public List<Board> searchTitle(String title) {
