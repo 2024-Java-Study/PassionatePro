@@ -37,7 +37,7 @@ public class MemberController {
     }
 
     @PutMapping("/profiles")
-    public BasicResponse<String> updateProfile(@Valid @ModelAttribute ProfileUpdateRequest request) {
+    public BasicResponse<String> updateProfile(@ModelAttribute ProfileUpdateRequest request) {
         Member member = authService.loadUser();
         member = memberService.updateProfile(request.getImage(), member);
         return ResponseUtil.success(member.getUsername() + "님의 프로필 이미지가 변경되었습니다.");
