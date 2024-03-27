@@ -48,4 +48,9 @@ public class Member extends BaseTimeEntity {
         this.profile = profileUrl;
         return this;
     }
+
+    public Member deleteProfile() {
+        this.profile = null;
+        return this;
+    }
 }

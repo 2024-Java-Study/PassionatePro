@@ -74,7 +74,7 @@ public class BoardImageService {
     public void deleteBoardImage (Board board) {
         List<String> urlList = getImageUrls(board);
         for (String url : urlList) {
-            fileUploader.deleteFile(url);
+            fileUploader.deleteFile(url, BOARD_KEY);
         }
 
         List<BoardImage> boardImageList = boardImageRepository.findByBoardId(board.getId());

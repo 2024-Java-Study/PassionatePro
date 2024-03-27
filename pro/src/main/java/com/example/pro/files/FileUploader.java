@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface FileUploader {
 
     String uploadFile(MultipartFile multipartFile, String path);
-    void deleteFile(String url);
+    void deleteFile(String url, String path);
 
     default ObjectMetadata createObjectMetaData(MultipartFile multipartFile) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -18,8 +18,8 @@ public interface FileUploader {
     }
 
     default String generateKey(MultipartFile file, String path) {
-        if (file.getOriginalFilename() == null)
-            throw new S3IOException("파일 이름이 null입니다.");
+        if (file.getOriginalFilename() == null || file.getOriginalFilename().isBlank())
+            throw new S3IOException("파일 이름이 존재하지 않습니다.");
         String fileName = file.getOriginalFilename();
         String ext = fileName.substring(fileName.lastIndexOf(".") + 1);
         return path + UUID.randomUUID() + "." + ext;
