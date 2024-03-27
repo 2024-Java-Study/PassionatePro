@@ -39,12 +39,14 @@ public class TestFileUploader implements FileUploader{
     }
 
     @Override
-    public void deleteFile(String url) {
+    public void deleteFile(String url, String path) {
         try {
             String fileName = url.substring(url.indexOf(TEST_KEY));
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
         } catch(SdkClientException e) {
             throw new S3IOException(e.getMessage());
+        } catch(NullPointerException e) {
+            throw new S3IOException("파일이 존재하지 않습니다.");
         }
     }
 }

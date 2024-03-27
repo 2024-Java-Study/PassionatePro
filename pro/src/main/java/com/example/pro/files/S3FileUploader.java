@@ -40,13 +40,14 @@ public class S3FileUploader implements FileUploader {
     }
 
     @Override
-    public void deleteFile(String url) {
-//        try {
-//            String key = url.substring(url.lastIndexOf(".com/"), "/");
-//            String fileName = url.substring(url.lastIndexOf(key) + key.length());
-//            amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
-//        } catch(SdkClientException e) {
-//            throw new S3IOException(e.getMessage());
-//        }
+    public void deleteFile(String url, String path) {
+       try {
+            String fileName = url.substring(url.indexOf(path));
+            amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        } catch(SdkClientException e) {
+            throw new S3IOException(e.getMessage());
+        } catch(NullPointerException e) {
+            throw new S3IOException("파일이 존재하지 않습니다.");
+        }
     }
 }

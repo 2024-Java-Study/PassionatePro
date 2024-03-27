@@ -28,6 +28,11 @@ public class MemberService {
 
     @Transactional
     public Member updateProfile(MultipartFile file, Member member) {
+        if (file.isEmpty()) {
+            fileUploader.deleteFile(member.getProfile(), PROFILE_KEY);
+            return member.deleteProfile();
+        }
+
         String url = fileUploader.uploadFile(file, PROFILE_KEY);
         return member.updateProfile(url);
     }
