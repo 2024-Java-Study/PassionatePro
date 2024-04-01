@@ -5,7 +5,6 @@ import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
-import com.example.pro.comment.domain.WriterInfo;
 import com.example.pro.comment.repository.CommentRepository;
 import com.example.pro.comment.repository.ReplyRepository;
 import com.example.pro.files.FileUploader;
@@ -23,9 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileInputStream;
 import java.util.List;
 
-import static com.example.pro.auth.service.MemberService.PROFILE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
