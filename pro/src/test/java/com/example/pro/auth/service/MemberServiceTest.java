@@ -20,10 +20,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.util.List;
 
 import static com.example.pro.auth.service.MemberService.PROFILE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +56,11 @@ class MemberServiceTest {
                 .email("helloworld@gmail.com")
                 .build();
 
-        file = new MockMultipartFile("ForTest", new byte[]{});
+        try (FileInputStream fileInputStream = new FileInputStream("src/test/resources/free-icon-banana.png")) {
+            file = new MockMultipartFile("ForTest", fileInputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("File Not Found");
+        }
     }
 
     @Test
