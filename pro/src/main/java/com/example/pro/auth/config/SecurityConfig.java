@@ -76,7 +76,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(request -> {
             request.requestMatchers(
-                            antMatcher("/docs/**"),
+//                            antMatcher("/docs/**"),
                             antMatcher("/api/test"),
                             antMatcher("/members/signup"),
                             antMatcher("/members/login"),
