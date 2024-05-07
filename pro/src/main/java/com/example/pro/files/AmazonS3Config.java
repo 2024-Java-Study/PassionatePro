@@ -31,7 +31,7 @@ public class AmazonS3Config {
 
     @Bean
     public FileUploader fileUploader() {
-        return new TestFileUploader(amazonS3Client());
-//        return new S3FileUploader(amazonS3Client());
+//        return new TestFileUploader(amazonS3Client());
+        return new S3FileUploader(amazonS3Client());
     }
 }
