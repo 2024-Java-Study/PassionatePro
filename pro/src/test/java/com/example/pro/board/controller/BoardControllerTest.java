@@ -183,6 +183,7 @@ class BoardControllerTest extends ControllerTest {
                 .username("ajeong7038")
                 .title("제목")
                 .createdAt("2024-02-07 18:32:25")
+                .content("내용")
                 .build();
         boards.add(dto);
         BoardCountResponseDto response = new BoardCountResponseDto(boards, 1L);
@@ -202,7 +203,8 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.boards[0].username").value(dto.getUsername()))
                 .andExpect(jsonPath("$.response.boards[0].isWriterQuit").value(false))
                 .andExpect(jsonPath("$.response.boards[0].title").value(dto.getTitle()))
-                .andExpect(jsonPath("$.response.boards[0].createdAt").value(dto.getCreatedAt()));
+                .andExpect(jsonPath("$.response.boards[0].createdAt").value(dto.getCreatedAt()))
+                .andExpect(jsonPath("$.response.boards[0].content").value(dto.getContent()));
 
         // 문서 자동화
         perform.andDo(document("board findAll-success",
@@ -217,7 +219,8 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.boards[].username").type(JsonFieldType.STRING).description("응답 메시지 - 유저명"),
                                 fieldWithPath("response.boards[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 작성자 탈퇴 여부"),
                                 fieldWithPath("response.boards[].title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
-                                fieldWithPath("response.boards[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
+                                fieldWithPath("response.boards[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜"),
+                                fieldWithPath("response.boards[].content").type(JsonFieldType.STRING).description("응답 메시지 - 내용")
                         ).build())
         ));
     }
