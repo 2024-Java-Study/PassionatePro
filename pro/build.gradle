@@ -1,7 +1,18 @@
+import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
+buildscript {
+	ext {
+		restdocsApiSpecVersion = '0.18.4'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.1'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+	id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'com.example'
@@ -21,6 +32,22 @@ repositories {
 	mavenCentral()
 }
 
+swaggerSources {
+	pro {
+		setInputFile(file("${project.buildDir}/api-spec/openapi3.yaml"))
+	}
+}
+
+openapi3 {
+	servers = [
+			{ url = "http://localhost:8080" }
+	]
+	title = "API 문서"
+	description = "RestDocsWithSwagger Docs"
+	version = "0.0.1"
+	format = "yaml"
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -31,8 +58,37 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testImplementation "com.epages:restdocs-api-spec-mockmvc:${restdocsApiSpecVersion}"
+	swaggerUI 'org.webjars:swagger-ui:4.18.1'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(GenerateSwaggerUI) {
+	dependsOn 'openapi3'
+}
+
+tasks.register('copySwaggerUI', Copy) {
+	dependsOn 'generateSwaggerUIPro'
+	def generateSwaggerUIProTask = tasks.named('generateSwaggerUIPro', GenerateSwaggerUI).get()
+	from("${generateSwaggerUIProTask.outputDir}")
+	into("${project.buildDir}/resources/main/static/docs")
+}
+
+tasks.withType(BootJar) {
+	dependsOn 'copySwaggerUI'
+}
+
+resolveMainClassName {
+	dependsOn('copySwaggerUI')
+}
+
+jar {
+	enabled = false
 }
