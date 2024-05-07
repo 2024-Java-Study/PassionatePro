@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: ap-northeast-2
-	    working-directory: ./pro
+      working-directory: ./pro
      
     steps:
     - name: Checkout
