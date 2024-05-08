@@ -18,6 +18,7 @@ public class BoardResponseDto {
     private String content;
     @NotBlank
     private String username;
+    private String profile;
     private Boolean isWriterQuit;
     private String createdAt;
     private List<String> urlList;
@@ -27,6 +28,7 @@ public class BoardResponseDto {
         return new BoardResponseDto(board.getTitle(),
                 board.getContent(),
                 board.getWriterInfo().getUsername(),
+                board.getWriterInfo().getProfile(),
                 board.getWriterInfo().isMemberQuit(),
                 board.getCreatedAt(),
                 urlList,

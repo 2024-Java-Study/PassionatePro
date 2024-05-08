@@ -5,7 +5,7 @@ import com.example.pro.comment.domain.Reply;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ReplyResponseDto(Long replyId, String username, boolean isWriterQuit, String content, String createdAt, boolean isDeleted) {
+public record ReplyResponseDto(Long replyId, String username, String profile, boolean isWriterQuit, String content, String createdAt, boolean isDeleted) {
 
     public static List<ReplyResponseDto> makeRepliesResponse(List<Reply> replies) {
         List<ReplyResponseDto> response = new ArrayList<>();
@@ -19,6 +19,7 @@ public record ReplyResponseDto(Long replyId, String username, boolean isWriterQu
         return new ReplyResponseDto(
                 reply.getId(),
                 reply.getWriter().getUsername(),
+                reply.getWriter().getProfile(),
                 reply.getWriter().isMemberQuit(),
                 reply.getContent(),
                 reply.getCreatedAt(),
@@ -30,6 +31,7 @@ public record ReplyResponseDto(Long replyId, String username, boolean isWriterQu
         return new ReplyResponseDto(
                 reply.getId(),
                 "(삭제)",
+                null,
                 true,
                 "삭제된 댓글입니다.",
                 reply.getCreatedAt(),

@@ -44,9 +44,9 @@ public class Comment extends BaseTimeEntity {
      * 생성 메서드
      */
     @Builder
-    public Comment(Long id, String username, Board board, String content) {
+    public Comment(Long id, String username, String profile, Board board, String content) {
         this.id = id;
-        this.writer = new WriterInfo(username, false);
+        this.writer = new WriterInfo(username, profile, false);
         this.board = board;
         this.content = Validator.validString(content);
         this.isDeleted = false;
@@ -57,7 +57,7 @@ public class Comment extends BaseTimeEntity {
     }
 
     public void removeWriterInfo() {
-        this.writer = new WriterInfo("탈퇴한 사용자", true);
+        this.writer = new WriterInfo("탈퇴한 사용자", null, true);
     }
 
     public void deleteComment() {

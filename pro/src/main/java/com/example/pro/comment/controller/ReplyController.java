@@ -22,7 +22,7 @@ public class ReplyController {
     @PostMapping
     public BasicResponse<String> saveReply(@Valid @RequestBody ReplySaveRequestDto saveRequest) {
         Member member = authService.loadUser();
-        Reply reply = replyService.saveReply(member.getUsername(), saveRequest);
+        Reply reply = replyService.saveReply(member.getUsername(), member.getProfile(), saveRequest);
         return ResponseUtil.success("답글이 성공적으로 등록되었습니다. Reply Id: " + reply.getId());
     }
 

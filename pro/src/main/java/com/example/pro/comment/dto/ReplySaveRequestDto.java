@@ -16,12 +16,13 @@ public record ReplySaveRequestDto(@NotNull Long commentId, @NotBlank String cont
         this.content = content;
     }
 
-    public Reply toReply(String username, Comment comment) {
+    public Reply toReply(String username, String profile, Comment comment) {
         if (!Objects.equals(commentId, comment.getId()))
             throw new ReplyException(ReplyErrorCode.REPLY_ID_NOT_MATCH);
 
         return Reply.builder()
                 .username(username)
+                .profile(profile)
                 .comment(comment)
                 .content(content)
                 .build();

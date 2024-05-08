@@ -22,10 +22,10 @@ public class ReplyService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Reply saveReply(String writerName, ReplySaveRequestDto saveRequestDto) {
+    public Reply saveReply(String writerName, String writerProfile, ReplySaveRequestDto saveRequestDto) {
         Comment comment = commentRepository.findById(saveRequestDto.commentId())
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        Reply reply = replyRepository.save(saveRequestDto.toReply(writerName, comment));
+        Reply reply = replyRepository.save(saveRequestDto.toReply(writerName, writerProfile, comment));
         comment.getReplies().add(reply);
         return reply;
     }
