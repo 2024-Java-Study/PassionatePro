@@ -84,7 +84,7 @@ class CommentControllerTest extends ControllerTest {
     @DisplayName("[성공] 댓글 저장 API")
     void saveComment() throws Exception {
         when(authService.loadUser()).thenReturn(member);
-        when(commentService.saveComment(any(), any())).thenReturn(comment);
+        when(commentService.saveComment(any(), any(), any())).thenReturn(comment);
 
         String body = objectMapper.writeValueAsString(saveRequest);
 
@@ -154,7 +154,7 @@ class CommentControllerTest extends ControllerTest {
     @DisplayName("[실패] 댓글 저장-존재하지 않는 board id")
     void boardIdNotFound() throws Exception {
         when(authService.loadUser()).thenReturn(member);
-        when(commentService.saveComment(any(), any()))
+        when(commentService.saveComment(any(), any(), any()))
                 .thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
         String body = objectMapper.writeValueAsString(saveRequest);
 

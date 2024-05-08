@@ -43,9 +43,9 @@ public class Board extends BaseTimeEntity {
      */
     // 유저 추가
     @Builder
-    public Board (Long id, String username, String title, String content, List<BoardImage> image) {
+    public Board (Long id, String username, String profile, String title, String content, List<BoardImage> image) {
         this.id = id;
-        this.writerInfo = new WriterInfo(username, false);
+        this.writerInfo = new WriterInfo(username, profile,false);
         this.title = title;
         this.content = content;
         this.image = image;
@@ -57,7 +57,7 @@ public class Board extends BaseTimeEntity {
     }
 
     public void removeWriterInfo() {
-        this.writerInfo = new WriterInfo("탈퇴한 사용자", true);
+        this.writerInfo = new WriterInfo("탈퇴한 사용자", null, true);
     }
 
     public void uploadFile(List<BoardImage> images) {
