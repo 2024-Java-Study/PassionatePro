@@ -94,7 +94,7 @@ class ReplyControllerTest extends ControllerTest {
     void saveReply() throws Exception {
 
         when(authService.loadUser()).thenReturn(member);
-        when(replyService.saveReply(any(), any())).thenReturn(reply);
+        when(replyService.saveReply(any(), any(), any())).thenReturn(reply);
 
         String body = objectMapper.writeValueAsString(saveRequest);
 
@@ -166,7 +166,7 @@ class ReplyControllerTest extends ControllerTest {
     @DisplayName("[실패] 대댓글 작성-잘못된 댓글 id")
     void saveReplyCommentNotFound() throws Exception {
         when(authService.loadUser()).thenReturn(member);
-        when(replyService.saveReply(any(), any()))
+        when(replyService.saveReply(any(), any(), any()))
                 .thenThrow(new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
 
         String body = objectMapper.writeValueAsString(saveRequest);

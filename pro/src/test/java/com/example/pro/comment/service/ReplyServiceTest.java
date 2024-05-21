@@ -80,8 +80,8 @@ class ReplyServiceTest {
     @DisplayName("[성공] 대댓글 작성")
     void saveReply() {
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
-        when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member.getUsername(), comment));
-        Reply reply = replyService.saveReply(member.getUsername(), saveRequest);
+        when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member.getUsername(), member.getProfile(), comment));
+        Reply reply = replyService.saveReply(member.getUsername(), member.getProfile(), saveRequest);
 
         assertThat(reply.getContent()).isEqualTo("대댓글 내용");
         assertThat(comment.getReplies().size()).isEqualTo(1);
@@ -93,7 +93,7 @@ class ReplyServiceTest {
         when(commentRepository.findById(any()))
                 .thenThrow(new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
 
-        assertThatThrownBy(() -> replyService.saveReply(member.getUsername(), saveRequest))
+        assertThatThrownBy(() -> replyService.saveReply(member.getUsername(), member.getProfile(), saveRequest))
                 .isInstanceOf(CommentException.class)
                 .hasMessageContaining("해당 댓글을 찾을 수 없습니다.");
     }

@@ -24,10 +24,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Comment saveComment(String writerName, CommentSaveRequestDto saveRequest) {
+    public Comment saveComment(String writerName, String writerProfile, CommentSaveRequestDto saveRequest) {
         Board board = boardRepository.findById(saveRequest.boardId())
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        Comment comment = commentRepository.save(saveRequest.toComment(board, writerName));
+        Comment comment = commentRepository.save(saveRequest.toComment(board, writerName, writerProfile));
         board.getComments().add(comment);
         return comment;
     }

@@ -41,9 +41,9 @@ public class Reply extends BaseTimeEntity {
      * 생성 메서드
      */
     @Builder
-    public Reply(Long id, String username, Comment comment, String content) {
+    public Reply(Long id, String username, String profile, Comment comment, String content) {
         this.id = id;
-        this.writer = new WriterInfo(username, false);
+        this.writer = new WriterInfo(username, profile, false);
         this.comment = comment;
         this.content = Validator.validString(content);
         this.isDeleted = false;
@@ -53,7 +53,7 @@ public class Reply extends BaseTimeEntity {
         this.content = content;
     }
     public void removeWriterInfo() {
-        this.writer = new WriterInfo("탈퇴한 사용자", true);
+        this.writer = new WriterInfo("탈퇴한 사용자", null, true);
     }
 
     public void deleteReply() {

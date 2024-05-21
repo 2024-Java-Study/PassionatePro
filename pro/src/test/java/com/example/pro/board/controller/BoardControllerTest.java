@@ -94,13 +94,14 @@ class BoardControllerTest extends ControllerTest {
 
         board = Board.builder()
                 .username(member.getUsername())
+                .profile(member.getProfile())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
 
 
         when(authService.loadUser()).thenReturn(member);
-        when(boardService.createBoard(any(), any())).thenReturn(board);
+        when(boardService.createBoard(any(), any(), any())).thenReturn(board);
 
         MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
 
@@ -183,6 +184,7 @@ class BoardControllerTest extends ControllerTest {
                 .username("ajeong7038")
                 .title("제목")
                 .createdAt("2024-02-07 18:32:25")
+                .content("내용")
                 .build();
         boards.add(dto);
         BoardCountResponseDto response = new BoardCountResponseDto(boards, 1L);
@@ -202,7 +204,8 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.boards[0].username").value(dto.getUsername()))
                 .andExpect(jsonPath("$.response.boards[0].isWriterQuit").value(false))
                 .andExpect(jsonPath("$.response.boards[0].title").value(dto.getTitle()))
-                .andExpect(jsonPath("$.response.boards[0].createdAt").value(dto.getCreatedAt()));
+                .andExpect(jsonPath("$.response.boards[0].createdAt").value(dto.getCreatedAt()))
+                .andExpect(jsonPath("$.response.boards[0].content").value(dto.getContent()));
 
         // 문서 자동화
         perform.andDo(document("board findAll-success",
@@ -217,7 +220,8 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.boards[].username").type(JsonFieldType.STRING).description("응답 메시지 - 유저명"),
                                 fieldWithPath("response.boards[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 작성자 탈퇴 여부"),
                                 fieldWithPath("response.boards[].title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
-                                fieldWithPath("response.boards[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜")
+                                fieldWithPath("response.boards[].createdAt").type(JsonFieldType.STRING).description("응답 메시지 - 생성 날짜"),
+                                fieldWithPath("response.boards[].content").type(JsonFieldType.STRING).description("응답 메시지 - 내용")
                         ).build())
         ));
     }
@@ -238,6 +242,7 @@ class BoardControllerTest extends ControllerTest {
 
         board = Board.builder()
                 .username(member.getUsername())
+                .profile(URL)
                 .title("제목")
                 .content("내용")
                 .image(boardImages)
@@ -245,6 +250,7 @@ class BoardControllerTest extends ControllerTest {
 
         Comment comment = Comment.builder()
                 .username("comment-writer")
+                .profile(URL)
                 .id(1L)
                 .board(board)
                 .content("댓글1 빈칸 아님")
@@ -253,6 +259,7 @@ class BoardControllerTest extends ControllerTest {
         Reply reply = Reply.builder()
                 .id(1L)
                 .username("reply-writer")
+                .profile(URL)
                 .content("답글 내용 빈칸 아님")
                 .comment(comment)
                 .build();
@@ -273,6 +280,7 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.response.username").value(dto.getUsername()))
+                .andExpect(jsonPath("$.response.profile").value(dto.getProfile()))
                 .andExpect(jsonPath("$.response.isWriterQuit").value(false))
                 .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.content").value(dto.getContent()))
@@ -280,12 +288,14 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()))
                 .andExpect(jsonPath("$.response.comments[0].commentId").value(comment.getId()))
                 .andExpect(jsonPath("$.response.comments[0].username").value(comment.getWriter().getUsername()))
+                .andExpect(jsonPath("$.response.comments[0].profile").value(comment.getWriter().getProfile()))
                 .andExpect(jsonPath("$.response.comments[0].isWriterQuit").value(comment.getWriter().isMemberQuit()))
                 .andExpect(jsonPath("$.response.comments[0].content").value(comment.getContent()))
                 .andExpect(jsonPath("$.response.comments[0].createdAt").value(comment.getCreatedAt()))
                 .andExpect(jsonPath("$.response.comments[0].isDeleted").value(false))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].replyId").value(reply.getId()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].username").value(reply.getWriter().getUsername()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].profile").value(reply.getWriter().getProfile()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].isWriterQuit").value(reply.getWriter().isMemberQuit()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].content").value(reply.getContent()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].createdAt").value(reply.getCreatedAt()))
@@ -300,6 +310,7 @@ class BoardControllerTest extends ControllerTest {
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
                                 fieldWithPath("response.username").type(JsonFieldType.STRING).description("응답 메시지 - 유저 아이디"),
+                                fieldWithPath("response.profile").type(JsonFieldType.STRING).description("응답 메시지 - 유저 프로필 사진"),
                                 fieldWithPath("response.isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 작성자 탈퇴 여부"),
                                 fieldWithPath("response.title").type(JsonFieldType.STRING).description("응답 메시지 - 제목"),
                                 fieldWithPath("response.content").type(JsonFieldType.STRING).description("응답 메시지 - 내용"),
@@ -307,12 +318,14 @@ class BoardControllerTest extends ControllerTest {
                                 fieldWithPath("response.createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 생성 날짜"),
                                 fieldWithPath("response.comments[].commentId").type(JsonFieldType.NUMBER).description("응답 메시지 - 댓글 아이디"),
                                 fieldWithPath("response.comments[].username").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 작성자 아이디"),
+                                fieldWithPath("response.comments[].profile").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 작성자 프로필 사진"),
                                 fieldWithPath("response.comments[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 작성자 탈퇴 여부"),
                                 fieldWithPath("response.comments[].content").type(JsonFieldType.STRING).description("응답 메시지 - 댓글 내용"),
                                 fieldWithPath("response.comments[].createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 댓글 작성일자"),
                                 fieldWithPath("response.comments[].isDeleted").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 삭제 여부"),
                                 fieldWithPath("response.comments[].replies[].replyId").type(JsonFieldType.NUMBER).description("응답 메시지 - 답글 아이디"),
                                 fieldWithPath("response.comments[].replies[].username").type(JsonFieldType.STRING).description("응답 메시지 - 답글 작성자 아이디"),
+                                fieldWithPath("response.comments[].replies[].profile").type(JsonFieldType.STRING).description("응답 메시지 - 답글 작성자 프로필 사진"),
                                 fieldWithPath("response.comments[].replies[].isWriterQuit").type(JsonFieldType.BOOLEAN).description("응답 메시지 - 댓글 작성자 탈퇴 여부"),
                                 fieldWithPath("response.comments[].replies[].content").type(JsonFieldType.STRING).description("응답 메시지 - 답글 내용"),
                                 fieldWithPath("response.comments[].replies[].createdAt").type(JsonFieldType.NULL).description("응답 메시지 - 답글 작성일자"),

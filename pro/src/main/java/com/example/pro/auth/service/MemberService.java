@@ -38,7 +38,7 @@ public class MemberService {
     }
 
     public void markQuitInWriterInfo(Member member) {
-        WriterInfo writer = new WriterInfo(member.getUsername(), false);
+        WriterInfo writer = new WriterInfo(member.getUsername(), member.getProfile(), false);
 
         List<Board> boards = boardRepository.findAllByWriterInfo(writer);
         List<Comment> comments = commentRepository.findAllByWriter(writer);
