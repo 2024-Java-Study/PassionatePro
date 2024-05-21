@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class WriterInfo {
 
     private String username;
+    private String profile;
 
     @Convert(converter = BooleanTypeConverter.class)
     private boolean memberQuit;

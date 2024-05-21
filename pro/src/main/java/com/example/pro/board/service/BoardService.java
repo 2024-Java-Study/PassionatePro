@@ -23,9 +23,10 @@ public class BoardService {
     private final BoardImageService boardImageService;
 
     @Transactional
-    public Board createBoard(BoardSaveDto boardDto, String username) {
+    public Board createBoard(BoardSaveDto boardDto, String username, String profile) {
         Board board = Board.builder()
                 .username(username)
+                .profile(profile)
                 .title(boardDto.getTitle())
                 .content(boardDto.getContent())
                 .build();

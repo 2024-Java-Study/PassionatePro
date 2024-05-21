@@ -61,6 +61,7 @@ public class BoardServiceSearchTest {
 
         board = Board.builder()
                 .username(member.getUsername())
+                .profile(member.getProfile())
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
                 .image(null)
@@ -78,8 +79,8 @@ public class BoardServiceSearchTest {
 
 
         // then
-        assertThat(boardService.createBoard(boardSaveDto, member.getUsername()).getTitle()).isEqualTo("제목");
-        assertThat(boardService.createBoard(boardSaveDto, member.getUsername()).getWriterInfo().getUsername()).isEqualTo("ajeong7038");
+        assertThat(boardService.createBoard(boardSaveDto, member.getUsername(), any()).getTitle()).isEqualTo("제목");
+        assertThat(boardService.createBoard(boardSaveDto, member.getUsername(), any()).getWriterInfo().getUsername()).isEqualTo("ajeong7038");
     }
     
     @Test
@@ -112,6 +113,7 @@ public class BoardServiceSearchTest {
         // then
         assertThat(findBoard.getTitle()).isEqualTo("제목");
         assertThat(findBoard.getWriterInfo().getUsername()).isEqualTo("ajeong7038");
+        assertThat(findBoard.getWriterInfo().getProfile()).isEqualTo(member.getProfile());
     }
 
     

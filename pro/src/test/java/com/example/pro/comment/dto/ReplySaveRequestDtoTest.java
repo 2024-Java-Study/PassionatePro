@@ -43,7 +43,7 @@ class ReplySaveRequestDtoTest {
     @DisplayName("[실패] comment id 불일치")
     void toReply() {
         ReplySaveRequestDto saveRequest = new ReplySaveRequestDto(1L, "답글 또는 대댓글");
-        assertThatThrownBy(() -> saveRequest.toReply(member.getUsername(), comment))
+        assertThatThrownBy(() -> saveRequest.toReply(member.getUsername(), member.getProfile(), comment))
                 .isInstanceOf(ReplyException.class)
                 .hasMessageContaining("요청한 댓글 id와 일치하지 않습니다.");
     }

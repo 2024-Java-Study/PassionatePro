@@ -10,16 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardRequest {
     private String username;
-    // 사진?
+    private String profile;
 
     @Builder
-    public BoardRequest(String username) {
+    public BoardRequest(String username, String profile) {
         this.username = username;
+        this.profile = profile;
     }
 
     public static BoardRequest toMemberDto(Member member) {
         return BoardRequest.builder()
                 .username(member.getUsername())
+                .profile(member.getProfile())
                 .build();
     }
 }

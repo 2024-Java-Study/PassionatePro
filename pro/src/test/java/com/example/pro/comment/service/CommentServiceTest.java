@@ -71,9 +71,9 @@ class CommentServiceTest {
         saveRequest = new CommentSaveRequestDto(1L, "댓글 내용");
 
         when(boardRepository.findById(1L)).thenReturn(Optional.ofNullable(board));
-        when(commentRepository.save(any())).thenReturn(saveRequest.toComment(board, member.getUsername()));
+        when(commentRepository.save(any())).thenReturn(saveRequest.toComment(board, member.getUsername(), member.getProfile()));
 
-        Comment comment = commentService.saveComment(member.getUsername(), saveRequest);
+        Comment comment = commentService.saveComment(member.getUsername(), member.getProfile(), saveRequest);
         assertThat(comment.getContent()).isEqualTo("댓글 내용");
         assertThat(board.getComments().size()).isEqualTo(1);
     }
@@ -84,7 +84,7 @@ class CommentServiceTest {
         saveRequest = new CommentSaveRequestDto(1L, "댓글 내용");
 
         when(boardRepository.findById(1L)).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        assertThatThrownBy(() -> commentService.saveComment(member.getUsername(), saveRequest))
+        assertThatThrownBy(() -> commentService.saveComment(member.getUsername(), member.getProfile(), saveRequest))
                 .isInstanceOf(BoardException.class)
                 .hasMessageContaining("게시물을 찾을 수 없습니다.");
     }
