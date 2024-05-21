@@ -56,7 +56,7 @@ class BoardRepositoryTest {
         assertThat(createdBoard.getContent()).isEqualTo("내용");
 
     }
-    
+
     @Test
     @DisplayName("Board 생성 시 null 값이 없어야 한다")
     public void validateCreateBoard() throws Exception {
