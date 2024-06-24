@@ -93,7 +93,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(sessionAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        http.cors();
+        http.cors(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
