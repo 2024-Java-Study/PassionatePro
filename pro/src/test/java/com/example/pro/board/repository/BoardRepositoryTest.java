@@ -2,7 +2,6 @@ package com.example.pro.board.repository;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.repository.BoardRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,8 @@ class BoardRepositoryTest {
     @Autowired
     BoardRepository boardRepository;
 
-    public static Board board;
-    public static Member member;
+    public Board board;
+    public Member member;
 
     @BeforeEach
     public void setUp() {
