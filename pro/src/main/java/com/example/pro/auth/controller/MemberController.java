@@ -12,6 +12,7 @@ import com.example.pro.common.response.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.pro.auth.domain.UserSession.SESSION_KEY;
@@ -19,6 +20,7 @@ import static com.example.pro.auth.domain.UserSession.SESSION_KEY;
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     private final AuthService authService;
     private final MemberService memberService;
@@ -32,6 +34,7 @@ public class MemberController {
     @PostMapping("/login")
     public BasicResponse<String> signIn(HttpServletRequest request, @Valid @RequestBody LoginRequest form) {
         String sessionId = CookieUtil.getCookieValue(request, SESSION_KEY);
+        log.info("[MemberController] new session id: {}", sessionId);
         String username = authService.login(sessionId, form);
         return ResponseUtil.success("로그인 성공: " + username);
     }
