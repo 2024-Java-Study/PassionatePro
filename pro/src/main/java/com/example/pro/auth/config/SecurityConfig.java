@@ -72,6 +72,8 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -92,8 +94,6 @@ public class SecurityConfig {
         http.exceptionHandling(handler -> handler.authenticationEntryPoint(authenticationEntryPoint))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(sessionAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
     }
