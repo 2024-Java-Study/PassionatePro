@@ -46,7 +46,9 @@ public class AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(form.getUsername(), form.getPassword())
         );
-        sessionRepository.save(UserSession.create(sessionId, form.getUsername(), clock));
+        log.info("[AuthService] session id: {}", sessionId);
+        UserSession session = UserSession.create(sessionId, form.getUsername(), clock);
+        sessionRepository.save(session);
         return form.getUsername();
     }
 
