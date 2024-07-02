@@ -3,6 +3,7 @@ package com.example.pro.board.repository;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -14,7 +15,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 @DataJpaTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Slf4j
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 db 이용
 class BoardRepositoryTest {
 
@@ -91,6 +93,7 @@ class BoardRepositoryTest {
         List<Board> boardList = boardRepository.findAll();
 
         // then
+        log.info("[게시판 전체 조회 결과] {}", boardList.size());
         assertThat(boardList.size()).isEqualTo(2);
     }
 
