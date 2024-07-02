@@ -43,7 +43,7 @@ public class MemberSignInControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 로그인")
     void signInSuccess() throws Exception {
-        when(authService.login(anyString(), any())).thenReturn(USERNAME);
+        when(authService.login( any())).thenReturn(USERNAME);
         LoginRequest request = new LoginRequest(USERNAME, "password1234");
         String body = objectMapper.writeValueAsString(request);
 
@@ -74,7 +74,7 @@ public class MemberSignInControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 로그인-존재하지 않는 회원")
     void memberNotFound() throws Exception {
-        when(authService.login(anyString(), any()))
+        when(authService.login( any()))
                 .thenThrow(new AuthException(AuthErrorCode.MEMBER_NOT_FOUND));
         LoginRequest request = new LoginRequest(USERNAME, "password1234");
         String body = objectMapper.writeValueAsString(request);
@@ -110,7 +110,7 @@ public class MemberSignInControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 로그인-틀린 비밀번호")
     void badCredential() throws Exception {
-        when(authService.login(anyString(), any()))
+        when(authService.login(any()))
                 .thenThrow(new AuthException(AuthErrorCode.UNAUTHORIZED_USER));
         LoginRequest request = new LoginRequest(USERNAME, "password1234");
         String body = objectMapper.writeValueAsString(request);
