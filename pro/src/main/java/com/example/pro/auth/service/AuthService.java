@@ -42,7 +42,8 @@ public class AuthService {
     }
 
     @Transactional
-    public String login(String sessionId, LoginRequest form) {
+    public String login(LoginRequest form) {
+        String sessionId = SecurityContextHolder.getContext().getAuthentication().getName();
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(form.getUsername(), form.getPassword())
         );

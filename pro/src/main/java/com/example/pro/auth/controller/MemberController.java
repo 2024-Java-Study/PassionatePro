@@ -32,10 +32,8 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public BasicResponse<String> signIn(HttpServletRequest request, @Valid @RequestBody LoginRequest form) {
-        String sessionId = CookieUtil.getCookieValue(request, SESSION_KEY);
-        log.info("[MemberController] new session id: {}", sessionId);
-        String username = authService.login(sessionId, form);
+    public BasicResponse<String> signIn(@Valid @RequestBody LoginRequest form) {
+        String username = authService.login(form);
         return ResponseUtil.success("로그인 성공: " + username);
     }
 
