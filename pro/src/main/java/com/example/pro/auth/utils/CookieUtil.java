@@ -21,7 +21,7 @@ public class CookieUtil {
     public static void addCookie(HttpServletResponse response, String name, String value) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setHttpOnly(false);
         cookie.setDomain("localhost");
         cookie.setMaxAge(300);
