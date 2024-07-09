@@ -24,6 +24,7 @@ public class CookieUtil {
         cookie.setSecure(true);
         cookie.setHttpOnly(false);
         cookie.setDomain("localhost");
+        cookie.setAttribute("SameSite", "None");
         cookie.setMaxAge(300);
 
         response.addCookie(cookie);
