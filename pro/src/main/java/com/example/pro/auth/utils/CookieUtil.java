@@ -26,7 +26,7 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
-        cookie.setDomain("localhost:3000");
+//        cookie.setDomain("localhost");
         cookie.setAttribute("SameSite", "None");
         cookie.setMaxAge(300);
 
