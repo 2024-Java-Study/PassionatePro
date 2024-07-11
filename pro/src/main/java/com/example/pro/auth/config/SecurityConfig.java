@@ -86,6 +86,7 @@ public class SecurityConfig {
                             antMatcher("/api/test"),
                             antMatcher("/members/signup"),
                             antMatcher("/members/login"),
+                            antMatcher("/boards"),
                             antMatcher("/health")
                     ).permitAll()
                     .anyRequest().authenticated();
