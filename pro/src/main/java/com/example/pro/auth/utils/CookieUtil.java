@@ -8,6 +8,9 @@ import org.springframework.util.SerializationUtils;
 import java.util.Base64;
 
 public class CookieUtil {
+
+    private static final int EXPIRE_SECONDS = 30 * 60;
+
     public static String getCookieValue(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
@@ -27,7 +30,7 @@ public class CookieUtil {
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
         cookie.setAttribute("SameSite", "None");
-        cookie.setMaxAge(300);
+        cookie.setMaxAge(EXPIRE_SECONDS);
 
         response.addCookie(cookie);
     }
