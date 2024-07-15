@@ -46,19 +46,18 @@ public class BoardService {
     }
 
     public BoardCountResponseDto findAllBoards() {
+        long totalCount = boardRepository.count();
         List<Board> boards = boardRepository.findAll();
 
         // 엔티티를 Dto로 변환하는 로직
         List<BoardListResponseDto> responses = boards.stream()
                 .map(BoardListResponseDto::toBoardListDto)
                 .collect(Collectors.toList());
-        long count = boardRepository.count();
-        return new BoardCountResponseDto(responses, count);
+        return new BoardCountResponseDto(responses, totalCount);
     }
 
     public List<Board> searchTitle(String title) {
         return boardRepository.findByTitle(title);
-
     }
 
     @Transactional
