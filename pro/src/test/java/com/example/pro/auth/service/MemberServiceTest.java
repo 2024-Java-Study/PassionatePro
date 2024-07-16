@@ -100,7 +100,7 @@ class MemberServiceTest {
         List<Board> boards = List.of(board);
         List<Comment> comments = List.of(comment);
         List<Reply> replies = List.of(reply);
-        when(boardRepository.findAllByWriterInfo(any())).thenReturn(boards);
+        when(boardRepository.findAllByWriter(any())).thenReturn(boards);
         when(commentRepository.findAllByWriter(any())).thenReturn(comments);
         when(replyRepository.findAllByWriter(any())).thenReturn(replies);
 

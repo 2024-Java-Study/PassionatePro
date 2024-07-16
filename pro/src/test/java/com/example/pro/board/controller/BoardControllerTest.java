@@ -616,6 +616,6 @@ class BoardControllerTest extends ControllerTest {
 
     @Override
     protected Object injectController() {
-        return new BoardController(boardService, boardImageService, authService);
+        return new BoardController(boardService, authService);
     }
 }
