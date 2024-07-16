@@ -10,6 +10,7 @@ import com.example.pro.board.domain.Board;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +25,16 @@ public class BoardService {
 
     @Transactional
     public Board createBoard(BoardSaveDto boardDto, String username, String profile) {
-        Board board = Board.builder()
-                .username(username)
-                .profile(profile)
-                .title(boardDto.getTitle())
-                .content(boardDto.getContent())
-                .build();
-        return boardRepository.save(board);
+        Board board = boardRepository.save(
+                Board.builder()
+                        .username(username)
+                        .profile(profile)
+                        .title(boardDto.getTitle())
+                        .content(boardDto.getContent())
+                        .build()
+        );
+        boardImageService.uploadBoardImage(boardDto.getImages(), board);
+        return board;
     }
 
     public BoardResponseDto makeBoardResponse(Long boardId) {
@@ -46,19 +50,18 @@ public class BoardService {
     }
 
     public BoardCountResponseDto findAllBoards() {
+        long totalCount = boardRepository.count();
         List<Board> boards = boardRepository.findAll();
 
         // 엔티티를 Dto로 변환하는 로직
         List<BoardListResponseDto> responses = boards.stream()
                 .map(BoardListResponseDto::toBoardListDto)
                 .collect(Collectors.toList());
-        long count = boardRepository.count();
-        return new BoardCountResponseDto(responses, count);
+        return new BoardCountResponseDto(responses, totalCount);
     }
 
     public List<Board> searchTitle(String title) {
         return boardRepository.findByTitle(title);
-
     }
 
     @Transactional
@@ -74,6 +77,13 @@ public class BoardService {
 
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
         return BoardUpdateDto.toBoardUpdateDto(board);
+    }
+
+    @Transactional
+    public void updateBoardImages(Long boardId, BoardImageUploadDto dto) {
+        Board board = findBoard(boardId);
+        boardImageService.deleteBoardImage(board);
+        boardImageService.uploadBoardImage(dto.getImages(), board);
     }
 
     @Transactional

@@ -10,12 +10,14 @@ import com.example.pro.auth.utils.CookieUtil;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.pro.auth.domain.UserSession.SESSION_KEY;
+
 
 @RestController
 @RequestMapping("/members")
@@ -37,6 +39,13 @@ public class MemberController {
         return ResponseUtil.success("로그인 성공: " + username);
     }
 
+    @PostMapping("/logout")
+    public BasicResponse<String> signOut(HttpServletRequest request, HttpServletResponse response) {
+        authService.logout();
+        CookieUtil.deleteCookie(request, response, SESSION_KEY);
+        return ResponseUtil.success("로그아웃되었습니다.");
+    }
+
     @PutMapping("/profiles")
     public BasicResponse<String> updateProfile(@ModelAttribute ProfileUpdateRequest request) {
         Member member = authService.loadUser();
@@ -45,8 +54,9 @@ public class MemberController {
     }
 
     @DeleteMapping
-    public BasicResponse<String> quitMember() {
+    public BasicResponse<String> quitMember(HttpServletRequest request, HttpServletResponse response) {
         authService.quit();
+        CookieUtil.deleteCookie(request, response, SESSION_KEY);
         return ResponseUtil.success("탈퇴되었습니다.");
     }
 
