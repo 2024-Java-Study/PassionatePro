@@ -8,6 +8,7 @@ import com.example.pro.auth.service.SessionAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -86,7 +87,7 @@ public class SecurityConfig {
                             antMatcher("/api/test"),
                             antMatcher("/members/signup"),
                             antMatcher("/members/login"),
-                            antMatcher("/boards"),
+                            antMatcher(HttpMethod.GET, "/boards"),
                             antMatcher("/health")
                     ).permitAll()
                     .anyRequest().authenticated();
