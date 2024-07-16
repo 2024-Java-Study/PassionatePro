@@ -18,14 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
 
     private final BoardService boardService;
-    private final BoardImageService boardImageService;
     private final AuthService authService;
 
     @PostMapping
     public BasicResponse<String> create(@ModelAttribute @Valid BoardSaveDto boardDto) {
         Member member = authService.loadUser();
         Board board = boardService.createBoard(boardDto, member.getUsername(), member.getProfile());
-        boardImageService.uploadBoardImage(boardDto.getImages(), board);
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }
 
@@ -55,9 +53,7 @@ public class BoardController {
 
     @PutMapping("/{id}/upload")
     public BasicResponse<String> uploadImage(@ModelAttribute BoardImageUploadDto request, @PathVariable Long id) {
-        Board board = boardService.findBoard(id);
-        boardImageService.deleteBoardImage(board);
-        boardImageService.uploadBoardImage(request.getImages(), board);
-        return ResponseUtil.success("게시물 id: " + id + "번 사진 추가에 성공하였습니다.");
+        boardService.updateBoardImages(id, request);
+        return ResponseUtil.success("사진 수정에 성공하였습니다. 게시물 id: " + id);
     }
 }

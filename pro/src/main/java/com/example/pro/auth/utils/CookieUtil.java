@@ -7,7 +7,10 @@ import org.springframework.util.SerializationUtils;
 
 import java.util.Base64;
 
+import static com.example.pro.auth.domain.UserSession.SESSION_EXPIRED_SECOND;
+
 public class CookieUtil {
+
     public static String getCookieValue(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
@@ -26,9 +29,8 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
-//        cookie.setDomain("localhost");
         cookie.setAttribute("SameSite", "None");
-        cookie.setMaxAge(300);
+        cookie.setMaxAge(SESSION_EXPIRED_SECOND);
 
         response.addCookie(cookie);
     }
