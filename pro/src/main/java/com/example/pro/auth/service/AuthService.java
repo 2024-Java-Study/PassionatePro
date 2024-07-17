@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -54,8 +55,16 @@ public class AuthService {
     }
 
     @Transactional
+    public void logout() {
+        Member member = loadUser();
+        Optional<UserSession> session = sessionRepository.findByUsername(member.getUsername());
+        session.ifPresent(sessionRepository::delete);
+    }
+
+    @Transactional
     public void quit() {
         Member member = loadUser();
+        log.info("login user:{}", member.getUsername());
         memberService.markQuitInWriterInfo(member);
         UserSession session = sessionRepository.findByUsername(member.getUsername())
                 .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED_USER));

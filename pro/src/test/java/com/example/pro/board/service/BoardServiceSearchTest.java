@@ -23,12 +23,14 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceSearchTest {
 
     @Mock BoardRepository boardRepository; // 의존성 주입
+    @Mock BoardImageService boardImageService;
     @Mock FileUploader fileUploader;
     @InjectMocks BoardService boardService;
 
@@ -76,7 +78,7 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.save(any())).thenReturn(board);
-
+        doNothing().when(boardImageService).uploadBoardImage(any(), any());
 
         // then
         assertThat(boardService.createBoard(boardSaveDto, member.getUsername(), any()).getTitle()).isEqualTo("제목");
