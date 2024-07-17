@@ -146,9 +146,9 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.findByTitle(any())).thenReturn(boardWithTitle);
-        List<Board> boardWithTitleList = boardService.searchTitle(title);
+        BoardCountResponseDto dto = boardService.searchTitle(title);
 
         // then
-        assertThat(boardWithTitleList.size()).isEqualTo(1);
+        assertThat(dto.getTotal()).isEqualTo(1);
     }
 }

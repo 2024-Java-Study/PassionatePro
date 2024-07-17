@@ -60,8 +60,15 @@ public class BoardService {
         return new BoardCountResponseDto(responses, totalCount);
     }
 
-    public List<Board> searchTitle(String title) {
-        return boardRepository.findByTitle(title);
+    public BoardCountResponseDto searchTitle(String title) {
+        List<Board> boards = boardRepository.findByTitle(title);
+
+        List<BoardListResponseDto> responses = boards.stream()
+                .map(BoardListResponseDto::toBoardListDto)
+                .collect(Collectors.toList());
+        long count = boards.size();
+
+        return new BoardCountResponseDto(responses, count);
     }
 
     @Transactional

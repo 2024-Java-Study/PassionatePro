@@ -28,8 +28,15 @@ public class BoardController {
     }
 
     @GetMapping // 전체 게시물 조회
-    public BasicResponse<BoardCountResponseDto> findAll() {
-        return ResponseUtil.success(boardService.findAllBoards());
+    public BasicResponse<BoardCountResponseDto> findAll(@RequestParam(required = false) String title) {
+        BoardCountResponseDto dto;
+
+        if (title == null) {
+            dto = boardService.findAllBoards();
+        } else {
+            dto = boardService.searchTitle(title);
+        }
+        return ResponseUtil.success(dto);
     }
 
     @GetMapping("{id}") // 게시물 조회
@@ -56,4 +63,10 @@ public class BoardController {
         boardService.updateBoardImages(id, request);
         return ResponseUtil.success("사진 수정에 성공하였습니다. 게시물 id: " + id);
     }
+//
+//    @GetMapping("/search")
+//    public BasicResponse<BoardCountResponseDto> findByTitle(@RequestParam String title) {
+//        return ResponseUtil.success(boardService.searchTitle(title));
+//    }
+
 }
