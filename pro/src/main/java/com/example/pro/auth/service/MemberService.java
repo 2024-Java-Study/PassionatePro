@@ -1,6 +1,7 @@
 package com.example.pro.auth.service;
 
 import com.example.pro.auth.domain.Member;
+import com.example.pro.auth.dto.MyInfoRequest;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.comment.domain.Comment;
@@ -45,5 +46,14 @@ public class MemberService {
         boards.forEach(Board::removeWriterInfo);
         comments.forEach(Comment::removeWriterInfo);
         replies.forEach(Reply::removeWriterInfo);
+    }
+
+    public MyInfoRequest myPageInfo(Member member) {
+        return MyInfoRequest.builder()
+                .username(member.getUsername())
+                .nickname(member.getNickname())
+                .profile(member.getProfile())
+                .email(member.getEmail())
+                .build();
     }
 }
