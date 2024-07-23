@@ -2,6 +2,7 @@ package com.example.pro.auth.controller;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.dto.LoginRequest;
+import com.example.pro.auth.dto.MyInfoRequest;
 import com.example.pro.auth.dto.ProfileUpdateRequest;
 import com.example.pro.auth.dto.SignUpRequest;
 import com.example.pro.auth.service.AuthService;
@@ -64,5 +65,12 @@ public class MemberController {
     public BasicResponse<String> requestMe() {
         String username = authService.loadUser().getUsername();
         return ResponseUtil.success("인증된 사용자: " + username);
+    }
+
+    @GetMapping("/profiles")
+    public BasicResponse<MyInfoRequest> myPageInfo() {
+        Member member = authService.loadUser();
+        MyInfoRequest myInfoRequest = memberService.myPageInfo(member);
+        return ResponseUtil.success(myInfoRequest);
     }
 }
