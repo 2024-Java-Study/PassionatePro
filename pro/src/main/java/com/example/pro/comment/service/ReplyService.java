@@ -52,6 +52,8 @@ public class ReplyService {
     private void deleteParentWithSiblings(Comment parent) {
         if (parent.countExistingReplies() == 0) {
             replyRepository.deleteAll(parent.getReplies());
+        }
+        if (parent.isDeleted()) {
             commentRepository.delete(parent);
         }
     }
