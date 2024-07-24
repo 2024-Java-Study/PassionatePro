@@ -57,8 +57,7 @@ public class AuthService {
     @Transactional
     public void logout() {
         Member member = loadUser();
-        Optional<UserSession> session = sessionRepository.findByUsername(member.getUsername());
-        session.ifPresent(sessionRepository::delete);
+        sessionRepository.deleteAllByUsername(member.getUsername());
     }
 
     @Transactional
@@ -66,9 +65,7 @@ public class AuthService {
         Member member = loadUser();
         log.info("login user:{}", member.getUsername());
         memberService.markQuitInWriterInfo(member);
-        UserSession session = sessionRepository.findByUsername(member.getUsername())
-                .orElseThrow(() -> new AuthException(AuthErrorCode.UNAUTHORIZED_USER));
-        sessionRepository.delete(session);
+        sessionRepository.deleteAllByUsername(member.getUsername());
         memberRepository.delete(member);
     }
 

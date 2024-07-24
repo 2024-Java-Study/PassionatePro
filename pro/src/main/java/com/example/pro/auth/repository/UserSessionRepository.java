@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface UserSessionRepository extends JpaRepository<UserSession, String> {
 
     Optional<UserSession> findByUsername(String username);
+
+    void deleteAllByUsername(String username);
 }
