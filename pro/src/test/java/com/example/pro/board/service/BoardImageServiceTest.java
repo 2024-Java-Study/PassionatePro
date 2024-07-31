@@ -66,6 +66,9 @@ class BoardImageServiceTest {
                 .build();
     }
 
+/**
+ * uploadImage는 클래스 내부에서만 사용해서 private 메서드로 수정하면 테스트를 따로 진행할 필요가 없다.
+ *
     @Test
     @DisplayName("[성공] 사진 저장")
     public void saveImages() throws Exception {
@@ -83,7 +86,7 @@ class BoardImageServiceTest {
         multipartFiles.add(file);
 
         // then
-        assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(urlList.size());
+        assertThat(boardImageService.uploadImages(multipartFiles).size()).isEqualTo(urlList.size());
     }
 
     @Test
@@ -95,8 +98,9 @@ class BoardImageServiceTest {
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
         // then
-        assertThat(boardImageService.saveImages(multipartFiles).size()).isEqualTo(0);
+        assertThat(boardImageService.uploadImages(multipartFiles).size()).isEqualTo(0);
     }
+    **/
 
     @Test
     @DisplayName("[실패] 사진 저장 - 게시물을 찾을 수 없는 경우")
@@ -113,7 +117,7 @@ class BoardImageServiceTest {
 
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardImageService.uploadBoardImage(dto.getImages(), board);
+            boardImageService.saveBoardImages(dto.getImages(), board);
         });
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());
     }
@@ -131,7 +135,7 @@ class BoardImageServiceTest {
 
         // when
         when(boardImageRepository.save(any())).thenReturn(boardImage);
-        boardImageService.uploadBoardImage(dto.getImages(), board);
+        boardImageService.saveBoardImages(dto.getImages(), board);
 
         // then
         assertThat(board.getImage().size()).isEqualTo(boardImageList.size());
