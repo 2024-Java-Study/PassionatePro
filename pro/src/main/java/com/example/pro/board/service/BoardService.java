@@ -33,7 +33,7 @@ public class BoardService {
                         .content(boardDto.getContent())
                         .build()
         );
-        boardImageService.uploadBoardImage(boardDto.getImages(), board);
+        boardImageService.saveBoardImages(boardDto.getImages(), board);
         return board;
     }
 
@@ -90,7 +90,7 @@ public class BoardService {
     public void updateBoardImages(Long boardId, BoardImageUploadDto dto) {
         Board board = findBoard(boardId);
         boardImageService.deleteBoardImage(board);
-        boardImageService.uploadBoardImage(dto.getImages(), board);
+        boardImageService.saveBoardImages(dto.getImages(), board);
     }
 
     @Transactional

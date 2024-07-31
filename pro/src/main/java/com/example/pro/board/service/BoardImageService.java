@@ -23,27 +23,15 @@ public class BoardImageService {
     static final String BOARD_KEY = "boards/";
     private final BoardImageRepository boardImageRepository;
 
-    public List<String> saveImages(List<MultipartFile> images) {
-        List<String> urlList = new ArrayList<>();
-
-        if (images != null && !images.isEmpty()) {
-            for (MultipartFile image : images) {
-                String url = fileUploader.uploadFile(image, BOARD_KEY);
-                urlList.add(url);
-            }
-        }
-        return urlList;
-    }
-
     @Transactional
-    public void uploadBoardImage(List<MultipartFile> file, Board board) {
+    public void saveBoardImages(List<MultipartFile> files, Board board) {
 
         // 사진 업로드 -> 리스트 형태의 url
-        List<String> urlList = saveImages(file);
+        List<String> urls = uploadImages(files);
         List<BoardImage> boardImages = new ArrayList<>();
 
-        if (!(urlList == null) && !urlList.isEmpty()) {
-            for (String url : urlList) {
+        if (!urls.isEmpty()) {
+            for (String url : urls) {
                 BoardImage boardImage = BoardImage.builder()
                         .board(board)
                         .url(url)
@@ -57,6 +45,18 @@ public class BoardImageService {
         else board.uploadFile(boardImages);
     }
 
+    private List<String> uploadImages(List<MultipartFile> images) {
+        List<String> urlList = new ArrayList<>();
+
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                String url = fileUploader.uploadFile(image, BOARD_KEY);
+                urlList.add(url);
+            }
+        }
+        return urlList;
+    }
+
     public List<String> getImageUrls(Board board) {
         List<BoardImage> boardImages = findBoardImages(board);
         List<String> urls = new ArrayList<>();
@@ -66,7 +66,7 @@ public class BoardImageService {
         return urls;
     }
 
-    public List<BoardImage> findBoardImages (Board board) {
+    private List<BoardImage> findBoardImages (Board board) {
         return board.getImage();
     }
 
