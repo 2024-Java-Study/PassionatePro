@@ -78,7 +78,7 @@ public class BoardServiceSearchTest {
 
         // when
         when(boardRepository.save(any())).thenReturn(board);
-        doNothing().when(boardImageService).uploadBoardImage(any(), any());
+        doNothing().when(boardImageService).saveBoardImages(any(), any());
 
         // then
         assertThat(boardService.createBoard(boardSaveDto, member.getUsername(), any()).getTitle()).isEqualTo("제목");

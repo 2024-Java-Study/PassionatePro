@@ -4,7 +4,6 @@ import com.example.pro.auth.domain.Member;
 import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.*;
-import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.common.response.BasicResponse;
 import com.example.pro.common.response.ResponseUtil;
@@ -28,8 +27,7 @@ public class BoardController {
     }
 
     @GetMapping // 전체 게시물 조회
-    public BasicResponse<BoardCountResponseDto> findAll(@RequestParam(required = false) String title) {
-
+    public BasicResponse<BoardCountResponseDto> findAll() {
         return ResponseUtil.success(boardService.findAllBoards());
     }
 
