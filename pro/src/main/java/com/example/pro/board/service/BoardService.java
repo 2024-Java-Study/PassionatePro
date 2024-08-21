@@ -72,7 +72,7 @@ public class BoardService {
     }
 
     @Transactional
-    public Long updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
+    public Board updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
         // 게시물 수정 로직
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
@@ -85,7 +85,7 @@ public class BoardService {
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
         boardImageService.updateBoardImage(boardUpdateDto.getImages(), board);
 
-        return board.getId();
+        return board;
     }
 
     @Transactional

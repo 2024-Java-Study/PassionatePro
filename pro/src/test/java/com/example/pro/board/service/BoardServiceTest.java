@@ -23,13 +23,16 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceTest {
 
     @Mock BoardRepository boardRepository;
+    @Mock BoardImageService boardImageService;
     @InjectMocks BoardService boardService;
 
     public BoardSaveDto boardSaveDto;
@@ -62,11 +65,13 @@ public class BoardServiceTest {
                 .username(member.getUsername())
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
+                .image(null)
                 .build();
 
         boardUpdateDto = BoardUpdateDto.builder()
                 .title("제목(new)")
                 .content("내용(new)")
+                .images(fileList)
                 .build();
     }
 
@@ -79,9 +84,9 @@ public class BoardServiceTest {
 
         // when
         when(boardRepository.findById(anyLong())).thenReturn(Optional.ofNullable(board));
+        doNothing().when(boardImageService).updateBoardImage(any(), any());
 
-
-        BoardUpdateDto updateBoard = boardService.updateBoard(boardId, boardUpdateDto, member);
+        Board updateBoard = boardService.updateBoard(boardId, boardUpdateDto, member);
 
         // then
         assertThat(updateBoard.getTitle()).isEqualTo("제목(new)");
