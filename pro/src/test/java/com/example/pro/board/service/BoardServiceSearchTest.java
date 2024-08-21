@@ -3,6 +3,7 @@ package com.example.pro.board.service;
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardCountResponseDto;
+import com.example.pro.board.dto.BoardResponseDto;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
@@ -110,12 +111,12 @@ public class BoardServiceSearchTest {
         
         // when
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
-        Board findBoard = boardService.findBoard(1L);
+        BoardResponseDto boardResponse = boardService.makeBoardResponse(1L);
 
         // then
-        assertThat(findBoard.getTitle()).isEqualTo("제목");
-        assertThat(findBoard.getWriterInfo().getUsername()).isEqualTo("ajeong7038");
-        assertThat(findBoard.getWriterInfo().getProfile()).isEqualTo(member.getProfile());
+        assertThat(boardResponse.getTitle()).isEqualTo("제목");
+        assertThat(boardResponse.getUsername()).isEqualTo("ajeong7038");
+        assertThat(boardResponse.getProfile()).isEqualTo(member.getProfile());
     }
 
     
@@ -128,7 +129,7 @@ public class BoardServiceSearchTest {
 
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {
-            boardService.findBoard(1L);
+            boardService.makeBoardResponse(1L);
         });
 
         assertThat(BoardErrorCode.BOARD_NOT_FOUND).isEqualTo(exception.getCode());

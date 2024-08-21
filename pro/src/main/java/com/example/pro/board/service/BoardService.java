@@ -38,13 +38,12 @@ public class BoardService {
     }
 
     public BoardResponseDto makeBoardResponse(Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        Board board = findBoard(boardId);
         List<String> urls = boardImageService.getImageUrls(board);
         return BoardResponseDto.toBoardResponse(board, urls);
     }
 
-    public Board findBoard(Long boardId) {
+    private Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
     }
@@ -74,8 +73,7 @@ public class BoardService {
     @Transactional
     public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
         // 게시물 수정 로직
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        Board board = findBoard(boardId);
 
         // 권한 확인 로직
         if (!member.getUsername().equals(board.getWriterInfo().getUsername())) {
