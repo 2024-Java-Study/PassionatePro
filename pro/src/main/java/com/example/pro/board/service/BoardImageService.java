@@ -80,4 +80,10 @@ public class BoardImageService {
         List<BoardImage> boardImageList = boardImageRepository.findByBoardId(board.getId());
         boardImageRepository.deleteAll(boardImageList);
     }
+
+    @Transactional
+    public void updateBoardImage (List<MultipartFile> files, Board board) {
+        deleteBoardImage(board);
+        saveBoardImages(files, board);
+    }
 }
