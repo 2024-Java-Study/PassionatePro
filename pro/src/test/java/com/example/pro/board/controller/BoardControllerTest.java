@@ -370,54 +370,73 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 수정")
     void update() throws Exception{
-        BoardUpdateDto dto = BoardUpdateDto.builder()
+
+        List<MultipartFile> fileList = new ArrayList<>();
+        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
+        fileList.add(image);
+
+        Board updateBoard = Board.builder()
+                .username(member.getUsername())
                 .title("제목(new)")
                 .content("내용(new)")
                 .build();
 
-        when(boardService.updateBoard(any(), any(), any())).thenReturn(dto);
-        String body = objectMapper.writeValueAsString(dto);
+        MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
 
-        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+        builder.with(request -> {
+            request.setMethod("PUT");
+            request.setRequestURI("/boards/" + boardId);
+            return request;
+        });
+
+        when(boardService.updateBoard(any(), any(), any())).thenReturn(updateBoard);
+
+        ResultActions perform = mockMvc.perform(builder
+                        .file(image)
+                .param("title", "제목")
+                .param("content", "내용")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
         );
 
         perform.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.response.title").value("제목(new)"))
-                .andExpect(jsonPath("$.response.content").value("내용(new)"));
+                .andExpect(jsonPath("$.response", containsString("게시물 수정에 성공하였습니다. 게시물 id : ")));
 
-        // 문서 자동화
         perform.andDo(document("board update-success",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 resource(ResourceSnippetParameters.builder()
-                        .tag("API-Board")
+                        .tag("API-Board") // 큰 태그
                         .responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("응답 정상 여부"),
-                                fieldWithPath("response.title").type(JsonFieldType.STRING).description("제목 업데이트 여부 검사"),
-                                fieldWithPath("response.content").type(JsonFieldType.STRING).description("내용 업데이트 여부 검사")
-                        ).build())
-        ));
+                                fieldWithPath("response").type(JsonFieldType.STRING).description("응답 메시지")
+                        ).build())));
     }
 
     @Test
     @DisplayName("[실패] 게시물 수정 - 유효성 검사 실패")
     void updateWithTitleAndContentNull() throws Exception{
-        BoardUpdateDto dto = BoardUpdateDto.builder()
-                .title(null)
-                .content("  ")
-                .build();
 
-        String body = objectMapper.writeValueAsString(dto);
+        List<MultipartFile> fileList = new ArrayList<>();
+        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
+        fileList.add(image);
 
-        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+        MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
+
+        builder.with(request -> {
+            request.setMethod("PUT");
+            request.setRequestURI("/boards/" + boardId);
+            return request;
+        });
+
+        ResultActions perform = mockMvc.perform(builder
+                .file(image)
+                .param("title", " ")
+                .param("content", " ")
                 .contentType(MediaType.APPLICATION_JSON)
                 .locale(Locale.KOREA)
-                .content(body)
         );
 
         perform.andDo(print())
@@ -449,17 +468,26 @@ class BoardControllerTest extends ControllerTest {
     @DisplayName("[실패] 게시물 수정 - 게시물을 찾을 수 없는 경우")
     void updateWithBoardNull() throws Exception{
 
-        BoardUpdateDto dto = BoardUpdateDto.builder()
-                .title("null")
-                .content("null")
-                .build();
+        List<MultipartFile> fileList = new ArrayList<>();
+        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
+        fileList.add(image);
 
         when(boardService.updateBoard(any(), any(), any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        String body = objectMapper.writeValueAsString(dto);
 
-        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+        MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
+
+        builder.with(request -> {
+            request.setMethod("PUT");
+            request.setRequestURI("/boards/" + boardId);
+            return request;
+        });
+
+        ResultActions perform = mockMvc.perform(builder
+                .file(image)
+                .param("title", "제목")
+                .param("content", "내용")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
+                .locale(Locale.KOREA)
         );
 
         perform.andDo(print())
@@ -488,17 +516,27 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[실패] 게시물 수정 - 권한이 없는 경우")
     void updateBoardNotValidation() throws Exception {
-        BoardUpdateDto dto = BoardUpdateDto.builder()
-                .title("제목")
-                .content("내용")
-                .build();
+
+        List<MultipartFile> fileList = new ArrayList<>();
+        MockMultipartFile image = new MockMultipartFile("image", "imageFile.jpeg", MediaType.IMAGE_JPEG_VALUE, "<<jpeg data>>".getBytes());
+        fileList.add(image);
 
         when(boardService.updateBoard(any(), any(), any())).thenThrow(new BoardUnauthorizedException(BoardErrorCode.UNAUTHORIZED_BOARD));
-        String body = objectMapper.writeValueAsString(dto);
 
-        ResultActions perform = mockMvc.perform(put("/boards/{id}", boardId)
+        MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
+
+        builder.with(request -> {
+            request.setMethod("PUT");
+            request.setRequestURI("/boards/" + boardId);
+            return request;
+        });
+
+        ResultActions perform = mockMvc.perform(builder
+                .file(image)
+                .param("title", "제목")
+                .param("content", "내용")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
+                .locale(Locale.KOREA)
         );
 
         perform.andDo(print())

@@ -42,7 +42,12 @@ public class BoardImageService {
         }
 
         if (board == null) throw new BoardException(BoardErrorCode.BOARD_NOT_FOUND);
-        else board.uploadFile(boardImages);
+
+        if (findBoardImages(board) != null) {
+            boardImages.addAll(findBoardImages(board));
+        }
+
+        board.uploadFile(boardImages);
     }
 
     private List<String> uploadImages(List<MultipartFile> images) {
@@ -79,5 +84,50 @@ public class BoardImageService {
 
         List<BoardImage> boardImageList = boardImageRepository.findByBoardId(board.getId());
         boardImageRepository.deleteAll(boardImageList);
+    }
+
+    @Transactional
+    public void updateBoardImage (List<MultipartFile> files, List<String> fileLists, Board board) {
+
+        List<BoardImage> boardImages = findBoardImages(board);
+
+        if (fileLists == null || fileLists.isEmpty()) {
+            deleteFileAndImage(boardImages);
+        } else if (boardImages.size() != fileLists.size()) {
+            List<BoardImage> deleteBoardImages = findImageToDelete(fileLists, boardImages);
+            deleteFileAndImage(deleteBoardImages);
+        }
+
+        if (files != null && !files.isEmpty()) {
+            saveBoardImages(files, board);
+        }
+    }
+
+    private void deleteFileAndImage(List<BoardImage> deleteBoardImages) {
+        deleteS3File(deleteBoardImages);
+        boardImageRepository.deleteAll(deleteBoardImages);
+    }
+
+
+    private List<BoardImage> findImageToDelete (List<String> fileLists, List<BoardImage> boardImages) {
+        List<BoardImage> deleteBoardImages = new ArrayList<>();
+
+        List<BoardImage> fileImageList = fileLists.stream()
+                .map(boardImageRepository::findByUrl)
+                .toList();
+
+        for (BoardImage boardImage : boardImages) {
+            if (!fileImageList.contains(boardImage)) {
+                deleteBoardImages.add(boardImage);
+            }
+        }
+        return deleteBoardImages;
+    }
+
+
+    private void deleteS3File(List<BoardImage> deleteBoardImages) {
+        deleteBoardImages.forEach(
+                image -> fileUploader.deleteFile(image.getUrl(), BOARD_KEY)
+        );
     }
 }
