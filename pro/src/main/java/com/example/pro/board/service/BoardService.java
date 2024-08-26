@@ -83,7 +83,7 @@ public class BoardService {
         }
 
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
-        boardImageService.updateBoardImage(boardUpdateDto.getImages(), board);
+        boardImageService.updateBoardImage(boardUpdateDto.getImages(), boardUpdateDto.getImageUrls(), board);
 
         return board;
     }

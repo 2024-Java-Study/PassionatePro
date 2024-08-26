@@ -84,7 +84,7 @@ public class BoardServiceTest {
 
         // when
         when(boardRepository.findById(anyLong())).thenReturn(Optional.ofNullable(board));
-        doNothing().when(boardImageService).updateBoardImage(any(), any());
+        doNothing().when(boardImageService).updateBoardImage(any(), any(), any());
 
         Board updateBoard = boardService.updateBoard(boardId, boardUpdateDto, member);
 

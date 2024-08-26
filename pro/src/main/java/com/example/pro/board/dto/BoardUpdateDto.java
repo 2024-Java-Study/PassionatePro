@@ -18,14 +18,17 @@ public class BoardUpdateDto {
     public String title;
     @NotBlank
     public String content;
+
     private List<MultipartFile> images;
+    private List<String> imageUrls;
 
 
     @Builder
-    public BoardUpdateDto(String title, String content, List<MultipartFile> images) {
+    public BoardUpdateDto(String title, String content, List<MultipartFile> images, List<String> imageUrls) {
         this.title = title;
         this.content = content;
         this.images = images;
+        this.imageUrls = imageUrls;
     }
 
 
