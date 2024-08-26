@@ -70,7 +70,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardUpdateDto updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
+    public Board updateBoard(Long boardId, BoardUpdateDto boardUpdateDto, Member member) {
         // 게시물 수정 로직
         Board board = findBoard(boardId);
 
@@ -80,7 +80,9 @@ public class BoardService {
         }
 
         board.updateBoard(boardUpdateDto.getTitle(), boardUpdateDto.getContent());
-        return BoardUpdateDto.toBoardUpdateDto(board);
+        boardImageService.updateBoardImage(boardUpdateDto.getImages(), boardUpdateDto.getImageUrls(), board);
+
+        return board;
     }
 
     @Transactional

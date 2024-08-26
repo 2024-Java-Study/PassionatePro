@@ -37,10 +37,10 @@ public class BoardController {
     }
 
     @PutMapping("/{id}") // 게시물 수정
-    public BasicResponse<BoardUpdateDto> update(@PathVariable Long id, @RequestBody @Valid BoardUpdateDto boardUpdateDto) {
+    public BasicResponse<String> update(@PathVariable Long id, @ModelAttribute @Valid BoardUpdateDto boardUpdateDto) {
         Member member = authService.loadUser();
-        BoardUpdateDto board = boardService.updateBoard(id, boardUpdateDto, member);
-        return ResponseUtil.success(board);
+        Board board = boardService.updateBoard(id, boardUpdateDto, member);
+        return ResponseUtil.success("게시물 수정에 성공하였습니다. 게시물 id : " + board.getId());
     }
 
     @DeleteMapping("/{id}") // 게시물 삭제
