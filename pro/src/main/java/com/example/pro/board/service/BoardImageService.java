@@ -75,6 +75,12 @@ public class BoardImageService {
         return board.getImage();
     }
 
+    private List<Long> findBoardImageIds (Board board) {
+        return findBoardImages(board).stream()
+                .map(BoardImage::getId)
+                .toList();
+    }
+
     @Transactional
     public void deleteBoardImage (Board board) {
         List<String> urlList = getImageUrls(board);
@@ -89,12 +95,13 @@ public class BoardImageService {
     @Transactional
     public void updateBoardImage (List<MultipartFile> files, List<String> fileLists, Board board) {
 
+        List<Long> boardImageIds = findBoardImageIds(board); // id 값으로 받아오기
         List<BoardImage> boardImages = findBoardImages(board);
 
         if (fileLists == null || fileLists.isEmpty()) {
             deleteFileAndImage(boardImages);
-        } else if (boardImages.size() != fileLists.size()) {
-            List<BoardImage> deleteBoardImages = findImageToDelete(fileLists, boardImages);
+        } else if (boardImageIds.size() != fileLists.size()) {
+            List<BoardImage> deleteBoardImages = findImageToDelete(fileLists, boardImageIds);
             deleteFileAndImage(deleteBoardImages);
         }
 
@@ -109,19 +116,24 @@ public class BoardImageService {
     }
 
 
-    private List<BoardImage> findImageToDelete (List<String> fileLists, List<BoardImage> boardImages) {
-        List<BoardImage> deleteBoardImages = new ArrayList<>();
+    private List<BoardImage> findImageToDelete (List<String> fileLists, List<Long> boardImageIds) {
+        List<Long> deleteBoardImageIds = new ArrayList<>();
 
-        List<BoardImage> fileImageList = fileLists.stream()
+        List<Long> fileImageList = fileLists.stream()
                 .map(boardImageRepository::findByUrl)
+                .map(BoardImage::getId)
                 .toList();
 
-        for (BoardImage boardImage : boardImages) {
-            if (!fileImageList.contains(boardImage)) {
-                deleteBoardImages.add(boardImage);
+        for (Long boardImageId : boardImageIds) {
+            if (!fileImageList.contains(boardImageId)) {
+                deleteBoardImageIds.add(boardImageId);
             }
         }
-        return deleteBoardImages;
+
+        return deleteBoardImageIds.stream()
+                .map(id -> boardImageRepository.findById(id)
+                        .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND)))
+                .toList();
     }
 
 
