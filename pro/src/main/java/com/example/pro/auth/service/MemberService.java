@@ -6,7 +6,6 @@ import com.example.pro.board.domain.Board;
 import com.example.pro.board.repository.BoardRepository;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
-import com.example.pro.comment.domain.WriterInfo;
 import com.example.pro.comment.repository.CommentRepository;
 import com.example.pro.comment.repository.ReplyRepository;
 import com.example.pro.files.FileUploader;

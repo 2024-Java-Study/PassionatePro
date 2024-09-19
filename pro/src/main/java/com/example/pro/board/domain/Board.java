@@ -1,8 +1,8 @@
 package com.example.pro.board.domain;
 
-import com.example.pro.comment.domain.WriterInfo;
 import com.example.pro.common.BaseTimeEntity;
 import com.example.pro.comment.domain.Comment;
+import com.example.pro.common.BooleanTypeConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
@@ -22,10 +22,12 @@ public class Board extends BaseTimeEntity {
     @Column(name = "board_id")
     private Long id;
 
-    private WriterInfo writerInfo;
+    private String writerName;
+    @Convert(converter = BooleanTypeConverter.class)
+    private boolean writerQuitYn;
     
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
-    private List<BoardImage> image = new ArrayList<>();
+    private List<BoardImage> image;
 
     @Column(length = 50, nullable = false)
     @NotBlank
@@ -43,12 +45,13 @@ public class Board extends BaseTimeEntity {
      */
     // 유저 추가
     @Builder
-    public Board (Long id, String username, String profile, String title, String content, List<BoardImage> image) {
+    public Board (Long id, String writerName, String title, String content, List<BoardImage> image) {
         this.id = id;
-        this.writerInfo = new WriterInfo(username, profile,false);
+        this.writerName = writerName;
+        this.writerQuitYn = false;
         this.title = title;
         this.content = content;
-        this.image = image;
+        this.image = image == null? new ArrayList<>(): image;
     }
 
     public void updateBoard(String title, String content) {
@@ -57,7 +60,8 @@ public class Board extends BaseTimeEntity {
     }
 
     public void removeWriterInfo() {
-        this.writerInfo = new WriterInfo("탈퇴한 사용자", null, true);
+        this.writerName = "탈퇴한 사용자";
+        this.writerQuitYn = true;
     }
 
     public void uploadFile(List<BoardImage> images) {

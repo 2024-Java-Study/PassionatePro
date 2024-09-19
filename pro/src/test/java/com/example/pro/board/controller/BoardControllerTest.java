@@ -13,6 +13,8 @@ import com.example.pro.board.service.BoardImageService;
 import com.example.pro.board.service.BoardService;
 import com.example.pro.comment.domain.Comment;
 import com.example.pro.comment.domain.Reply;
+import com.example.pro.comment.dto.CommentQueryObject;
+import com.example.pro.comment.dto.ReplyQueryObject;
 import com.example.pro.docs.ControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,9 +29,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,8 +57,8 @@ class BoardControllerTest extends ControllerTest {
     static MultipartFile file = new MockMultipartFile("ForTest", new byte[]{});
     static Long boardId = 1L;
 
-    static Board board;
-    static Member member;
+    Board board;
+    Member member;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -71,10 +71,9 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         board = Board.builder()
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("제목")
                 .content("내용")
-                .image(null)
                 .build();
     }
 
@@ -93,15 +92,14 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         board = Board.builder()
-                .username(member.getUsername())
-                .profile(member.getProfile())
+                .writerName(member.getUsername())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .build();
 
 
         when(authService.loadUser()).thenReturn(member);
-        when(boardService.createBoard(any(), any(), any())).thenReturn(board);
+        when(boardService.createBoard(any(), any())).thenReturn(board);
 
         MockMultipartHttpServletRequestBuilder builder = multipart("/boards");
 
@@ -229,45 +227,42 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 조회")
     void findById() throws Exception{
-        List<String> urlList = new ArrayList<>();
-        urlList.add("https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg");
+        List<String> urlList = List.of(URL);
 
         BoardImage boardImage = BoardImage.builder()
                 .board(board)
-                .url(urlList.get(0))
+                .url(URL)
                 .build();
 
-        List<BoardImage> boardImages = new ArrayList<>();
-        boardImages.add(boardImage);
-
-        board = Board.builder()
-                .username(member.getUsername())
-                .profile(URL)
-                .title("제목")
-                .content("내용")
-                .image(boardImages)
-                .build();
+        board.getImage().add(boardImage);
 
         Comment comment = Comment.builder()
-                .username("comment-writer")
-                .profile(URL)
+                .username("ajeong7038")
                 .id(1L)
                 .board(board)
                 .content("댓글1 빈칸 아님")
                 .build();
 
+        List<CommentQueryObject> comments = new ArrayList<>();
+        comments.add( new CommentQueryObject(comment, null));
+
         Reply reply = Reply.builder()
                 .id(1L)
-                .username("reply-writer")
-                .profile(URL)
+                .writerName("ajeong7038")
                 .content("답글 내용 빈칸 아님")
                 .comment(comment)
                 .build();
 
+        ReplyQueryObject replyObject = new ReplyQueryObject(reply, null);
+        Map<Long, List<ReplyQueryObject>> repliesMap = new HashMap<>();
+        repliesMap.put(1L, List.of(replyObject));
+
+        BoardQueryDto boardQueryDto = new BoardQueryDto(new BoardWithWriterDto(board, null), board.getImage(), comments, repliesMap);
+
         board.getComments().add(comment);
         comment.getReplies().add(reply);
 
-        BoardResponseDto dto = BoardResponseDto.toBoardResponse(board, urlList);
+        BoardResponseDto dto = BoardResponseDto.toBoardResponse(boardQueryDto);
 
         when(boardService.makeBoardResponse(any())).thenReturn(dto);
 
@@ -287,16 +282,16 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()))
                 .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()))
                 .andExpect(jsonPath("$.response.comments[0].commentId").value(comment.getId()))
-                .andExpect(jsonPath("$.response.comments[0].username").value(comment.getWriter().getUsername()))
-                .andExpect(jsonPath("$.response.comments[0].profile").value(comment.getWriter().getProfile()))
-                .andExpect(jsonPath("$.response.comments[0].isWriterQuit").value(comment.getWriter().isMemberQuit()))
+                .andExpect(jsonPath("$.response.comments[0].username").value(comment.getWriterName()))
+                .andExpect(jsonPath("$.response.comments[0].profile").value(member.getProfile()))
+                .andExpect(jsonPath("$.response.comments[0].isWriterQuit").value(comment.isWriterQuitYn()))
                 .andExpect(jsonPath("$.response.comments[0].content").value(comment.getContent()))
                 .andExpect(jsonPath("$.response.comments[0].createdAt").value(comment.getCreatedAt()))
                 .andExpect(jsonPath("$.response.comments[0].isDeleted").value(false))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].replyId").value(reply.getId()))
-                .andExpect(jsonPath("$.response.comments[0].replies[0].username").value(reply.getWriter().getUsername()))
-                .andExpect(jsonPath("$.response.comments[0].replies[0].profile").value(reply.getWriter().getProfile()))
-                .andExpect(jsonPath("$.response.comments[0].replies[0].isWriterQuit").value(reply.getWriter().isMemberQuit()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].username").value(reply.getWriterName()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].profile").value(member.getProfile()))
+                .andExpect(jsonPath("$.response.comments[0].replies[0].isWriterQuit").value(reply.isWriterQuitYn()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].content").value(reply.getContent()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].createdAt").value(reply.getCreatedAt()))
                 .andExpect(jsonPath("$.response.comments[0].replies[0].isDeleted").value(false));
@@ -376,7 +371,7 @@ class BoardControllerTest extends ControllerTest {
         fileList.add(image);
 
         Board updateBoard = Board.builder()
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("제목(new)")
                 .content("내용(new)")
                 .build();

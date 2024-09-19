@@ -53,7 +53,7 @@ class ReplyServiceTest {
 
         board = Board.builder()
                 .id(1L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -67,7 +67,7 @@ class ReplyServiceTest {
 
         reply = Reply.builder()
                 .id(1L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .comment(comment)
                 .content("댓글에 대한 답글 빈칸 아님")
                 .build();
@@ -80,7 +80,7 @@ class ReplyServiceTest {
     @DisplayName("[성공] 대댓글 작성")
     void saveReply() {
         when(commentRepository.findById(any())).thenReturn(Optional.ofNullable(comment));
-        when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member.getUsername(), member.getProfile(), comment));
+        when(replyRepository.save(any())).thenReturn(saveRequest.toReply(member.getUsername(), comment));
         Reply reply = replyService.saveReply(member.getUsername(), member.getProfile(), saveRequest);
 
         assertThat(reply.getContent()).isEqualTo("대댓글 내용");
@@ -138,7 +138,7 @@ class ReplyServiceTest {
     void hardDeleteReply() {
         Reply reply2 = Reply.builder()
                 .id(2L)
-                .username("other-reply-writer")
+                .writerName("other-reply-writer")
                 .comment(comment)
                 .content("댓글에 대한 답글2 빈칸 아님")
                 .build();
@@ -157,7 +157,7 @@ class ReplyServiceTest {
     void softDeleteReply() {
         Reply reply2 = Reply.builder()
                 .id(2L)
-                .username("other-reply-writer")
+                .writerName("other-reply-writer")
                 .comment(comment)
                 .content("댓글에 대한 답글2 빈칸 아님")
                 .build();

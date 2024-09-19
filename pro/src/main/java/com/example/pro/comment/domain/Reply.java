@@ -23,8 +23,10 @@ public class Reply extends BaseTimeEntity {
     @Column(name = "reply_id")
     private Long id;
 
-    @Embedded
-    private WriterInfo writer;
+    private String writerName;
+
+    @Convert(converter = BooleanTypeConverter.class)
+    private boolean writerQuitYn;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "comment_id", nullable = false)
@@ -41,9 +43,10 @@ public class Reply extends BaseTimeEntity {
      * 생성 메서드
      */
     @Builder
-    public Reply(Long id, String username, String profile, Comment comment, String content) {
+    public Reply(Long id, String writerName, Comment comment, String content) {
         this.id = id;
-        this.writer = new WriterInfo(username, profile, false);
+        this.writerName = writerName;
+        this.writerQuitYn = false;
         this.comment = comment;
         this.content = Validator.validString(content);
         this.isDeleted = false;
@@ -53,7 +56,8 @@ public class Reply extends BaseTimeEntity {
         this.content = content;
     }
     public void removeWriterInfo() {
-        this.writer = new WriterInfo("탈퇴한 사용자", null, true);
+        this.writerName = "탈퇴한 사용자";
+        this.writerQuitYn = true;
     }
 
     public void deleteReply() {

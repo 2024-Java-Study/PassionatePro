@@ -2,12 +2,15 @@ package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
 import com.example.pro.board.domain.Board;
-import com.example.pro.board.dto.BoardCountResponseDto;
-import com.example.pro.board.dto.BoardResponseDto;
-import com.example.pro.board.dto.BoardSaveDto;
+import com.example.pro.board.domain.BoardImage;
+import com.example.pro.board.dto.*;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
+import com.example.pro.comment.domain.Comment;
+import com.example.pro.comment.domain.Reply;
+import com.example.pro.comment.dto.CommentQueryObject;
+import com.example.pro.comment.dto.ReplyQueryObject;
 import com.example.pro.files.FileUploader;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,13 +31,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceSearchTest {
 
-    @Mock BoardRepository boardRepository; // 의존성 주입
+    @Mock
+    BoardRepository boardRepository; // 의존성 주입
     @Mock BoardImageService boardImageService;
     @Mock FileUploader fileUploader;
     @InjectMocks BoardService boardService;
 
 
-    public static Board board;
+    public Board board;
     public static Member member;
     public BoardSaveDto boardSaveDto;
 
@@ -63,8 +65,7 @@ public class BoardServiceSearchTest {
                 .build();
 
         board = Board.builder()
-                .username(member.getUsername())
-                .profile(member.getProfile())
+                .writerName(member.getUsername())
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
                 .image(null)
@@ -82,8 +83,8 @@ public class BoardServiceSearchTest {
         doNothing().when(boardImageService).saveBoardImages(any(), any());
 
         // then
-        assertThat(boardService.createBoard(boardSaveDto, member.getUsername(), any()).getTitle()).isEqualTo("제목");
-        assertThat(boardService.createBoard(boardSaveDto, member.getUsername(), any()).getWriterInfo().getUsername()).isEqualTo("ajeong7038");
+        assertThat(boardService.createBoard(boardSaveDto, member.getUsername()).getTitle()).isEqualTo("제목");
+        assertThat(boardService.createBoard(boardSaveDto, member.getUsername()).getWriterName()).isEqualTo("ajeong7038");
     }
     
     @Test
@@ -108,9 +109,51 @@ public class BoardServiceSearchTest {
     public void findById() throws Exception {
         // given
         // static board
+
+        List<String> urlList = new ArrayList<>();
+        urlList.add("https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg");
+
+        BoardImage boardImage = BoardImage.builder()
+                .board(board)
+                .url(urlList.get(0))
+                .build();
+
+        List<BoardImage> boardImages = new ArrayList<>();
+        boardImages.add(boardImage);
+
+        board = Board.builder()
+                .writerName(member.getUsername())
+                .title("제목")
+                .content("내용")
+                .image(boardImages)
+                .build();
+
+        Comment comment = Comment.builder()
+                .username("ajeong7038")
+                .id(1L)
+                .board(board)
+                .content("댓글1 빈칸 아님")
+                .build();
+
+        List<CommentQueryObject> comments = new ArrayList<>();
+        comments.add( new CommentQueryObject(comment, null));
+
+        Reply reply = Reply.builder()
+                .id(1L)
+                .writerName("ajeong7038")
+                .content("답글 내용 빈칸 아님")
+                .comment(comment)
+                .build();
+
+        Map<Long, List<ReplyQueryObject>> repliesMap = new HashMap<>();
+
+        BoardQueryDto boardQueryDto = new BoardQueryDto(new BoardWithWriterDto(board, null), boardImages, comments, repliesMap);
+
+        board.getComments().add(comment);
+        comment.getReplies().add(reply);
         
         // when
-        when(boardRepository.findById(any())).thenReturn(Optional.of(board));
+        when(boardRepository.findBoardDtoByBoardId(any())).thenReturn(boardQueryDto);
         BoardResponseDto boardResponse = boardService.makeBoardResponse(1L);
 
         // then
@@ -125,7 +168,7 @@ public class BoardServiceSearchTest {
     public void findByIdException() throws Exception {
 
         // boardRepository 동작 명시
-        when(boardRepository.findById(any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
+        when(boardRepository.findBoardDtoByBoardId(any())).thenThrow(new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
 
         // then
         BoardException exception = assertThrows(BoardException.class, () -> {

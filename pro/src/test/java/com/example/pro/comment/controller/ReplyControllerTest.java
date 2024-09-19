@@ -66,7 +66,7 @@ class ReplyControllerTest extends ControllerTest {
 
         board = Board.builder()
                 .id(1L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -80,7 +80,7 @@ class ReplyControllerTest extends ControllerTest {
 
         reply = Reply.builder()
                 .id(1L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .comment(comment)
                 .content("대딧글 내용")
                 .build();

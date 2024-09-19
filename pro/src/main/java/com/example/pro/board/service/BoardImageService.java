@@ -82,7 +82,7 @@ public class BoardImageService {
             fileUploader.deleteFile(url, BOARD_KEY);
         }
 
-        List<BoardImage> boardImageList = boardImageRepository.findByBoardId(board.getId());
+        List<BoardImage> boardImageList = boardImageRepository.findAllByBoardId(board.getId());
         boardImageRepository.deleteAll(boardImageList);
     }
 

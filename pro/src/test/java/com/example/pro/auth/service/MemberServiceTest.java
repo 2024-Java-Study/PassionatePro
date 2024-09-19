@@ -73,7 +73,7 @@ class MemberServiceTest {
     void markQuitWriterInfo() {
         Board board = Board.builder()
                 .id(1L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -87,7 +87,7 @@ class MemberServiceTest {
 
         Reply reply = Reply.builder()
                 .id(1L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .comment(comment)
                 .content("대댓글 내용")
                 .build();
@@ -103,8 +103,8 @@ class MemberServiceTest {
         when(replyRepository.findAllByWriter(any())).thenReturn(replies);
 
         memberService.markQuitInWriterInfo(member);
-        assertThat(board.getWriterInfo().isMemberQuit()).isTrue();
-        assertThat(comment.getWriter().isMemberQuit()).isTrue();
-        assertThat(reply.getWriter().isMemberQuit()).isTrue();
+        assertThat(board.isWriterQuitYn()).isTrue();
+        assertThat(comment.isWriterQuitYn()).isTrue();
+        assertThat(reply.isWriterQuitYn()).isTrue();
     }
 }

@@ -28,7 +28,7 @@ class CommentSaveRequestDtoTest {
 
         board = Board.builder()
                 .id(2L)
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -37,7 +37,7 @@ class CommentSaveRequestDtoTest {
     @Test
     @DisplayName("[실패] board 식별자가 일치하지 않는 경우")
     void dtoToEntity() {
-        assertThatThrownBy(() -> request.toComment(board, member.getUsername(), member.getProfile()))
+        assertThatThrownBy(() -> request.toComment(board, member.getUsername()))
                 .isInstanceOf(CommentException.class)
                 .hasMessageContaining("요청한 게시글 id와 일치하지 않습니다.");
     }

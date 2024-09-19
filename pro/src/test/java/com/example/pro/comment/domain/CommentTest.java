@@ -17,7 +17,7 @@ class CommentTest {
     void init() {
         board = Board.builder()
                 .id(1L)
-                .username("board-writer")
+                .writerName("board-writer")
                 .title("게시글 제목")
                 .content("게시글 내용")
                 .build();
@@ -33,14 +33,14 @@ class CommentTest {
 
         reply1 = Reply.builder()
                 .id(1L)
-                .username("board-writer")
+                .writerName("board-writer")
                 .comment(comment)
                 .content("대댓글 내용1 빈칸 아님")
                 .build();
 
         reply2 = Reply.builder()
                 .id(2L)
-                .username("comment-writer")
+                .writerName("comment-writer")
                 .comment(comment)
                 .content("대댓글 내용2 빈칸 아님")
                 .build();

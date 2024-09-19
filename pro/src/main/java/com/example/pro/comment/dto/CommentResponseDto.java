@@ -4,40 +4,43 @@ import com.example.pro.comment.domain.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public record CommentResponseDto(Long commentId, String profile, String username, Boolean isWriterQuit, String content, String createdAt, Boolean isDeleted, List<ReplyResponseDto> replies) {
 
-    public static List<CommentResponseDto> makeDtoCollection(List<Comment> comments) {
+    public static List<CommentResponseDto> makeDtoCollection(List<CommentQueryObject> comments, Map<Long, List<ReplyQueryObject>> repliesMap) {
         List<CommentResponseDto> responses = new ArrayList<>();
-        comments.forEach(comment ->
-            responses.add(comment.isDeleted() ? toDeletedCommentDto(comment) : toCommentDto(comment))
+        comments.forEach(queryObject ->
+            responses.add(queryObject.comment().isDeleted() ?
+                    toDeletedCommentDto(queryObject, repliesMap.get(queryObject.comment().getId())==null? new ArrayList<>(): repliesMap.get(queryObject.comment().getId()))
+                    : toCommentDto(queryObject, repliesMap.get(queryObject.comment().getId())==null? new ArrayList<>(): repliesMap.get(queryObject.comment().getId())))
         );
         return responses;
     }
 
-    private static CommentResponseDto toCommentDto(Comment comment) {
+    private static CommentResponseDto toCommentDto(CommentQueryObject response, List<ReplyQueryObject> replies) {
         return new CommentResponseDto(
-                comment.getId(),
-                comment.getWriter().getProfile(),
-                comment.getWriter().getUsername(),
-                comment.getWriter().isMemberQuit(),
-                comment.getContent(),
-                comment.getCreatedAt(),
-                comment.isDeleted(),
-                ReplyResponseDto.makeRepliesResponse(comment.getReplies())
+                response.comment().getId(),
+                response.writerProfile(),
+                response.comment().getWriterName(),
+                response.comment().isWriterQuitYn(),
+                response.comment().getContent(),
+                response.comment().getCreatedAt(),
+                response.comment().isDeleted(),
+                ReplyResponseDto.makeRepliesResponse(replies)
         );
     }
 
-    private static CommentResponseDto toDeletedCommentDto(Comment comment) {
+    private static CommentResponseDto toDeletedCommentDto(CommentQueryObject response, List<ReplyQueryObject> replies) {
         return new CommentResponseDto(
-                comment.getId(),
+                response.comment().getId(),
                 null,
                 "(삭제)",
                 true,
                 "삭제된 댓글입니다.",
-                comment.getCreatedAt(),
-                comment.isDeleted(),
-                ReplyResponseDto.makeRepliesResponse(comment.getReplies())
+                response.comment().getCreatedAt(),
+                response.comment().isDeleted(),
+                ReplyResponseDto.makeRepliesResponse(replies)
         );
     }
 }

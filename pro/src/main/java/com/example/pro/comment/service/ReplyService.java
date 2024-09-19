@@ -25,7 +25,7 @@ public class ReplyService {
     public Reply saveReply(String writerName, String writerProfile, ReplySaveRequestDto saveRequestDto) {
         Comment comment = commentRepository.findById(saveRequestDto.commentId())
                 .orElseThrow(() -> new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
-        Reply reply = replyRepository.save(saveRequestDto.toReply(writerName, writerProfile, comment));
+        Reply reply = replyRepository.save(saveRequestDto.toReply(writerName, comment));
         comment.getReplies().add(reply);
         return reply;
     }
@@ -67,7 +67,7 @@ public class ReplyService {
     }
 
     private void checkPermission(String sessionUsername, Reply reply) {
-        if (! sessionUsername.equals(reply.getWriter().getUsername())) {
+        if (! sessionUsername.equals(reply.getWriterName())) {
             throw new ReplyException(ReplyErrorCode.REPLY_ACCESS_NOT_PERMITTED);
         }
     }

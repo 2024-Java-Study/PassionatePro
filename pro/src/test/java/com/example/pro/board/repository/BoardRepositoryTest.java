@@ -31,7 +31,7 @@ class BoardRepositoryTest {
                 .build();
 
         board = Board.builder()
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .build();
@@ -59,7 +59,7 @@ class BoardRepositoryTest {
         // given
         // static board
         Board boardWithNull = Board.builder()
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title(null)
                 .content(null)
                 .build();
@@ -77,7 +77,7 @@ class BoardRepositoryTest {
         // given
         // static board
         Board board1 = Board.builder()
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title("제목")
                 .content("내용")
                 .build();

@@ -34,8 +34,8 @@ public class BoardListResponseDto {
     public static BoardListResponseDto toBoardListDto(Board board) {
         return BoardListResponseDto.builder()
                 .id(board.getId())
-                .username(board.getWriterInfo().getUsername())
-                .isWriterQuit(board.getWriterInfo().isMemberQuit())
+                .username(board.getWriterName())
+                .isWriterQuit(board.isWriterQuitYn())
                 .title(board.getTitle())
                 .createdAt(String.valueOf(board.getCreatedAt()))
                 .content(board.getContent())

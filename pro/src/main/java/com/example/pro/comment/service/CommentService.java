@@ -24,10 +24,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Comment saveComment(String writerName, String writerProfile, CommentSaveRequestDto saveRequest) {
+    public Comment saveComment(String writerName, CommentSaveRequestDto saveRequest) {
         Board board = boardRepository.findById(saveRequest.boardId())
                 .orElseThrow(() -> new BoardException(BoardErrorCode.BOARD_NOT_FOUND));
-        Comment comment = commentRepository.save(saveRequest.toComment(board, writerName, writerProfile));
+        Comment comment = commentRepository.save(saveRequest.toComment(board, writerName));
         board.getComments().add(comment);
         return comment;
     }
@@ -59,7 +59,7 @@ public class CommentService {
     }
 
     private void checkPermission(String sessionUsername, Comment comment) {
-        if (! comment.getWriter().getUsername().equals(sessionUsername))
+        if (! comment.getWriterName().equals(sessionUsername))
             throw new CommentException(CommentErrorCode.COMMENT_ACCESS_NOT_PERMITTED);
     }
 

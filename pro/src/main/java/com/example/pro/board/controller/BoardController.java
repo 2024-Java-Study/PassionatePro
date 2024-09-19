@@ -22,7 +22,7 @@ public class BoardController {
     @PostMapping
     public BasicResponse<String> create(@ModelAttribute @Valid BoardSaveDto boardDto) {
         Member member = authService.loadUser();
-        Board board = boardService.createBoard(boardDto, member.getUsername(), member.getProfile());
+        Board board = boardService.createBoard(boardDto, member.getUsername());
         return ResponseUtil.success("게시물 생성에 성공하였습니다. 게시물id: " + board.getId());
     }
 

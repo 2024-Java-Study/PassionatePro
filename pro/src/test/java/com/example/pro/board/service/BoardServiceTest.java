@@ -1,14 +1,12 @@
 package com.example.pro.board.service;
 
 import com.example.pro.auth.domain.Member;
-import com.example.pro.auth.service.AuthService;
 import com.example.pro.board.domain.Board;
 import com.example.pro.board.dto.BoardSaveDto;
 import com.example.pro.board.dto.BoardUpdateDto;
 import com.example.pro.board.exception.BoardErrorCode;
 import com.example.pro.board.exception.BoardException;
 import com.example.pro.board.repository.BoardRepository;
-import com.example.pro.files.FileUploader;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,7 +29,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class) // Junit5 & Mockito 연동
 public class BoardServiceTest {
 
-    @Mock BoardRepository boardRepository;
+    @Mock
+    BoardRepository boardRepository;
     @Mock BoardImageService boardImageService;
     @InjectMocks BoardService boardService;
 
@@ -62,7 +61,7 @@ public class BoardServiceTest {
                 .build();
 
         board = Board.builder()
-                .username(member.getUsername())
+                .writerName(member.getUsername())
                 .title(boardSaveDto.getTitle())
                 .content(boardSaveDto.getContent())
                 .image(null)

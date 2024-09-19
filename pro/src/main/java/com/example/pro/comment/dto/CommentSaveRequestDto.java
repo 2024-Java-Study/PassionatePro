@@ -11,14 +11,13 @@ import java.util.Objects;
 
 public record CommentSaveRequestDto(@NotNull Long boardId, @NotBlank String content) {
 
-    public Comment toComment(Board board, String username, String profile) {
+    public Comment toComment(Board board, String username) {
         if (!Objects.equals(boardId, board.getId()))
             throw new CommentException(CommentErrorCode.COMMENT_ID_NOT_MATCH);
 
         return Comment.builder()
                 .board(board)
                 .username(username)
-                .profile(profile)
                 .content(this.content)
                 .build();
     }
