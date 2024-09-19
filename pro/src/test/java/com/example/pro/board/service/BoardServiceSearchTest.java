@@ -136,7 +136,7 @@ public class BoardServiceSearchTest {
                 .build();
 
         List<CommentQueryObject> comments = new ArrayList<>();
-        comments.add( new CommentQueryObject(comment, null));
+        comments.add( new CommentQueryObject(comment, ""));
 
         Reply reply = Reply.builder()
                 .id(1L)
@@ -147,7 +147,7 @@ public class BoardServiceSearchTest {
 
         Map<Long, List<ReplyQueryObject>> repliesMap = new HashMap<>();
 
-        BoardQueryDto boardQueryDto = new BoardQueryDto(new BoardWithWriterDto(board, null), boardImages, comments, repliesMap);
+        BoardQueryDto boardQueryDto = new BoardQueryDto(new BoardWithWriterDto(board, ""), boardImages, comments, repliesMap);
 
         board.getComments().add(comment);
         comment.getReplies().add(reply);

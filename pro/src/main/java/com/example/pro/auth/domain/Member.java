@@ -28,6 +28,7 @@ public class Member extends BaseTimeEntity {
     private String password;
     @NotNull
     private String nickname;
+    @NotNull
     private String profile;
     @NotNull
     private String email;
@@ -41,6 +42,7 @@ public class Member extends BaseTimeEntity {
         this.password = validString(password);
         this.nickname = validString(nickname);
         this.email = validEmail(email);
+        this.profile = "";
         this.role = Role.USER;
     }
 

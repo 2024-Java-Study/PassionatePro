@@ -227,7 +227,6 @@ class BoardControllerTest extends ControllerTest {
     @Test
     @DisplayName("[성공] 게시물 조회")
     void findById() throws Exception{
-        List<String> urlList = List.of(URL);
 
         BoardImage boardImage = BoardImage.builder()
                 .board(board)
@@ -244,7 +243,7 @@ class BoardControllerTest extends ControllerTest {
                 .build();
 
         List<CommentQueryObject> comments = new ArrayList<>();
-        comments.add( new CommentQueryObject(comment, null));
+        comments.add( new CommentQueryObject(comment, ""));
 
         Reply reply = Reply.builder()
                 .id(1L)
@@ -253,11 +252,11 @@ class BoardControllerTest extends ControllerTest {
                 .comment(comment)
                 .build();
 
-        ReplyQueryObject replyObject = new ReplyQueryObject(reply, null);
+        ReplyQueryObject replyObject = new ReplyQueryObject(reply, "");
         Map<Long, List<ReplyQueryObject>> repliesMap = new HashMap<>();
         repliesMap.put(1L, List.of(replyObject));
 
-        BoardQueryDto boardQueryDto = new BoardQueryDto(new BoardWithWriterDto(board, null), board.getImage(), comments, repliesMap);
+        BoardQueryDto boardQueryDto = new BoardQueryDto(new BoardWithWriterDto(board, ""), board.getImage(), comments, repliesMap);
 
         board.getComments().add(comment);
         comment.getReplies().add(reply);
@@ -280,7 +279,7 @@ class BoardControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.response.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.response.content").value(dto.getContent()))
                 .andExpect(jsonPath("$.response.createdAt").value(dto.getCreatedAt()))
-                .andExpect(jsonPath("$.response.urlList").value(dto.getUrlList()))
+                .andExpect(jsonPath("$.response.urlList[0]").value(URL))
                 .andExpect(jsonPath("$.response.comments[0].commentId").value(comment.getId()))
                 .andExpect(jsonPath("$.response.comments[0].username").value(comment.getWriterName()))
                 .andExpect(jsonPath("$.response.comments[0].profile").value(member.getProfile()))

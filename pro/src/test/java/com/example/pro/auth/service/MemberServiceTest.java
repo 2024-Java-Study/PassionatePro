@@ -61,7 +61,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("[성공] 프로필 이미지 수정")
     void updateProfile() {
-        Assertions.assertNull(member.getProfile());
+        assertThat(member.getProfile()).isBlank();
         when(fileUploader.uploadFile(any(), any()))
                 .thenReturn("https://passionate-pro-bucket.s3.ap-northeast-2.amazonaws.com/test/ForTest.jpeg");
         Member updatedMember = memberService.updateProfile(file, member);
